@@ -276,6 +276,7 @@ def sim_worker(conn, category, object_name, task_name, table_urdf,
                 # Success criteria
                 "task.env.evalSuccessTolerance": 0.01,
                 "task.env.successSteps": 1,
+                "task.env.fixedSizeKeypointReward": True,
                 # Table
                 "task.env.asset.table": str(table_urdf),
                 "task.env.tableResetZ": TABLE_Z,
