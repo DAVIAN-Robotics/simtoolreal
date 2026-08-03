@@ -1,20 +1,20 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <robot name="spoon_spatula">
   <link name="spoon_spatula">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-0.006270055178429121 0.015916978721118264 -0.10937831885728583" rpy="0.5895954536727112 -1.4691604539351009 -1.149993019959096" />
       <geometry>
-        <mesh filename="spoon_spatula.obj" scale="1 1 1"/>
+        <mesh filename="spoon_spatula.obj" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-0.006270055178429121 0.015916978721118264 -0.10937831885728583" rpy="0.5895954536727112 -1.4691604539351009 -1.149993019959096" />
       <geometry>
-        <mesh filename="spoon_spatula.obj" scale="1 1 1"/>
+        <mesh filename="spoon_spatula.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <inertial>
-      <density value="400.0"/>
+      <density value="400.0" />
     </inertial>
   </link>
 </robot>

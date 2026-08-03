@@ -1,23 +1,23 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <robot name="red_brush">
   <link name="red_brush">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-0.032381321358938786 -0.019974640884749775 0.0937218916557084" rpy="1.7352485893597467 1.4947079777153518 1.8008891255609893" />
       <geometry>
-        <mesh filename="red_brush.obj" scale="1 1 1"/>
+        <mesh filename="red_brush.obj" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-0.032381321358938786 -0.019974640884749775 0.0937218916557084" rpy="1.7352485893597467 1.4947079777153518 1.8008891255609893" />
       <geometry>
-        <mesh filename="red_brush.obj" scale="1 1 1"/>
+        <mesh filename="red_brush.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <inertial>
-      <!-- From real world measurement, this is about 115g and CoM is at (0.1, 0, 0) wrt origin -->
-      <!-- This density made this object have the correct mass -->
-      <density value="115.0"/>
-      <origin xyz="0.05 0 0" rpy="0 0 0"/>
+      
+      
+      <density value="115.0" />
+      <origin xyz="0.05 0 0" rpy="0 0 0" />
     </inertial>
   </link>
 </robot>

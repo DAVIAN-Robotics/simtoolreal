@@ -1,20 +1,20 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <robot name="handle_eraser">
   <link name="handle_eraser">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-0.0017249381263605005 0.03419746988684759 0.0034491888507703207" rpy="0.21976746049166254 -1.5623154948252955 -1.749400299770223" />
       <geometry>
-        <mesh filename="handle_eraser.obj" scale="1 1 1"/>
+        <mesh filename="handle_eraser.obj" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-0.0017249381263605005 0.03419746988684759 0.0034491888507703207" rpy="0.21976746049166254 -1.5623154948252955 -1.749400299770223" />
       <geometry>
-        <mesh filename="handle_eraser.obj" scale="1 1 1"/>
+        <mesh filename="handle_eraser.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <inertial>
-      <density value="400.0"/>
+      <density value="400.0" />
     </inertial>
   </link>
 </robot>

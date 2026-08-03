@@ -5,17 +5,17 @@
       <geometry>
         <mesh filename="long_screwdriver.obj" scale="1 1 1" />
       </geometry>
-    </visual>
+    <origin xyz="0.0010011399624955807 0.0019453065798193377 -0.06691125450600015" rpy="1.7856099821656486 -1.534067049109143 2.9496068270662406" /></visual>
     <collision>
       <geometry>
         <mesh filename="long_screwdriver_collision/decomp_0.obj" scale="1 1 1" />
       </geometry>
-    </collision>
+    <origin xyz="0.0010011399624955807 0.0019453065798193377 -0.06691125450600015" rpy="1.7856099821656486 -1.534067049109143 2.9496068270662406" /></collision>
     <collision>
       <geometry>
         <mesh filename="long_screwdriver_collision/decomp_1.obj" scale="1 1 1" />
       </geometry>
-    </collision>
+    <origin xyz="0.0010011399624955807 0.0019453065798193377 -0.06691125450600015" rpy="1.7856099821656486 -1.534067049109143 2.9496068270662406" /></collision>
     <inertial>
       <origin xyz="0.04 0.0 0.0" rpy="0 0 0" />
       <mass value="0.101" />

@@ -2,31 +2,31 @@
 <robot name="flat_eraser">
   <link name="flat_eraser">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.00010873054418469863 -1.7508541250415434e-05 -0.03500923254463601" rpy="-3.053656797065886 -1.5700827321336441 1.4860180059097252" />
       <geometry>
         <mesh filename="flat_eraser.obj" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.00010873054418469863 -1.7508541250415434e-05 -0.03500923254463601" rpy="-3.053656797065886 -1.5700827321336441 1.4860180059097252" />
       <geometry>
         <mesh filename="flat_eraser_collision/decomp_0.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.00010873054418469863 -1.7508541250415434e-05 -0.03500923254463601" rpy="-3.053656797065886 -1.5700827321336441 1.4860180059097252" />
       <geometry>
         <mesh filename="flat_eraser_collision/decomp_1.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.00010873054418469863 -1.7508541250415434e-05 -0.03500923254463601" rpy="-3.053656797065886 -1.5700827321336441 1.4860180059097252" />
       <geometry>
         <mesh filename="flat_eraser_collision/decomp_2.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.00010873054418469863 -1.7508541250415434e-05 -0.03500923254463601" rpy="-3.053656797065886 -1.5700827321336441 1.4860180059097252" />
       <geometry>
         <mesh filename="flat_eraser_collision/decomp_3.obj" scale="1 1 1" />
       </geometry>

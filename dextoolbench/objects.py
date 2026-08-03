@@ -1,20 +1,22 @@
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 from typing import Dict, Tuple
 
 import numpy as np
 import trimesh
 
+from dextoolbench.oriented_box import oriented_box
 from isaacgymenvs.utils.utils import get_repo_root_dir
+
+# Reward-space normalization, the same constant both backends use.
+OBJECT_BASE_SIZE = 0.04
 
 
 @dataclass
 class Object:
     urdf_path: Path
     """Path to the object URDF file."""
-
-    scale: Tuple[float, float, float]
-    """Scale of the object's grasp bounding box in x, y, z directions. Note this is not metric scale but scale given to policy."""
 
     need_vhacd: bool
     """Legacy flag (now always False): collision is pre-decomposed offline by
@@ -23,6 +25,17 @@ class Object:
 
     def __post_init__(self):
         assert self.urdf_path.exists(), f"Filepath {self.urdf_path} does not exist"
+
+    @cached_property
+    def scale(self) -> Tuple[float, float, float]:
+        """The object's own bounding box, extents over object_base_size.
+
+        Computed from the mesh by the same routine the procedural pool uses, so
+        an eval object and a training object are described the same way. The
+        URDF is authored in this box's frame, so the box needs no centre.
+        """
+        extents, _ = oriented_box(self.get_object_mesh())
+        return tuple(float(v / OBJECT_BASE_SIZE) for v in extents)
 
     @property
     def decomposed_urdf_path(self) -> Path:
@@ -71,12 +84,6 @@ class Object:
         return mesh
 
 
-def rescale_by_factor(
-    scale: Tuple[float, float, float], factor: float
-) -> Tuple[float, float, float]:
-    return (scale[0] * factor, scale[1] * factor, scale[2] * factor)
-
-
 NAME_TO_OBJECT: Dict[str, Object] = {}
 
 HAMMER_NAME_TO_OBJECT = {
@@ -85,7 +92,6 @@ HAMMER_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/hammer/mallet_hammer/mallet_hammer.urdf"
         ),
-        scale=rescale_by_factor((0.24, 0.03, 0.02), factor=25),
         need_vhacd=False,
     ),
     "claw_hammer": Object(
@@ -93,7 +99,6 @@ HAMMER_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/hammer/claw_hammer/claw_hammer.urdf"
         ),
-        scale=rescale_by_factor((0.10, 0.0225, 0.015), factor=25),
         need_vhacd=False,
     ),
 }
@@ -108,7 +113,6 @@ SCREWDRIVER_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/screwdriver/long_screwdriver/long_screwdriver.urdf"
         ),
-        scale=rescale_by_factor((0.1, 0.03, 0.03), factor=25),
         need_vhacd=False,
     ),
     "short_screwdriver": Object(
@@ -116,7 +120,6 @@ SCREWDRIVER_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/screwdriver/short_screwdriver/short_screwdriver.urdf"
         ),
-        scale=rescale_by_factor((0.07, 0.035, 0.035), factor=25),
         need_vhacd=False,
     ),
 }
@@ -128,7 +131,6 @@ ERASER_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/eraser/handle_eraser/handle_eraser.urdf"
         ),
-        scale=rescale_by_factor((0.09, 0.032, 0.01), factor=25),
         need_vhacd=False,
     ),
     "flat_eraser": Object(
@@ -136,7 +138,6 @@ ERASER_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/eraser/flat_eraser/flat_eraser.urdf"
         ),
-        scale=rescale_by_factor((0.10, 0.028, 0.05), factor=25),
         need_vhacd=False,
     ),
 }
@@ -149,7 +150,6 @@ SPATULA_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/spatula/flat_spatula/flat_spatula.urdf"
         ),
-        scale=rescale_by_factor((0.2, 0.015, 0.0075), factor=25),
         need_vhacd=False,
     ),
     "spoon_spatula": Object(
@@ -157,7 +157,6 @@ SPATULA_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/spatula/spoon_spatula/spoon_spatula.urdf"
         ),
-        scale=rescale_by_factor((0.12, 0.02, 0.02), factor=25),
         need_vhacd=False,
     ),
 }
@@ -169,7 +168,6 @@ MARKER_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/marker/sharpie_marker/sharpie_marker.urdf"
         ),
-        scale=rescale_by_factor((0.085, 0.022, 0.022), factor=25),
         need_vhacd=False,
     ),
     "staples_marker": Object(
@@ -177,7 +175,6 @@ MARKER_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/marker/staples_marker/staples_marker.urdf"
         ),
-        scale=rescale_by_factor((0.12, 0.018, 0.018), factor=25),
         need_vhacd=False,
     ),
 }
@@ -189,7 +186,6 @@ BRUSH_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/brush/red_brush/red_brush.urdf"
         ),
-        scale=rescale_by_factor((0.1, 0.02, 0.015), factor=25),
         need_vhacd=False,
     ),
     "blue_brush": Object(
@@ -197,7 +193,6 @@ BRUSH_NAME_TO_OBJECT = {
             get_repo_root_dir()
             / "assets/urdf/dextoolbench/brush/blue_brush/blue_brush.urdf"
         ),
-        scale=rescale_by_factor((0.12, 0.035, 0.02), factor=25),
         need_vhacd=False,
     ),
 }

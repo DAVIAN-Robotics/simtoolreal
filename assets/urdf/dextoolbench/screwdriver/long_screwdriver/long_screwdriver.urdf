@@ -1,28 +1,28 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <robot name="long_screwdriver">
   <link name="long_screwdriver">
     <contact>
-      <lateral_friction value="0.8"/>
-      <rolling_friction value="0.001"/>
-      <contact_cfm value="0.0"/>
-      <contact_erp value="1.0"/>
+      <lateral_friction value="0.8" />
+      <rolling_friction value="0.001" />
+      <contact_cfm value="0.0" />
+      <contact_erp value="1.0" />
     </contact>
     <inertial>
-      <origin xyz="0.04 0.0 0.0" rpy="0 0 0"/>
-      <mass value="0.101"/>
-      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      <origin xyz="0.04 0.0 0.0" rpy="0 0 0" />
+      <mass value="0.101" />
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001" />
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="long_screwdriver.obj" scale="1 1 1"/>
+        <mesh filename="long_screwdriver.obj" scale="1 1 1" />
       </geometry>
-      <!-- The following material makes the object white in Isaac Gym, so we comment it out. -->
-      <!-- <material name="white"> <color rgba="1. 1. 1. 1."/> </material> -->
-    </visual>
+      
+      
+    <origin xyz="0.0010011399624955807 0.0019453065798193377 -0.06691125450600015" rpy="1.7856099821656486 -1.534067049109143 2.9496068270662406" /></visual>
     <collision>
       <geometry>
-        <mesh filename="long_screwdriver.obj" scale="1 1 1"/>
+        <mesh filename="long_screwdriver.obj" scale="1 1 1" />
       </geometry>
-    </collision>
+    <origin xyz="0.0010011399624955807 0.0019453065798193377 -0.06691125450600015" rpy="1.7856099821656486 -1.534067049109143 2.9496068270662406" /></collision>
   </link>
 </robot>

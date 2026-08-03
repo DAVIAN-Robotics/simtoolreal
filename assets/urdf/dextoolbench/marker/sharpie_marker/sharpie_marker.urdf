@@ -1,20 +1,20 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <robot name="sharpie_marker">
   <link name="sharpie_marker">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-0.0009563128876587737 0.0016572381904644705 0.02817848646252319" rpy="2.628848828860489 1.5209039752966442 -1.4710306457842426" />
       <geometry>
-        <mesh filename="sharpie_marker.obj" scale="1 1 1"/>
+        <mesh filename="sharpie_marker.obj" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-0.0009563128876587737 0.0016572381904644705 0.02817848646252319" rpy="2.628848828860489 1.5209039752966442 -1.4710306457842426" />
       <geometry>
-        <mesh filename="sharpie_marker.obj" scale="1 1 1"/>
+        <mesh filename="sharpie_marker.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <inertial>
-      <density value="400.0"/>
+      <density value="400.0" />
     </inertial>
   </link>
 </robot>

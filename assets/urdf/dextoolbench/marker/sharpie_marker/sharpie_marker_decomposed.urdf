@@ -2,25 +2,25 @@
 <robot name="sharpie_marker">
   <link name="sharpie_marker">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="-0.0009563128876587737 0.0016572381904644705 0.02817848646252319" rpy="2.628848828860489 1.5209039752966442 -1.4710306457842426" />
       <geometry>
         <mesh filename="sharpie_marker.obj" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="-0.0009563128876587737 0.0016572381904644705 0.02817848646252319" rpy="2.628848828860489 1.5209039752966442 -1.4710306457842426" />
       <geometry>
         <mesh filename="sharpie_marker_collision/decomp_0.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="-0.0009563128876587737 0.0016572381904644705 0.02817848646252319" rpy="2.628848828860489 1.5209039752966442 -1.4710306457842426" />
       <geometry>
         <mesh filename="sharpie_marker_collision/decomp_1.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="-0.0009563128876587737 0.0016572381904644705 0.02817848646252319" rpy="2.628848828860489 1.5209039752966442 -1.4710306457842426" />
       <geometry>
         <mesh filename="sharpie_marker_collision/decomp_2.obj" scale="1 1 1" />
       </geometry>

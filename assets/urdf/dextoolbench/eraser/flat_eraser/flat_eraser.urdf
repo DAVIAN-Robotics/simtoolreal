@@ -1,20 +1,20 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <robot name="flat_eraser">
   <link name="flat_eraser">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0.00010873054418469863 -1.7508541250415434e-05 -0.03500923254463601" rpy="-3.053656797065886 -1.5700827321336441 1.4860180059097252" />
       <geometry>
-        <mesh filename="flat_eraser.obj" scale="1 1 1"/>
+        <mesh filename="flat_eraser.obj" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0.00010873054418469863 -1.7508541250415434e-05 -0.03500923254463601" rpy="-3.053656797065886 -1.5700827321336441 1.4860180059097252" />
       <geometry>
-        <mesh filename="flat_eraser.obj" scale="1 1 1"/>
+        <mesh filename="flat_eraser.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <inertial>
-      <density value="400.0"/>
+      <density value="400.0" />
     </inertial>
   </link>
 </robot>

@@ -2,37 +2,37 @@
 <robot name="claw_hammer">
   <link name="claw_hammer">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.0005408888029423374 -0.005037985562603271 0.04512180773832466" rpy="1.7457842581992407 1.566984069862272 1.7455082724064541" />
       <geometry>
         <mesh filename="claw_hammer.obj" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.0005408888029423374 -0.005037985562603271 0.04512180773832466" rpy="1.7457842581992407 1.566984069862272 1.7455082724064541" />
       <geometry>
         <mesh filename="claw_hammer_collision/decomp_0.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.0005408888029423374 -0.005037985562603271 0.04512180773832466" rpy="1.7457842581992407 1.566984069862272 1.7455082724064541" />
       <geometry>
         <mesh filename="claw_hammer_collision/decomp_1.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.0005408888029423374 -0.005037985562603271 0.04512180773832466" rpy="1.7457842581992407 1.566984069862272 1.7455082724064541" />
       <geometry>
         <mesh filename="claw_hammer_collision/decomp_2.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.0005408888029423374 -0.005037985562603271 0.04512180773832466" rpy="1.7457842581992407 1.566984069862272 1.7455082724064541" />
       <geometry>
         <mesh filename="claw_hammer_collision/decomp_3.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
+      <origin xyz="0.0005408888029423374 -0.005037985562603271 0.04512180773832466" rpy="1.7457842581992407 1.566984069862272 1.7455082724064541" />
       <geometry>
         <mesh filename="claw_hammer_collision/decomp_4.obj" scale="1 1 1" />
       </geometry>

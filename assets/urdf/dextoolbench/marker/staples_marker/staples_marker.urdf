@@ -1,20 +1,20 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <robot name="staples_marker">
   <link name="staples_marker">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-5.3416486297790864e-06 -1.733275096261166e-05 0.03855976679264156" rpy="0.928473251912387 1.5687858292804628 3.1361151567659253" />
       <geometry>
-        <mesh filename="staples_marker.obj" scale="1 1 1"/>
+        <mesh filename="staples_marker.obj" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-5.3416486297790864e-06 -1.733275096261166e-05 0.03855976679264156" rpy="0.928473251912387 1.5687858292804628 3.1361151567659253" />
       <geometry>
-        <mesh filename="staples_marker.obj" scale="1 1 1"/>
+        <mesh filename="staples_marker.obj" scale="1 1 1" />
       </geometry>
     </collision>
     <inertial>
-      <density value="400.0"/>
+      <density value="400.0" />
     </inertial>
   </link>
 </robot>

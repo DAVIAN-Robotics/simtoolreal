@@ -5,17 +5,17 @@
       <geometry>
         <mesh filename="mallet_hammer.obj" scale="1 1 1" />
       </geometry>
-    </visual>
+    <origin xyz="0.008621174467644844 -0.009097885943193426 0.08304056493488896" rpy="-0.6619301178305271 1.5215054418214329 2.469927853992478" /></visual>
     <collision>
       <geometry>
         <mesh filename="mallet_hammer_collision/decomp_0.obj" scale="1 1 1" />
       </geometry>
-    </collision>
+    <origin xyz="0.008621174467644844 -0.009097885943193426 0.08304056493488896" rpy="-0.6619301178305271 1.5215054418214329 2.469927853992478" /></collision>
     <collision>
       <geometry>
         <mesh filename="mallet_hammer_collision/decomp_1.obj" scale="1 1 1" />
       </geometry>
-    </collision>
+    <origin xyz="0.008621174467644844 -0.009097885943193426 0.08304056493488896" rpy="-0.6619301178305271 1.5215054418214329 2.469927853992478" /></collision>
     <inertial>
       <origin xyz="0.1 0.0 0.0" rpy="0 0 0" />
       <mass value="0.333" />

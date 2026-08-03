@@ -1,28 +1,28 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <robot name="mallet_hammer">
   <link name="mallet_hammer">
     <contact>
-      <lateral_friction value="0.8"/>
-      <rolling_friction value="0.001"/>
-      <contact_cfm value="0.0"/>
-      <contact_erp value="1.0"/>
+      <lateral_friction value="0.8" />
+      <rolling_friction value="0.001" />
+      <contact_cfm value="0.0" />
+      <contact_erp value="1.0" />
     </contact>
     <inertial>
-      <origin xyz="0.1 0.0 0.0" rpy="0 0 0"/>
-      <mass value="0.333"/>
-      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      <origin xyz="0.1 0.0 0.0" rpy="0 0 0" />
+      <mass value="0.333" />
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001" />
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="mallet_hammer.obj" scale="1 1 1"/>
+        <mesh filename="mallet_hammer.obj" scale="1 1 1" />
       </geometry>
-      <!-- The following material makes the object white in Isaac Gym, so we comment it out. -->
-      <!-- <material name="white"> <color rgba="1. 1. 1. 1."/> </material> -->
-    </visual>
+      
+      
+    <origin xyz="0.008621174467644844 -0.009097885943193426 0.08304056493488896" rpy="-0.6619301178305271 1.5215054418214329 2.469927853992478" /></visual>
     <collision>
       <geometry>
-        <mesh filename="mallet_hammer.obj" scale="1 1 1"/>
+        <mesh filename="mallet_hammer.obj" scale="1 1 1" />
       </geometry>
-    </collision>
+    <origin xyz="0.008621174467644844 -0.009097885943193426 0.08304056493488896" rpy="-0.6619301178305271 1.5215054418214329 2.469927853992478" /></collision>
   </link>
 </robot>

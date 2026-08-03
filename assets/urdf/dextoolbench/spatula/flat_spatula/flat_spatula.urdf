@@ -1,20 +1,20 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <robot name="flat_spatula">
   <link name="flat_spatula">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-0.004100242568404246 -0.005431173241657705 -0.05708981579647257" rpy="-0.9126057182701858 -1.5412852760206572 0.9011335705286324" />
       <geometry>
-        <mesh filename="flat_spatula.obj" scale="1.0 1.0 1.0"/>
+        <mesh filename="flat_spatula.obj" scale="1.0 1.0 1.0" />
       </geometry>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="-0.004100242568404246 -0.005431173241657705 -0.05708981579647257" rpy="-0.9126057182701858 -1.5412852760206572 0.9011335705286324" />
       <geometry>
-        <mesh filename="flat_spatula.obj" scale="1.0 1.0 1.0"/>
+        <mesh filename="flat_spatula.obj" scale="1.0 1.0 1.0" />
       </geometry>
     </collision>
     <inertial>
-      <density value="400"/>
+      <density value="400" />
     </inertial>
   </link>
 </robot>
