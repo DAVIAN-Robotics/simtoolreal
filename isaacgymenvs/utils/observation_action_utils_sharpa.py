@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Literal
 
 import numpy as np
+
+from dextoolbench.oriented_box import CORNER_SIGNS, NUM_CORNERS
 import yourdfpy
 from scipy.spatial.transform import Rotation as R
 
@@ -194,10 +196,10 @@ OBS_NAME_TO_NAMES = {
     "palm_rot": [f"palm_rot_{x}" for x in "xyzw"],
     "object_rot": [f"object_rot_{x}" for x in "xyzw"],
     "keypoints_rel_palm": [
-        f"keypoints_rel_palm_{i}_{x}" for i in range(4) for x in "xyz"
+        f"keypoints_rel_palm_{i}_{x}" for i in range(NUM_CORNERS) for x in "xyz"
     ],
     "keypoints_rel_goal": [
-        f"keypoints_rel_goal_{i}_{x}" for i in range(4) for x in "xyz"
+        f"keypoints_rel_goal_{i}_{x}" for i in range(NUM_CORNERS) for x in "xyz"
     ],
     "fingertip_pos_rel_palm": [
         f"fingertip_rel_pos_{finger}_{x}"
@@ -207,7 +209,7 @@ OBS_NAME_TO_NAMES = {
     "object_scales": [f"object_scales_{x}" for x in "xyz"],
 }
 OBS_NAMES = sum(OBS_NAME_TO_NAMES.values(), [])
-N_OBS = 140
+N_OBS = 164
 assert len(OBS_NAMES) == N_OBS, f"len(OBS_NAMES): {len(OBS_NAMES)}, expected: {N_OBS}"
 
 T_W_R_np = np.eye(4)
@@ -224,9 +226,7 @@ FINGERTIP_OFFSETS_np = np.array(
         [0.02, 0.002, 0],
     ]
 )
-OBJECT_KEYPOINT_OFFSETS_np = np.array(
-    [[1, 1, 1], [1, 1, -1], [-1, -1, 1], [-1, -1, -1]]
-)
+OBJECT_KEYPOINT_OFFSETS_np = np.array(CORNER_SIGNS)
 
 
 def create_urdf_object(
@@ -349,7 +349,7 @@ def compute_observation(
     )
 
     # keypoint positions
-    N_KEYPOINTS = 4
+    N_KEYPOINTS = NUM_CORNERS
     object_keypoint_positions = _compute_keypoint_positions(
         pose=object_pose, scales=object_scales
     )
@@ -654,7 +654,7 @@ def _compute_keypoint_positions(
         / 2
         * scales[:, None]
     )
-    N_KEYPOINTS = 4
+    N_KEYPOINTS = NUM_CORNERS
     assert object_keypoint_offsets.shape == (N, N_KEYPOINTS, 3), (
         f"object_keypoint_offsets.shape: {object_keypoint_offsets.shape}, expected: (N, N_KEYPOINTS, 3)"
     )
@@ -686,10 +686,10 @@ Key transforms:
 
 Robot: iiwa14 arm (7 DOF) + SharPa hand (22 DOF) = 29 DOF total
 
-Observation (140-dim):
+Observation (164-dim):
   joint_pos (29), joint_vel (29), prev_action_targets (29),
   palm_pos (3), palm_rot (4), object_rot (4),
-  keypoints_rel_palm (4x3=12), keypoints_rel_goal (4x3=12),
+  keypoints_rel_palm (8x3=24), keypoints_rel_goal (8x3=24),
   fingertip_pos_rel_palm (5x3=15), object_scales (3)
 
 Action → Joint Position Targets:
@@ -716,7 +716,7 @@ Pseudocode (see rl_policy_node.py for full implementation)
           q=q, qd=qd, prev_action_targets=prev_targets,
           object_pose=object_pose_W, goal_object_pose=goal_pose_W,
           object_scales=object_scales, urdf=urdf, obs_list=obs_list,
-      )  # (1, 140)
+      )  # (1, 164)
 
       # Get action from policy
       action = player.get_normalized_action(obs=obs, deterministic_actions=True)  # (1, 29)

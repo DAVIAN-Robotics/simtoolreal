@@ -17,7 +17,7 @@ from deployment.isaac.isaac_env import create_env
 from deployment.rl_player import RlPlayer
 from isaacgymenvs.utils.utils import get_repo_root_dir
 
-N_OBS = 140
+N_OBS = 164
 N_ACT = 29
 
 
@@ -150,7 +150,6 @@ def main():
             # Success criteria
             "task.env.evalSuccessTolerance": 0.01,
             "task.env.successSteps": 1,
-            "task.env.fixedSizeKeypointReward": True,
             # Initialization
             "task.env.useFixedInitObjectPose": True,
             "task.env.objectStartPose": traj_data["start_pose"],

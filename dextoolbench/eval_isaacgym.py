@@ -123,8 +123,6 @@ class ViserServer:
         # Keypoint spheres (red for object, green for goal)
         self.obj_keypoint_spheres = []
         self.goal_keypoint_spheres = []
-        self.obj_keypoint_spheres_fixed_size = []
-        self.goal_keypoint_spheres_fixed_size = []
         for i in range(self.num_keypoints):
             self.obj_keypoint_spheres.append(
                 self.server.scene.add_icosphere(
@@ -134,22 +132,6 @@ class ViserServer:
             self.goal_keypoint_spheres.append(
                 self.server.scene.add_icosphere(
                     f"/goal_keypoint_{i}", radius=0.01, color=(0, 255, 0)
-                )
-            )
-            self.obj_keypoint_spheres_fixed_size.append(
-                self.server.scene.add_icosphere(
-                    f"/obj_keypoint_{i}_fixed_size",
-                    radius=0.01,
-                    color=(255, 0, 0),
-                    opacity=0.6,
-                )
-            )
-            self.goal_keypoint_spheres_fixed_size.append(
-                self.server.scene.add_icosphere(
-                    f"/goal_keypoint_{i}_fixed_size",
-                    radius=0.01,
-                    color=(0, 255, 0),
-                    opacity=0.6,
                 )
             )
 
@@ -170,29 +152,12 @@ class ViserServer:
             "Show Keypoints", initial_value=True
         )
         self.keypoint_toggle.on_update(lambda _: self._toggle_keypoints())
-        self.keypoint_toggle_fixed_size = self.server.gui.add_checkbox(
-            "Show Keypoints Fixed Size", initial_value=True
-        )
-        self.keypoint_toggle_fixed_size.on_update(
-            lambda _: self._toggle_keypoints_fixed_size()
-        )
-        self.keypoint_toggle_fixed_size.value = (
-            False  # start as True, then set to False to hide them
-        )
 
     def _toggle_keypoints(self):
         """Toggle visibility of keypoint spheres."""
         self.show_keypoints = self.keypoint_toggle.value
         for sphere in self.obj_keypoint_spheres + self.goal_keypoint_spheres:
             sphere.visible = self.show_keypoints
-
-    def _toggle_keypoints_fixed_size(self):
-        """Toggle visibility of keypoint spheres fixed size."""
-        self.show_keypoints_fixed_size = self.keypoint_toggle_fixed_size.value
-        for sphere in (
-            self.obj_keypoint_spheres_fixed_size + self.goal_keypoint_spheres_fixed_size
-        ):
-            sphere.visible = self.show_keypoints_fixed_size
 
     def _toggle_pause(self):
         """Toggle pause state."""
@@ -213,8 +178,6 @@ class ViserServer:
         goal_pose,
         obj_keypoints=None,
         goal_keypoints=None,
-        obj_keypoints_fixed_size=None,
-        goal_keypoints_fixed_size=None,
     ):
         """Update visualization with current state."""
         self.robot.update_cfg(joint_pos)
@@ -229,12 +192,6 @@ class ViserServer:
         if goal_keypoints is not None:
             for i, sphere in enumerate(self.goal_keypoint_spheres):
                 sphere.position = tuple(goal_keypoints[i])
-        if obj_keypoints_fixed_size is not None:
-            for i, sphere in enumerate(self.obj_keypoint_spheres_fixed_size):
-                sphere.position = tuple(obj_keypoints_fixed_size[i])
-        if goal_keypoints_fixed_size is not None:
-            for i, sphere in enumerate(self.goal_keypoint_spheres_fixed_size):
-                sphere.position = tuple(goal_keypoints_fixed_size[i])
 
     def update_progress(
         self, current: int, total: int, timestep: int, control_hz: float = 60.0
@@ -349,8 +306,6 @@ class EvalRunner:
             self.env.goal_pose[0].cpu().numpy(),
             self.env.obj_keypoint_pos[0].cpu().numpy(),
             self.env.goal_keypoint_pos[0].cpu().numpy(),
-            self.env.obj_keypoint_pos_fixed_size[0].cpu().numpy(),
-            self.env.goal_keypoint_pos_fixed_size[0].cpu().numpy(),
         )
 
     def _sim_step(self, timestep: int) -> bool:
@@ -591,7 +546,6 @@ def main():
             # Success criteria
             "task.env.evalSuccessTolerance": 0.01,
             "task.env.successSteps": 1,
-            "task.env.fixedSizeKeypointReward": True,
             # Table
             "task.env.asset.table": str(selected_table_urdf),
             "task.env.tableResetZ": TABLE_Z,

@@ -56,6 +56,7 @@ from pytorch3d.transforms import (
 )
 
 from dextoolbench.objects import NAME_TO_OBJECT
+from dextoolbench.oriented_box import CORNER_SIGNS
 from isaacgymenvs.tasks.base.vec_task import VecTask
 from isaacgymenvs.tasks.simtoolreal.utils import (
     populate_dof_properties,
@@ -617,16 +618,6 @@ class SimToolReal(VecTask):
             device=self.device,
         )
 
-        self.obj_keypoint_pos_fixed_size = torch.zeros(
-            (self.num_envs, self.num_keypoints, 3),
-            dtype=torch.float,
-            device=self.device,
-        )
-        self.goal_keypoint_pos_fixed_size = torch.zeros(
-            (self.num_envs, self.num_keypoints, 3),
-            dtype=torch.float,
-            device=self.device,
-        )
 
         self.object_scale_noise_multiplier = torch.ones(
             (self.num_envs, 3), dtype=torch.float, device=self.device
@@ -641,9 +632,6 @@ class SimToolReal(VecTask):
             self.num_envs, dtype=torch.bool, device=self.device
         )
         self.closest_keypoint_max_dist = -torch.ones(
-            self.num_envs, dtype=torch.float, device=self.device
-        )
-        self.closest_keypoint_max_dist_fixed_size = -torch.ones(
             self.num_envs, dtype=torch.float, device=self.device
         )
         self.prev_total_episode_closest_keypoint_max_dist = torch.zeros(
@@ -1153,10 +1141,7 @@ class SimToolReal(VecTask):
 
     def _object_keypoint_offsets(self):
         return [
-            [1, 1, 1],
-            [1, 1, -1],
-            [-1, -1, 1],
-            [-1, -1, -1],
+            list(c) for c in CORNER_SIGNS
         ]
 
     def _object_start_pose(self, robot_pose, table_pose_dy, table_pose_dz):
@@ -1523,7 +1508,6 @@ class SimToolReal(VecTask):
             near_goal_steps=self.near_goal_steps,
             lifted_object=self.lifted_object,
             closest_keypoint_max_dist=self.closest_keypoint_max_dist,
-            closest_keypoint_max_dist_fixed_size=self.closest_keypoint_max_dist_fixed_size,
             closest_fingertip_dist=self.closest_fingertip_dist,
             furthest_hand_dist=self.furthest_hand_dist,
             prev_targets=self.prev_targets,
@@ -1533,8 +1517,6 @@ class SimToolReal(VecTask):
             reset_goal_buf=self.reset_goal_buf,
             obj_keypoint_pos=self.obj_keypoint_pos,
             goal_keypoint_pos=self.goal_keypoint_pos,
-            obj_keypoint_pos_fixed_size=self.obj_keypoint_pos_fixed_size,
-            goal_keypoint_pos_fixed_size=self.goal_keypoint_pos_fixed_size,
             rewards_episode=self.rewards_episode,
             last_curriculum_update=self.last_curriculum_update,
             rb_forces=self.rb_forces,
@@ -1912,7 +1894,6 @@ class SimToolReal(VecTask):
         table_indices = []
         object_scales = []
         object_keypoint_offsets = []
-        object_keypoint_offsets_fixed_size = []
 
         # Sanity checks
         body_names = self.gym.get_asset_rigid_body_names(robot_asset)
@@ -2095,21 +2076,6 @@ class SimToolReal(VecTask):
                 object_offsets.append(keypoint)
             object_keypoint_offsets.append(object_offsets)
 
-            # We make a version of keypoint offsets that are a fixed size for all objects
-            object_scale_fixed_size = self.cfg["env"]["fixedSize"]
-            assert len(object_scale_fixed_size) == 3, (
-                f"object_scale_fixed_size must be a 3-element list, got {len(object_scale_fixed_size)}"
-            )
-            object_offsets_fixed_size = []
-            for keypoint in self.keypoints_offsets:
-                keypoint_fixed_size = copy(keypoint)
-                for coord_idx in range(3):
-                    keypoint_fixed_size[coord_idx] *= (
-                        object_scale_fixed_size[coord_idx] * self.keypoint_scale / 2
-                    )  # Don't multiply by object_base_size here since it's already metric scale
-                object_offsets_fixed_size.append(keypoint_fixed_size)
-            object_keypoint_offsets_fixed_size.append(object_offsets_fixed_size)
-
             # table object
             table_handle = self.gym.create_actor(
                 env_ptr, table_asset, table_pose, "table_object", i, 0, 0
@@ -2229,9 +2195,6 @@ class SimToolReal(VecTask):
         self.object_keypoint_offsets = to_torch(
             object_keypoint_offsets, dtype=torch.float, device=self.device
         )
-        self.object_keypoint_offsets_fixed_size = to_torch(
-            object_keypoint_offsets_fixed_size, dtype=torch.float, device=self.device
-        )
 
         self.joint_names = self.gym.get_actor_joint_names(env_ptr, robot_actor)
         props = self.gym.get_actor_dof_properties(env_ptr, robot_actor)
@@ -2349,35 +2312,21 @@ class SimToolReal(VecTask):
         self.lifted_object = lifted_object
         return lifting_rew, lift_bonus_rew, lifted_object
 
-    def _keypoint_reward(self, lifted_object: Tensor) -> Tuple[Tensor, Tensor]:
+    def _keypoint_reward(self, lifted_object: Tensor) -> Tensor:
         # this is positive if we got closer, negative if we're further away
         max_keypoint_deltas = self.closest_keypoint_max_dist - self.keypoints_max_dist
-        max_keypoint_deltas_fixed_size = (
-            self.closest_keypoint_max_dist_fixed_size
-            - self.keypoints_max_dist_fixed_size
-        )
 
         # update the values if we got closer to the target
         self.closest_keypoint_max_dist = torch.minimum(
             self.closest_keypoint_max_dist, self.keypoints_max_dist
         )
-        self.closest_keypoint_max_dist_fixed_size = torch.minimum(
-            self.closest_keypoint_max_dist_fixed_size,
-            self.keypoints_max_dist_fixed_size,
-        )
 
         # clip between zero and +inf to turn deltas into rewards
         max_keypoint_deltas = torch.clip(max_keypoint_deltas, 0, 100)
-        max_keypoint_deltas_fixed_size = torch.clip(
-            max_keypoint_deltas_fixed_size, 0, 100
-        )
 
         # administer reward only when we already lifted an object from the table
         # to prevent the situation where the agent just rolls it around the table
-        keypoint_rew = max_keypoint_deltas * lifted_object
-        keypoint_rew_fixed_size = max_keypoint_deltas_fixed_size * lifted_object
-
-        return keypoint_rew, keypoint_rew_fixed_size
+        return max_keypoint_deltas * lifted_object
 
     def _action_penalties(self) -> Tuple[Tensor, Tensor]:
         kuka_actions_penalty = (
@@ -2566,19 +2515,12 @@ class SimToolReal(VecTask):
         fingertip_delta_rew, hand_delta_penalty = self._distance_delta_rewards(
             lifted_object
         )
-        keypoint_rew, keypoint_rew_fixed_size = self._keypoint_reward(lifted_object)
-        if self.cfg["env"]["fixedSizeKeypointReward"]:
-            keypoint_rew = keypoint_rew_fixed_size
+        keypoint_rew = self._keypoint_reward(lifted_object)
 
         keypoint_success_tolerance = self.success_tolerance * self.keypoint_scale
 
         # noinspection PyTypeChecker
         near_goal: Tensor = self.keypoints_max_dist <= keypoint_success_tolerance
-        near_goal_fixed_size: Tensor = (
-            self.keypoints_max_dist_fixed_size <= keypoint_success_tolerance
-        )
-        if self.cfg["env"]["fixedSizeKeypointReward"]:
-            near_goal = near_goal_fixed_size
 
         if self.cfg["env"]["forceConsecutiveNearGoalSteps"]:
             # If near_goal is True (1): (steps + 1) * 1 = Increment
@@ -2992,19 +2934,9 @@ class SimToolReal(VecTask):
                 )
             )
 
-            self.obj_keypoint_pos_fixed_size[:, i] = self.object_pos + quat_rotate(
-                self.object_rot, self.object_keypoint_offsets_fixed_size[:, i]
-            )
-            self.goal_keypoint_pos_fixed_size[:, i] = self.goal_pos + quat_rotate(
-                self.goal_rot, self.object_keypoint_offsets_fixed_size[:, i]
-            )
-
         self.keypoints_rel_goal = self.obj_keypoint_pos - self.goal_keypoint_pos
         self.observed_keypoints_rel_goal = (
             self.observed_obj_keypoint_pos - self.goal_keypoint_pos
-        )
-        self.keypoints_rel_goal_fixed_size = (
-            self.obj_keypoint_pos_fixed_size - self.goal_keypoint_pos_fixed_size
         )
 
         palm_center_repeat = self.palm_center_pos.unsqueeze(1).repeat(
@@ -3016,15 +2948,9 @@ class SimToolReal(VecTask):
         )
 
         self.keypoint_distances_l2 = torch.norm(self.keypoints_rel_goal, dim=-1)
-        self.keypoint_distances_l2_fixed_size = torch.norm(
-            self.keypoints_rel_goal_fixed_size, dim=-1
-        )
 
         # furthest keypoint from the goal
         self.keypoints_max_dist = self.keypoint_distances_l2.max(dim=-1).values
-        self.keypoints_max_dist_fixed_size = self.keypoint_distances_l2_fixed_size.max(
-            dim=-1
-        ).values
 
         # this is the closest the keypoint had been to the target in the current episode (for the furthest keypoint of all)
         # make sure we initialize this value before using it for obs or rewards
@@ -3032,11 +2958,6 @@ class SimToolReal(VecTask):
             self.closest_keypoint_max_dist < 0.0,
             self.keypoints_max_dist,
             self.closest_keypoint_max_dist,
-        )
-        self.closest_keypoint_max_dist_fixed_size = torch.where(
-            self.closest_keypoint_max_dist_fixed_size < 0.0,
-            self.keypoints_max_dist_fixed_size,
-            self.closest_keypoint_max_dist_fixed_size,
         )
 
     def populate_obs_and_states_buffers(self) -> None:
@@ -3091,10 +3012,6 @@ class SimToolReal(VecTask):
         obs_dict["closest_keypoint_max_dist"] = (
             self.closest_keypoint_max_dist.unsqueeze(-1)
         )
-        if self.cfg["env"]["fixedSizeKeypointReward"]:
-            obs_dict["closest_keypoint_max_dist"] = (
-                self.closest_keypoint_max_dist_fixed_size.unsqueeze(-1)
-            )
 
         # closest distance between a fingertip and an object achieved since last target reset
         # this should help the critic predict the anticipated fingertip reward
@@ -3367,7 +3284,6 @@ class SimToolReal(VecTask):
                 torch.zeros_like(self.closest_keypoint_max_dist[env_ids]),
             )
             self.closest_keypoint_max_dist[env_ids] = -1
-            self.closest_keypoint_max_dist_fixed_size[env_ids] = -1
 
     def reset_object_pose(
         self, env_ids: Tensor, reset_buf_idxs=None, tensor_reset=True
@@ -4574,15 +4490,11 @@ class SimToolReal(VecTask):
             sphere_pose.r = gymapi.Quat(0, 0, 0, 1)
             YELLOW = (1, 1, 0)
             WHITE = (1, 1, 1)
-            BLACK = (0, 0, 0)
             sphere_geom = gymutil.WireframeSphereGeometry(
                 0.01, 8, 8, sphere_pose, color=YELLOW
             )
             sphere_geom_white = gymutil.WireframeSphereGeometry(
                 0.02, 8, 8, sphere_pose, color=WHITE
-            )
-            sphere_geom_black = gymutil.WireframeSphereGeometry(
-                0.01, 8, 8, sphere_pose, color=BLACK
             )
 
             palm_center_pos_cpu = self.palm_center_pos.cpu().numpy()
@@ -4680,12 +4592,6 @@ class SimToolReal(VecTask):
             for j in range(self.num_keypoints):
                 keypoint_pos_cpu = self.obj_keypoint_pos[:, j].cpu().numpy()
                 goal_keypoint_pos_cpu = self.goal_keypoint_pos[:, j].cpu().numpy()
-                keypoint_pos_fixed_size_cpu = (
-                    self.obj_keypoint_pos_fixed_size[:, j].cpu().numpy()
-                )
-                goal_keypoint_pos_fixed_size_cpu = (
-                    self.goal_keypoint_pos_fixed_size[:, j].cpu().numpy()
-                )
 
                 for i in range(self.num_envs):
                     keypoint_transform = gymapi.Transform()
@@ -4706,30 +4612,6 @@ class SimToolReal(VecTask):
                         self.viewer,
                         self.envs[i],
                         goal_keypoint_transform,
-                    )
-
-                    keypoint_transform_fixed_size = gymapi.Transform()
-                    keypoint_transform_fixed_size.p = gymapi.Vec3(
-                        *keypoint_pos_fixed_size_cpu[i]
-                    )
-                    gymutil.draw_lines(
-                        sphere_geom_black,
-                        self.gym,
-                        self.viewer,
-                        self.envs[i],
-                        keypoint_transform_fixed_size,
-                    )
-
-                    goal_keypoint_transform_fixed_size = gymapi.Transform()
-                    goal_keypoint_transform_fixed_size.p = gymapi.Vec3(
-                        *goal_keypoint_pos_fixed_size_cpu[i]
-                    )
-                    gymutil.draw_lines(
-                        sphere_geom_black,
-                        self.gym,
-                        self.viewer,
-                        self.envs[i],
-                        goal_keypoint_transform_fixed_size,
                     )
 
             # Visualize object and goal pose

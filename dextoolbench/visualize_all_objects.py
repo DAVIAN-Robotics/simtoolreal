@@ -17,6 +17,7 @@ import trimesh
 import viser
 
 from dextoolbench.objects import NAME_TO_OBJECT
+from dextoolbench.oriented_box import CORNER_SIGNS
 from isaacgymenvs.utils.utils import get_repo_root_dir
 
 # Base directory for all dextoolbench assets
@@ -32,12 +33,7 @@ KEYPOINT_COLOR = (255, 50, 50)  # Bright red for keypoints
 KEYPOINT_RADIUS = 0.0  # Radius of keypoint spheres
 KEYPOINT_SCALE = 1.0  # Scale factor for keypoint positions (1.0 = at handle corners)
 OBJECT_BASE_SIZE = 0.04  # Base size used in training
-KEYPOINT_OFFSETS = [
-    [1, 1, 1],
-    [1, 1, -1],
-    [-1, -1, 1],
-    [-1, -1, -1],
-]  # Normalized keypoint positions (corners of bounding box)
+KEYPOINT_OFFSETS = [list(c) for c in CORNER_SIGNS]  # all eight box corners
 
 # Tools organized by category (2 per category, displayed side by side)
 # Each row is one category with 2 objects

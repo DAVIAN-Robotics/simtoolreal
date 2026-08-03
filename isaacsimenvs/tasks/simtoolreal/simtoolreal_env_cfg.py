@@ -326,8 +326,6 @@ class RewardCfg:
     keypoint_rew_scale: float = 200.0
     keypoint_scale: float = 1.5
     object_base_size: float = 0.04
-    fixed_size: tuple[float, float, float] = (0.141, 0.03025, 0.0271)
-    fixed_size_keypoint_reward: bool = True
 
     lifting_rew_scale: float = 20.0
     lifting_bonus: float = 300.0
@@ -542,8 +540,8 @@ class SimToolRealEnvCfg(DirectRLEnvCfg):
     # Obs/state sizes are derived from obs.obs_list / obs.state_list at env init.
     # Placeholder keeps the configclass instantiable before the env computes the
     # final spaces.
-    observation_space: int = 140
-    state_space: int = 140
+    observation_space: int = 164
+    state_space: int = 186
 
     # --- Isaac Lab base fields ---
     sim: SimulationCfg = _default_sim_cfg()

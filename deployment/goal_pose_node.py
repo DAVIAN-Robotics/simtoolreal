@@ -5,6 +5,9 @@ from copy import deepcopy
 from dataclasses import dataclass
 
 import numpy as np
+
+from dextoolbench.objects import NAME_TO_OBJECT
+from dextoolbench.oriented_box import NUM_CORNERS
 import rospy
 import tyro
 from geometry_msgs.msg import Pose, PoseStamped
@@ -52,7 +55,7 @@ def keypoint_distance(
         pose=pose2_xyzw[None], scales=object_scales[None]
     )
     keypoints_rel_goal = object_keypoint_positions - goal_keypoint_positions
-    N_KEYPOINTS = 4
+    N_KEYPOINTS = NUM_CORNERS
     N = 1
     assert keypoints_rel_goal.shape == (N, N_KEYPOINTS, 3), (
         f"keypoints_rel_goal.shape: {keypoints_rel_goal.shape}, expected: (N, N_KEYPOINTS, 3)"
@@ -305,7 +308,7 @@ def main():
         # Create and run the GoalPoseNode
         node = GoalPoseNode(
             goal_poses_robot_frame=np.array(goal_poses_robot_frame),
-            object_scales=np.array([0.141, 0.03025, 0.0271]) * 25,  # fixed size
+            object_scales=np.array(NAME_TO_OBJECT[args.object_name].scale),
             success_threshold=args.success_threshold,
             success_steps=args.success_steps,
             force_open_loop=args.force_open_loop,

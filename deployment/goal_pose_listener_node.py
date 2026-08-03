@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
+
+from dextoolbench.oriented_box import NUM_CORNERS
 import rospy
 import torch
 from geometry_msgs.msg import Pose, PoseStamped
@@ -59,7 +61,7 @@ def keypoint_distance(
         pose=object_pose2_xyzw[None], scales=object_scales[None]
     )
     keypoints_rel_goal = object_keypoint_positions - goal_keypoint_positions
-    N_KEYPOINTS = 4
+    N_KEYPOINTS = NUM_CORNERS
     N = 1
     assert keypoints_rel_goal.shape == (N, N_KEYPOINTS, 3), (
         f"keypoints_rel_goal.shape: {keypoints_rel_goal.shape}, expected: (N, N_KEYPOINTS, 3)"

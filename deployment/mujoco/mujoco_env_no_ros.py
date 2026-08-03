@@ -20,7 +20,7 @@ from isaacgymenvs.utils.observation_action_utils_sharpa import (
     create_urdf_object,
 )
 
-N_OBS = 140
+N_OBS = 164
 N_ACT = 29
 
 

@@ -129,7 +129,7 @@ def main() -> None:
 
     CONFIG_PATH = Path("pretrained_policy/config.yaml")
     CHECKPOINT_PATH = Path("pretrained_policy/model.pth")
-    NUM_OBSERVATIONS = 140
+    NUM_OBSERVATIONS = 164
     NUM_ACTIONS = 29
 
     player = RlPlayer(

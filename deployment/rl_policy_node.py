@@ -303,7 +303,7 @@ class RLPolicyNode:
         # Faster with CPU
         # self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.device = "cpu"
-        self.num_observations = 140  # Update this number based on actual dimensions
+        self.num_observations = 164  # Update this number based on actual dimensions
         self.num_actions = 29
 
         assert self.config_path.exists(), (

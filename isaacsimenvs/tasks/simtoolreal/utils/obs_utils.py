@@ -8,6 +8,8 @@ import torch
 
 from isaaclab.utils.math import convert_quat, quat_apply, quat_from_angle_axis, quat_mul
 
+from dextoolbench.oriented_box import CORNER_SIGNS, NUM_CORNERS
+
 
 # ----------------------------------------------------------------------------
 # Constants
@@ -15,16 +17,11 @@ from isaaclab.utils.math import convert_quat, quat_apply, quat_from_angle_axis, 
 
 
 NUM_FINGERTIPS: int = 5
-NUM_KEYPOINTS: int = 4
+NUM_KEYPOINTS: int = NUM_CORNERS
 
-
-# Object-frame keypoint corners before scaling.
-KEYPOINT_CORNERS: tuple[tuple[int, int, int], ...] = (
-    (1, 1, 1),
-    (1, 1, -1),
-    (-1, -1, 1),
-    (-1, -1, -1),
-)
+# All eight corners of the object's own box, one definition shared with every
+# other consumer so no two of them can drift apart.
+KEYPOINT_CORNERS: tuple[tuple[int, int, int], ...] = CORNER_SIGNS
 
 OBS_FIELD_SIZES: dict[str, int] = {
     "palm_pos": 3,
@@ -33,8 +30,8 @@ OBS_FIELD_SIZES: dict[str, int] = {
     "object_rot": 4,
     "object_vel": 6,
     "fingertip_pos_rel_palm": 3 * NUM_FINGERTIPS,  # 15
-    "keypoints_rel_palm": 3 * NUM_KEYPOINTS,  # 12
-    "keypoints_rel_goal": 3 * NUM_KEYPOINTS,  # 12
+    "keypoints_rel_palm": 3 * NUM_KEYPOINTS,  # 24
+    "keypoints_rel_goal": 3 * NUM_KEYPOINTS,  # 24
     "object_scales": 3,
     "closest_keypoint_max_dist": 1,
     "closest_fingertip_dist": NUM_FINGERTIPS,  # 5
@@ -180,10 +177,7 @@ def compute_intermediate_values(env) -> None:
         ft_pos - obj_pos.unsqueeze(1), dim=-1
     )  # (N, 5)
 
-    if rew_cfg.fixed_size_keypoint_reward:
-        kp_offsets = env._keypoint_offsets_fixed
-    else:
-        kp_offsets = env._keypoint_offsets
+    kp_offsets = env._keypoint_offsets
 
     obj_kp = _keypoints_world(obj_pos, obj_rot, kp_offsets)
     goal_kp = _keypoints_world(goal_pos, goal_rot, kp_offsets)

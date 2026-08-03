@@ -62,18 +62,12 @@ def allocate_state_buffers(env) -> None:
     # --- Keypoint offsets in object local frame ---
     corners = torch.tensor(
         KEYPOINT_CORNERS, device=env.device, dtype=torch.float32
-    )  # (4, 3)
+    )  # (8, 3)
 
     env._keypoint_offsets = (
         corners.unsqueeze(0)
         * (env._object_scale_per_env * rew.object_base_size * rew.keypoint_scale * 0.5).unsqueeze(1)
-    )  # (N, 4, 3)
-
-    # Fixed-size reward keypoints follow legacy: fixed_size * keypoint_scale / 2.
-    env._keypoint_offsets_fixed = (
-        corners
-        * (0.5 * rew.keypoint_scale * torch.tensor(rew.fixed_size, device=env.device)).unsqueeze(0)
-    ).unsqueeze(0).expand(env.num_envs, -1, -1).contiguous()
+    )  # (N, 8, 3)
 
     # --- Per-env DR priors (re-sampled on reset; seeded once here) ---
     lo, hi = dr.object_scale_noise_multiplier_range
