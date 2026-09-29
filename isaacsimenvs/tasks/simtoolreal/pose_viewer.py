@@ -114,12 +114,19 @@ def _obj_to_stl_data_uri(obj_path: Path) -> str:
 
 
 def _strip_materials(urdf_text: str) -> str:
-    """Drop every <material> so a colour override survives urdf-loader."""
+    """Replace every <material> with the goal green.
+
+    urdf-loader assigns the URDF material to an STL mesh after loadMeshCb returns, which overwrote
+    the viewer's colour_override and left the goal grey. A material the URDF itself carries survives.
+    """
     root = ET.fromstring(urdf_text)
     for parent in root.iter():
         for child in list(parent):
             if child.tag == "material":
                 parent.remove(child)
+    for visual in root.iter("visual"):
+        material = ET.SubElement(visual, "material", name="goal_green")
+        ET.SubElement(material, "color", rgba="0.20 0.72 0.31 1.0")
     return ET.tostring(root, encoding="unicode")
 
 
