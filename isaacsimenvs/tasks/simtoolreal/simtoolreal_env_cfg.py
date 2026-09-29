@@ -374,6 +374,14 @@ class ResetCfg:
     table_reset_z: float = 0.38
     table_reset_z_range: float = 0.01
     table_object_z_offset: float = 0.25
+    # How far above the table surface the object's lowest point starts, so every object falls the
+    # same distance. table_object_z_offset is the legacy centre-height and is no longer read.
+    object_drop_height: float = 0.10
+    # Candidate start poses drawn per env, each with its own position and orientation.
+    start_pose_candidates: int = 256
+    # Grown on every side of the hand's box. Covers the joint reset noise that moves the hand
+    # off the nominal pose.
+    hand_clearance_margin: float = 0.01
     # Per-env XY position noise applied at reset (uniform half-widths in m).
     # Default (0, 0) keeps the table centered on the env origin (legacy behavior).
     table_reset_xy_range_m: tuple[float, float] = (0.0, 0.0)

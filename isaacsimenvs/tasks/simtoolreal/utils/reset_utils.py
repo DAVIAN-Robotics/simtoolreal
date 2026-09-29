@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from xml.etree import ElementTree
 
 import torch
 
@@ -110,6 +111,15 @@ def allocate_state_buffers(env) -> None:
     env._object_init_z = torch.full(
         (env.num_envs,), init_z, device=env.device
     )
+
+    # --- Table half height, from the urdf the scene spawns ---
+    env._table_half_height_m = float(
+        ElementTree.parse(Path(env.cfg.assets.table_urdf))
+        .getroot()
+        .find(".//collision/geometry/box")
+        .get("size")
+        .split()[2]
+    ) * 0.5
 
     # --- Per-env table surface z (randomized in _reset_table_pose) ---
     env._table_z_per_env = torch.full(
@@ -255,6 +265,81 @@ def _reset_table_pose(env, env_ids: torch.Tensor) -> None:
     pose = torch.cat([pos_local + env_origins, quat], dim=-1)
     env.table.write_root_pose_to_sim(pose, env_ids=env_ids)
 
+def box_gap(centre, rot, half, lo, hi):
+    """Separation between oriented boxes at `centre`/`rot`/`half` and an axis-aligned box.
+
+    Separating axis over the three world axes and the three object axes. Positive means the two are
+    apart, negative means they overlap by that much on the tightest axis.
+    """
+    box_c = (lo + hi) * 0.5
+    box_h = (hi - lo) * 0.5
+    d = box_c - centre
+    obj_w = (rot.abs() * half.unsqueeze(-2)).sum(dim=-1)
+    gap_w = d.abs() - obj_w - box_h
+    d_o = (rot * d.unsqueeze(-1)).sum(dim=-2)
+    box_o = (rot.abs() * box_h.unsqueeze(-1)).sum(dim=-2)
+    gap_o = d_o.abs() - half - box_o
+    return torch.maximum(gap_w.amax(-1), gap_o.amax(-1))
+
+
+def _hand_box(env):
+    """The hand's box at the reset pose, env-local, grown by the margin.
+
+    A constant. The base pose and the reset joint angles are both fixed, so the hand sits in the
+    same place on every reset in every env. The numbers are in robots.py.
+    """
+    if not hasattr(env, "_hand_box_local"):
+        lo, hi = env.cfg.robot.hand_box_local
+        m = float(env.cfg.reset.hand_clearance_margin)
+        env._hand_box_local = (
+            torch.tensor(lo, dtype=torch.float32, device=env.device) - m,
+            torch.tensor(hi, dtype=torch.float32, device=env.device) + m,
+        )
+    return env._hand_box_local
+
+
+def _sample_clear_start(env, env_ids: torch.Tensor):
+    """Draw start poses that clear the table and the hand.
+
+    Each candidate carries its own position and its own orientation. Holding either fixed leaves
+    large objects with no admissible pose, measured on the ManipTrans pool.
+    """
+    from isaaclab.utils.math import matrix_from_quat
+
+    cfg = env.cfg.reset
+    n = env_ids.numel()
+    k = cfg.start_pose_candidates
+
+    noise = torch.empty(n, k, 2, device=env.device).uniform_(-1.0, 1.0)
+    xy = torch.stack(
+        (noise[..., 0] * cfg.reset_position_noise_x, noise[..., 1] * cfg.reset_position_noise_y),
+        dim=-1,
+    )
+    quat = random_orientation(n * k, device=env.device).view(n, k, 4)
+    rot = matrix_from_quat(quat.reshape(-1, 4)).view(n, k, 3, 3)
+
+    # The lowest point of the object's box below its centre, in the drawn orientation.
+    half = env._object_scale_per_env[env_ids] * (env.cfg.reward.object_base_size * 0.5)
+    support = (rot[..., 2, :].abs() * half.unsqueeze(1)).sum(dim=-1)
+    surface = (env._table_z_per_env[env_ids] + env._table_half_height_m).unsqueeze(1)
+    land_z = surface + support
+    z = land_z + cfg.object_drop_height
+    centre = torch.cat([xy, z.unsqueeze(-1)], dim=-1)
+
+    lo, hi = _hand_box(env)
+    clearance = box_gap(centre, rot, half.view(n, 1, 3).expand(n, k, 3), lo, hi)
+
+    # First survivor, and the least-bad candidate where nothing survives. Candidates are drawn
+    # identically, so taking the first keeps the start distribution unbiased. A least-bad pose
+    # gets ejected and falls off the table, so the episode resets and the draw costs nothing.
+    survives = clearance > 0.0
+    first = torch.argmax(survives.float(), dim=1)
+    pick = torch.where(survives.any(dim=1), first, clearance.argmax(dim=1))
+
+    rows = torch.arange(n, device=env.device)
+    return centre[rows, pick], quat[rows, pick], land_z[rows, pick]
+
+
 def _reset_object_pose(env, env_ids: torch.Tensor) -> None:
     """Reset object pose and lifted-reward reference height."""
     cfg = env.cfg.reset
@@ -265,19 +350,9 @@ def _reset_object_pose(env, env_ids: torch.Tensor) -> None:
         fixed = torch.as_tensor(cfg.fixed_start_pose, device=env.device, dtype=torch.float32)
         pos_local = fixed[:3].unsqueeze(0).expand(n, -1)
         quat = fixed[3:].unsqueeze(0).expand(n, -1)
+        land_z = pos_local[:, 2]
     else:
-        noise = torch.empty(n, 3, device=env.device).uniform_(-1.0, 1.0)
-        pos_local = torch.stack(
-            (
-                noise[:, 0] * cfg.reset_position_noise_x,
-                noise[:, 1] * cfg.reset_position_noise_y,
-                env._table_z_per_env[env_ids]
-                + cfg.table_object_z_offset
-                + noise[:, 2] * cfg.reset_position_noise_z,
-            ),
-            dim=-1,
-        )
-        quat = random_orientation(n, device=env.device)
+        pos_local, quat, land_z = _sample_clear_start(env, env_ids)
 
     pose = torch.cat([pos_local + env_origins, quat], dim=-1)
     env.object.write_root_pose_to_sim(pose, env_ids=env_ids)
