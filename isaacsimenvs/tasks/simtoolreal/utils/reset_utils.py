@@ -427,8 +427,36 @@ def _reset_goal_pose(env, env_ids: torch.Tensor, mode: str) -> None:
     else:
         raise ValueError(f"unknown goal sampling mode: {mode}")
 
+    new_pos_local = _clear_table(env, env_ids, new_pos_local, new_quat)
+
     pose = torch.cat([new_pos_local + env_origins, new_quat], dim=-1)
     env.goal_viz.write_root_pose_to_sim(pose, env_ids=env_ids)
+
+
+def _clear_table(env, env_ids, pos_local, quat_wxyz):
+    """Raise a sampled goal until the object clears the table at that orientation.
+
+    The sampler draws position uniformly and orientation uniformly over SO(3) with no geometry in
+    the loop, so 2.4 percent of goals put part of the object below the table surface, measured over
+    the cap16 pool. Those goals are unreachable and only add noise.
+
+    ``_table_z_per_env`` holds the table's centre, not its surface. The URDF box is 0.3 m tall, so
+    the surface is 0.15 m above it. The cfg comment claiming table_reset_z is the surface is wrong.
+
+    The lowest point of a box below its centre is the support function along -z, sum over axes of
+    |R[2,i]| times the half extent. object_scale_per_env is extent_m / object_base_size, so the
+    metric half extent is that times object_base_size / 2.
+    """
+    from isaaclab.utils.math import matrix_from_quat
+
+    half = env._object_scale_per_env[env_ids] * (env.cfg.reward.object_base_size * 0.5)
+    r_z = matrix_from_quat(quat_wxyz)[:, 2, :]
+    support = (r_z.abs() * half).sum(dim=-1)
+    table_top = env._table_z_per_env[env_ids] + env._table_half_height_m
+
+    out = pos_local.clone()
+    out[:, 2] = torch.maximum(out[:, 2], table_top + support)
+    return out
 
 
 def _clear_goal_trackers(env, env_ids: torch.Tensor) -> None:
