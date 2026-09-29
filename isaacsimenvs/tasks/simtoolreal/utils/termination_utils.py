@@ -115,12 +115,20 @@ def compute_terminations(env) -> tuple[torch.Tensor, torch.Tensor]:
 
     hand_far = env._curr_fingertip_distances.max(dim=-1).values > 1.5
 
-    terminated = fall | max_successes_reached | hand_far
+    if env.cfg.reset.reset_state_dir:
+        touching = torch.stack([
+            s.data.force_matrix_w.norm(dim=-1).amax(dim=(1, 2)) for s in env.hand_contacts
+        ]).amax(dim=0) > 0.0
+        dropped = ~touching
+    else:
+        dropped = torch.zeros_like(fall)
+    terminated = fall | max_successes_reached | hand_far | dropped
     truncated = env.episode_length_buf >= env.max_episode_length
     env._termination_reasons = {
         "fall": fall,
         "max_successes": max_successes_reached,
         "hand_far": hand_far,
+        "dropped": dropped,
         "timeout": truncated,
     }
     return terminated, truncated

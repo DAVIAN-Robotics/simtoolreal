@@ -14,6 +14,35 @@ from .action_utils import sample_log_uniform
 from .goal_sampling import sample_absolute_goal_pose, sample_delta_goal_pose
 from .obs_utils import KEYPOINT_CORNERS, NUM_FINGERTIPS
 
+# Dexonomy's squeeze pose is the grasp plus the contact torques over this gain, the gainprm of every
+# XHand actuator in its assets/hand/xhand/right.xml.
+DEXONOMY_HAND_KP = 3.0
+
+
+def _load_reset_states(env) -> None:
+    """Every pool object's grasped states, stacked (objects, states, ...) on the device. The squeeze
+    target is rescaled from Dexonomy's gain to this hand's stiffness and clamped to the joint limits."""
+    import numpy as np
+
+    files = [np.load(Path(env.cfg.reset.reset_state_dir) / f"{Path(p).stem}.npz") for p in env._object_urdf_paths]
+    names = list(env.robot.data.joint_names)
+    arm_joints, hand_joints = list(files[0]["arm_joints"]), list(files[0]["hand_joints"])
+    env._rs_arm_ids = torch.tensor([names.index(j) for j in arm_joints], device=env.device)
+    env._rs_hand_ids = torch.tensor([names.index(j) for j in hand_joints], device=env.device)
+
+    def stack(key):
+        return torch.tensor(np.stack([f[key] for f in files]), dtype=torch.float32, device=env.device)
+
+    env._rs_obj_pos = stack("obj_pos")
+    env._rs_obj_quat = stack("obj_quat_wxyz")
+    env._rs_arm_q = stack("arm_q")
+    env._rs_hand_q = stack("hand_q")
+    kp = torch.tensor([env.cfg.robot.hand_stiffness[j] for j in hand_joints], device=env.device)
+    lo, hi = env.robot.data.joint_pos_limits[0, env._rs_hand_ids].unbind(-1)
+    squeeze = env._rs_hand_q + (stack("hand_target") - env._rs_hand_q) * DEXONOMY_HAND_KP / kp
+    env._rs_hand_target = torch.maximum(torch.minimum(squeeze, hi), lo)
+
+
 def allocate_state_buffers(env) -> None:
     """Populate every per-env buffer + index cache used by the hooks.
 
@@ -126,6 +155,9 @@ def allocate_state_buffers(env) -> None:
         .get("size")
         .split()[2]
     ) * 0.5
+
+    if env.cfg.reset.reset_state_dir:
+        _load_reset_states(env)
 
     # --- Per-env table surface z (randomized in _reset_table_pose) ---
     env._table_z_per_env = torch.full(
@@ -477,19 +509,46 @@ def reset_goal_trackers(env, env_ids: torch.Tensor) -> None:
     _reset_goal_pose(env, env_ids, mode=env.cfg.reset.goal_sampling_type)
 
 
+def _reset_grasped(env, env_ids: torch.Tensor) -> None:
+    """Start from a random one of the object's grasped states, with the start pose as the first goal."""
+    n = env_ids.numel()
+    asset = env._object_asset_index_per_env[env_ids]
+    k = torch.randint(0, env._rs_obj_pos.shape[1], (n,), device=env.device)
+
+    joint_pos = env.robot.data.default_joint_pos[env_ids].clone()
+    joint_pos[:, env._rs_arm_ids] = env._rs_arm_q[asset, k]
+    joint_pos[:, env._rs_hand_ids] = env._rs_hand_q[asset, k]
+    env.robot.write_joint_state_to_sim(joint_pos, torch.zeros_like(joint_pos), env_ids=env_ids)
+    targets = joint_pos.clone()
+    targets[:, env._rs_hand_ids] = env._rs_hand_target[asset, k]
+    env._prev_targets[env_ids] = targets
+    env._cur_targets[env_ids] = targets
+
+    pos_local = env._rs_obj_pos[asset, k]
+    pose = torch.cat([pos_local + env.scene.env_origins[env_ids], env._rs_obj_quat[asset, k]], dim=-1)
+    env.object.write_root_pose_to_sim(pose, env_ids=env_ids)
+    env.object.write_root_velocity_to_sim(torch.zeros(n, 6, device=env.device), env_ids=env_ids)
+    env.goal_viz.write_root_pose_to_sim(pose, env_ids=env_ids)
+    env._object_init_z[env_ids] = pos_local[:, 2]
+
+
 def reset_env_state(env, env_ids: torch.Tensor) -> None:
     """Full per-env reset after ``super()._reset_idx``."""
     n = env_ids.numel()
 
-    _randomize_robot_dof_state(env, env_ids)
-    _reset_table_pose(env, env_ids)
-    _reset_object_pose(env, env_ids)
-    _reset_goal_pose(env, env_ids, mode="absolute")  # full reset → always absolute
+    if env.cfg.reset.reset_state_dir:
+        _reset_table_pose(env, env_ids)
+        _reset_grasped(env, env_ids)
+    else:
+        _randomize_robot_dof_state(env, env_ids)
+        _reset_table_pose(env, env_ids)
+        _reset_object_pose(env, env_ids)
+        _reset_goal_pose(env, env_ids, mode="absolute")  # full reset → always absolute
 
     env._prev_episode_successes[env_ids] = env._successes[env_ids]
 
     _clear_goal_trackers(env, env_ids)
-    env._lifted_object[env_ids] = False
+    env._lifted_object[env_ids] = bool(env.cfg.reset.reset_state_dir)
     env._successes[env_ids] = 0
 
     env._action_queue[env_ids] = 0.0

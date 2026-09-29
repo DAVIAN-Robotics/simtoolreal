@@ -389,6 +389,11 @@ class ResetCfg:
     # Default 0.0 preserves the identity quat (legacy behavior).
     table_reset_yaw_range_deg: float = 0.0
 
+    # One <object urdf stem>.npz of grasped reset states per pool object. When set, every episode
+    # starts grasped from a random one of its object's states, lifted, with the start pose as the
+    # first goal.
+    reset_state_dir: str = ""
+
     # Goal sampling
     goal_sampling_type: str = "delta"  # "delta" | "absolute"
     delta_goal_distance: float = 0.1

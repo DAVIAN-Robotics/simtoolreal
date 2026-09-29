@@ -46,7 +46,7 @@ _PHYSICS_SPECS: dict[str, tuple[str, str, str]] = {
 
 
 def build_robot_articulation_usd_cfg(
-    usd_path: str, robot, *, start_arm_higher: bool = False
+    usd_path: str, robot, *, start_arm_higher: bool = False, contact_sensors: bool = False
 ) -> ArticulationCfg:
     arm_default = dict(robot.arm_default_pos)
     if start_arm_higher:
@@ -56,7 +56,7 @@ def build_robot_articulation_usd_cfg(
         arm_default[arm_names[3]] += math.radians(10.0)
     return ArticulationCfg(
         prim_path="/World/envs/env_.*/Robot",
-        spawn=UsdFileCfg(usd_path=usd_path),
+        spawn=UsdFileCfg(usd_path=usd_path, activate_contact_sensors=contact_sensors),
         init_state=ArticulationCfg.InitialStateCfg(
             pos=(0.0, 0.48, 0.53),
             rot=tuple(float(x) for x in robot.base_quat_wxyz),
@@ -1724,6 +1724,7 @@ def setup_scene(env) -> None:
         robot_usd_path,
         env.cfg.robot,
         start_arm_higher=getattr(env.cfg.reset, "start_arm_higher", False),
+        contact_sensors=bool(env.cfg.reset.reset_state_dir),
     ))
     env.table = RigidObject(build_rigid_object_cfg("/World/envs/env_.*/Table", table_usd_paths))
     env.object = RigidObject(build_rigid_object_cfg("/World/envs/env_.*/Object", object_usd_paths))
@@ -1740,6 +1741,20 @@ def setup_scene(env) -> None:
 
     # 7. Register with scene so DirectRLEnv refreshes their tensors each step.
     env.scene.articulations["robot"] = env.robot
+    if env.cfg.reset.reset_state_dir:
+        from isaaclab.sensors import ContactSensor, ContactSensorCfg
+
+        # One sensor per hand body, because PhysX resolves an object filter only for a sensor pattern
+        # that matches a single body per env.
+        hand = find_matching_prim_paths("/World/envs/env_0/Robot/(fr3_link7|thumb_.*|index_.*|mid_.*|ring_.*|pinky_.*)")
+        env.hand_contacts = []
+        for body in (p.rsplit("/", 1)[-1] for p in hand):
+            sensor = ContactSensor(ContactSensorCfg(
+                prim_path=f"/World/envs/env_.*/Robot/{body}",
+                filter_prim_paths_expr=["/World/envs/env_.*/Object/object_root"],
+            ))
+            env.scene.sensors[f"hand_contact_{body}"] = sensor
+            env.hand_contacts.append(sensor)
     env.scene.rigid_objects["table"] = env.table
     env.scene.rigid_objects["object"] = env.object
     env.scene.rigid_objects["goal_viz"] = env.goal_viz
