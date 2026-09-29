@@ -79,6 +79,9 @@ def build_robot_articulation_usd_cfg(
                 stiffness=robot.hand_stiffness,
                 damping=robot.hand_damping,
                 armature=robot.hand_armature,
+                friction=robot.hand_friction,
+                dynamic_friction=robot.hand_dynamic_friction,
+                effort_limit_sim=robot.hand_effort_limit,
             ),
         },
     )
