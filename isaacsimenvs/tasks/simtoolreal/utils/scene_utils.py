@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import json
 import math
 import shutil
 import tempfile
@@ -1325,6 +1327,13 @@ def _convert_urdf_to_usd(
     replace_cylinders_with_capsules: bool = False,
     joint_drive=None,
 ) -> str:
+    # A converted asset that is already on disk is reused as is. The converter
+    # names its output <work dir>/<stem>/<stem>.usd, so the path is predictable
+    # without running it.
+    cached = Path(usd_work_dir) / Path(asset_path).stem / f"{Path(asset_path).stem}.usd"
+    if cached.exists():
+        return str(cached)
+
     converter_asset_path = _prepare_urdf_for_isaacsim(asset_path, usd_work_dir)
     cfg_kwargs = dict(
         asset_path=converter_asset_path,
@@ -1381,6 +1390,8 @@ def _bake_usd(
 
     raw = Path(raw_usd_path)
     baked_usd_path = bake_root / baked_subdir / raw.parent.name / raw.name
+    if baked_usd_path.exists():
+        return str(baked_usd_path)
     baked_usd_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(raw, baked_usd_path)
     for child in raw.parent.iterdir():
@@ -1565,8 +1576,22 @@ def setup_scene(env) -> None:
 
     # 1. Resolve the object pool: a single named URDF (DexToolBench eval) or
     #    procedural URDFs generated in a per-launch temp dir.
-    env._tmp_asset_dir = tempfile.mkdtemp(prefix="simtoolreal_assets_")
-    if assets_cfg.object_urdf:
+    if assets_cfg.asset_cache_dir:
+        env._tmp_asset_dir = str(Path(assets_cfg.asset_cache_dir))
+        os.makedirs(env._tmp_asset_dir, exist_ok=True)
+    else:
+        env._tmp_asset_dir = tempfile.mkdtemp(prefix="simtoolreal_assets_")
+    if assets_cfg.object_pool_dir:
+        pool_file = Path(assets_cfg.object_pool_dir) / "pool.json"
+        if not pool_file.exists():
+            raise FileNotFoundError(f"no pool.json in {assets_cfg.object_pool_dir}")
+        pool = json.loads(pool_file.read_text())
+        urdf_paths = [Path(entry["urdf"]) for entry in pool]
+        missing = [str(p) for p in urdf_paths if not p.exists()]
+        if missing:
+            raise FileNotFoundError(f"staged urdfs not found: {missing[:3]}")
+        object_scales_normalized = [tuple(entry["scale"]) for entry in pool]
+    elif assets_cfg.object_urdf:
         if assets_cfg.object_scale is None:
             raise ValueError(
                 "cfg.assets.object_scale must be set when object_urdf is given "

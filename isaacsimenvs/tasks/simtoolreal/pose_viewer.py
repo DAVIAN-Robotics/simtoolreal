@@ -7,7 +7,9 @@ Three.js/URDF HTML viewer that can be opened locally or logged to WandB.
 
 from __future__ import annotations
 
+import base64
 import random
+import struct
 import time
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -78,6 +80,50 @@ def _raw_url_for_repo_path(path: Path, raw_base: str) -> str | None:
     return raw_base + quote(rel.as_posix(), safe="/")
 
 
+def _obj_to_stl_data_uri(obj_path: Path) -> str:
+    """Convert a triangulated OBJ into a binary-STL data URI.
+
+    The viewer template's OBJ branch derives a base URL from the mesh URL, which
+    throws on data URIs, while its STL branch loads them and recomputes normals.
+    The trailing #ext=.stl is the template's format hint for an extension-less
+    URL. Fan triangulation is exact for convex CoACD pieces.
+    """
+    vertices: list[list[float]] = []
+    faces: list[tuple[int, int, int]] = []
+    with open(obj_path, "r", encoding="utf-8") as handle:
+        for line in handle:
+            parts = line.split()
+            if not parts:
+                continue
+            if parts[0] == "v":
+                vertices.append([float(parts[1]), float(parts[2]), float(parts[3])])
+            elif parts[0] == "f":
+                idx = [int(tok.split("/")[0]) for tok in parts[1:]]
+                assert all(i > 0 for i in idx), f"negative OBJ indices in {obj_path}"
+                for k in range(1, len(idx) - 1):
+                    faces.append((idx[0] - 1, idx[k] - 1, idx[k + 1] - 1))
+    assert vertices and faces, f"no geometry parsed from {obj_path}"
+
+    verts = np.asarray(vertices, dtype="<f4")
+    blob = bytearray(struct.pack("<80xI", len(faces)))
+    zero_normal = struct.pack("<3f", 0.0, 0.0, 0.0)
+    for a, b, c in faces:
+        blob += zero_normal
+        blob += verts[a].tobytes() + verts[b].tobytes() + verts[c].tobytes()
+        blob += b"\x00\x00"
+    return "data:model/stl;base64," + base64.b64encode(bytes(blob)).decode("ascii") + "#ext=.stl"
+
+
+def _strip_materials(urdf_text: str) -> str:
+    """Drop every <material> so a colour override survives urdf-loader."""
+    root = ET.fromstring(urdf_text)
+    for parent in root.iter():
+        for child in list(parent):
+            if child.tag == "material":
+                parent.remove(child)
+    return ET.tostring(root, encoding="unicode")
+
+
 def _rewrite_embedded_urdf_mesh_urls(
     urdf_text: str,
     *,
@@ -92,6 +138,7 @@ def _rewrite_embedded_urdf_mesh_urls(
         return urdf_text
 
     changed = False
+    _embed_cache: dict[Path, str] = {}
     for mesh_elem in root.findall(".//mesh"):
         filename = mesh_elem.get("filename")
         if not filename:
@@ -113,7 +160,14 @@ def _rewrite_embedded_urdf_mesh_urls(
 
         mesh_url = _raw_url_for_repo_path(mesh_path, raw_base)
         if mesh_url is None:
-            continue
+            # Outside the repo, so no public URL exists. Inline it instead of
+            # leaving a filesystem path no browser can fetch.
+            if mesh_path.suffix.lower() != ".obj" or not mesh_path.exists():
+                continue
+            mesh_url = _embed_cache.get(mesh_path)
+            if mesh_url is None:
+                mesh_url = _obj_to_stl_data_uri(mesh_path)
+                _embed_cache[mesh_path] = mesh_url
         mesh_elem.set("filename", mesh_url)
         changed = True
 
@@ -257,7 +311,7 @@ def build_pose_viewer_html(
         make_embedded_robot(name="object", urdf_text=object_urdf_text),
         make_embedded_robot(
             name="goal",
-            urdf_text=object_urdf_text,
+            urdf_text=_strip_materials(object_urdf_text),
             color_override=(0.20, 0.72, 0.31),
         ),
     ]

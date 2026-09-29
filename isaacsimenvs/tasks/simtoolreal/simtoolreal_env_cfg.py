@@ -73,6 +73,14 @@ class AssetsCfg:
     # convention: metric bbox / object_base_size) and is required with it.
     object_urdf: str = ""
     object_scale: tuple[float, float, float] | None = None
+
+    # A pool staged on disk, one urdf per object, with pool.json carrying the
+    # box extents each urdf was written against.
+    object_pool_dir: str = ""
+
+    # Persistent dir for converted and baked USDs. Empty keeps the per-launch
+    # temp dir, which reconverts the whole pool every time.
+    asset_cache_dir: str = ""
     handle_head_types: tuple[str, ...] = (
         "hammer",
         "screwdriver",
