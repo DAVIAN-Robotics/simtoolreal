@@ -66,11 +66,12 @@ def main() -> None:
     # --- Pose-only interactive HTML viewer (no cameras / no renderer) ---
     parser.add_argument(
         "--capture_viewer",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
+        default=True,
         help="Write periodic pose-only interactive HTML viewers; does not enable Isaac cameras.",
     )
     parser.add_argument("--capture_viewer_len", type=int, default=600)
-    parser.add_argument("--capture_viewer_interval", type=int, default=6000)
+    parser.add_argument("--capture_viewer_interval", type=int, default=1000)
     parser.add_argument("--capture_viewer_env_id", type=int, default=0)
     parser.add_argument("--capture_viewer_wandb_key", default="interactive_viewer")
     parser.add_argument(
