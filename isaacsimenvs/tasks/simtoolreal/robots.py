@@ -173,12 +173,16 @@ ROBOT_PROFILES: dict[str, RobotCfg] = {
             "fr3_joint7": -0.7854,
         },
         palm_center_offset=(0.0, 0.0, 0.16),
+        # The centroid of that fingertip's 120 vendor taxels, not the vendor tip point. The tip
+        # sits 12.5 mm past the pad centroid on a finger and 15.5 mm on the thumb, and it is off
+        # the pad face, so every distance measured from it rewards a tip pose over a pad grasp.
+        # T16 centroid (4.874, 0, 30.7745) mm, T30 centroid (0, 35.083167, 3.4695) mm.
         fingertip_offset_by_body={
-            "thumb_rota_link2": (0.0, 0.0502276499414863, 0.0),
-            "index_rota_link2": (0.0, 0.0, 0.0422482924089424),
-            "mid_link2": (0.0, 0.0, 0.042248),
-            "ring_link2": (0.0, 0.0, 0.0422482924089404),
-            "pinky_link2": (0.0, 0.0, 0.0422482924089405),
+            "thumb_rota_link2": (0.0, 0.035083167, 0.0034695),
+            "index_rota_link2": (0.004874, 0.0, 0.0307745),
+            "mid_link2": (0.004874, 0.0, 0.0307745),
+            "ring_link2": (0.004874, 0.0, 0.0307745),
+            "pinky_link2": (0.004874, 0.0, 0.0307745),
         },
         raycast_link_exprs=(
             "/World/envs/env_.*/Robot/fr3_link.*/visuals",
