@@ -1,10 +1,5 @@
 <robot name="fr3_xhand"><link name="fr3_link0">
-    <visual>
-      <geometry>
-        <mesh filename="../fr3/meshes/visual/link0.stl" />
-      </geometry>
-      <material name="fr3_white" />
-    </visual>
+    <visual><geometry><mesh filename="../fr3/meshes/visual/link0_0.stl" /></geometry><material name="fr3v2_link0_0"><color rgba="1.000 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link0_1.stl" /></geometry><material name="fr3v2_link0_1"><color rgba="1.000 0.071 0.039 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link0_2.stl" /></geometry><material name="fr3v2_link0_2"><color rgba="0.020 0.020 0.020 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link0_3.stl" /></geometry><material name="fr3v2_link0_3"><color rgba="0.039 0.051 0.055 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link0_4.stl" /></geometry><material name="fr3v2_link0_4"><color rgba="0.878 0.925 0.933 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link0_5.stl" /></geometry><material name="fr3v2_link0_5"><color rgba="0.647 0.647 0.647 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link0_6.stl" /></geometry><material name="fr3v2_link0_6"><color rgba="1.000 0.949 0.949 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link0_7.stl" /></geometry><material name="fr3v2_link0_7"><color rgba="0.953 0.988 0.933 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link0_8.stl" /></geometry><material name="fr3v2_link0_8"><color rgba="0.639 0.639 0.639 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link0_9.stl" /></geometry><material name="fr3v2_link0_9"><color rgba="0.667 0.678 0.682 1" /></material></visual>
     <collision>
       <geometry>
         <mesh filename="../fr3/meshes/collision/link0.stl" />
@@ -19,12 +14,7 @@
 
   
   <link name="fr3_link1">
-    <visual>
-      <geometry>
-        <mesh filename="../fr3/meshes/visual/link1.stl" />
-      </geometry>
-      <material name="fr3_white" />
-    </visual>
+    <visual><geometry><mesh filename="../fr3/meshes/visual/link1_0.stl" /></geometry><material name="fr3v2_link1_0"><color rgba="1.000 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link1_1.stl" /></geometry><material name="fr3v2_link1_1"><color rgba="0.965 0.992 0.965 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link1_2.stl" /></geometry><material name="fr3v2_link1_2"><color rgba="0.667 0.678 0.682 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link1_3.stl" /></geometry><material name="fr3v2_link1_3"><color rgba="0.973 1.000 1.000 1" /></material></visual>
     <collision>
       <geometry>
         <mesh filename="../fr3/meshes/collision/link1.stl" />
@@ -38,12 +28,7 @@
   </link>
 
   <link name="fr3_link2">
-    <visual>
-      <geometry>
-        <mesh filename="../fr3/meshes/visual/link2.stl" />
-      </geometry>
-      <material name="fr3_white" />
-    </visual>
+    <visual><geometry><mesh filename="../fr3/meshes/visual/link2_0.stl" /></geometry><material name="fr3v2_link2_0"><color rgba="1.000 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link2_1.stl" /></geometry><material name="fr3v2_link2_1"><color rgba="0.969 0.988 0.969 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link2_2.stl" /></geometry><material name="fr3v2_link2_2"><color rgba="0.973 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link2_3.stl" /></geometry><material name="fr3v2_link2_3"><color rgba="0.667 0.678 0.682 1" /></material></visual>
     <collision>
       <geometry>
         <mesh filename="../fr3/meshes/collision/link2.stl" />
@@ -57,12 +42,7 @@
   </link>
 
   <link name="fr3_link3">
-    <visual>
-      <geometry>
-        <mesh filename="../fr3/meshes/visual/link3.stl" />
-      </geometry>
-      <material name="fr3_white" />
-    </visual>
+    <visual><geometry><mesh filename="../fr3/meshes/visual/link3_0.stl" /></geometry><material name="fr3v2_link3_0"><color rgba="1.000 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link3_1.stl" /></geometry><material name="fr3v2_link3_1"><color rgba="0.969 0.988 0.969 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link3_2.stl" /></geometry><material name="fr3v2_link3_2"><color rgba="0.667 0.678 0.682 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link3_3.stl" /></geometry><material name="fr3v2_link3_3"><color rgba="0.973 1.000 1.000 1" /></material></visual>
     <collision>
       <geometry>
         <mesh filename="../fr3/meshes/collision/link3.stl" />
@@ -76,12 +56,7 @@
   </link>
 
   <link name="fr3_link4">
-    <visual>
-      <geometry>
-        <mesh filename="../fr3/meshes/visual/link4.stl" />
-      </geometry>
-      <material name="fr3_white" />
-    </visual>
+    <visual><geometry><mesh filename="../fr3/meshes/visual/link4_0.stl" /></geometry><material name="fr3v2_link4_0"><color rgba="1.000 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link4_1.stl" /></geometry><material name="fr3v2_link4_1"><color rgba="0.969 0.988 0.969 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link4_2.stl" /></geometry><material name="fr3v2_link4_2"><color rgba="0.973 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link4_3.stl" /></geometry><material name="fr3v2_link4_3"><color rgba="0.667 0.678 0.682 1" /></material></visual>
     <collision>
       <geometry>
         <mesh filename="../fr3/meshes/collision/link4.stl" />
@@ -95,12 +70,7 @@
   </link>
 
   <link name="fr3_link5">
-    <visual>
-      <geometry>
-        <mesh filename="../fr3/meshes/visual/link5.stl" />
-      </geometry>
-      <material name="fr3_white" />
-    </visual>
+    <visual><geometry><mesh filename="../fr3/meshes/visual/link5_0.stl" /></geometry><material name="fr3v2_link5_0"><color rgba="1.000 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link5_1.stl" /></geometry><material name="fr3v2_link5_1"><color rgba="0.039 0.051 0.055 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link5_2.stl" /></geometry><material name="fr3v2_link5_2"><color rgba="0.969 0.988 0.969 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link5_3.stl" /></geometry><material name="fr3v2_link5_3"><color rgba="0.973 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link5_4.stl" /></geometry><material name="fr3v2_link5_4"><color rgba="0.667 0.678 0.682 1" /></material></visual>
     <collision>
       <geometry>
         <mesh filename="../fr3/meshes/collision/link5.stl" />
@@ -114,12 +84,7 @@
   </link>
 
   <link name="fr3_link6">
-    <visual>
-      <geometry>
-        <mesh filename="../fr3/meshes/visual/link6.stl" />
-      </geometry>
-      <material name="fr3_white" />
-    </visual>
+    <visual><geometry><mesh filename="../fr3/meshes/visual/link6_0.stl" /></geometry><material name="fr3v2_link6_0"><color rgba="0.039 0.051 0.055 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link6_1.stl" /></geometry><material name="fr3v2_link6_1"><color rgba="1.000 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link6_2.stl" /></geometry><material name="fr3v2_link6_2"><color rgba="0.878 0.925 0.933 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link6_3.stl" /></geometry><material name="fr3v2_link6_3"><color rgba="0.973 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link6_4.stl" /></geometry><material name="fr3v2_link6_4"><color rgba="0.016 0.408 0.749 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link6_5.stl" /></geometry><material name="fr3v2_link6_5"><color rgba="0.969 0.988 0.969 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link6_6.stl" /></geometry><material name="fr3v2_link6_6"><color rgba="0.667 0.678 0.682 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link6_7.stl" /></geometry><material name="fr3v2_link6_7"><color rgba="0.702 0.051 0.075 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link6_8.stl" /></geometry><material name="fr3v2_link6_8"><color rgba="0.141 0.557 0.047 1" /></material></visual>
     <collision>
       <geometry>
         <mesh filename="../fr3/meshes/collision/link6.stl" />
@@ -133,12 +98,7 @@
   </link>
 
   <link name="fr3_link7">
-    <visual>
-      <geometry>
-        <mesh filename="../fr3/meshes/visual/link7.stl" />
-      </geometry>
-      <material name="fr3_white" />
-    </visual>
+    <visual><geometry><mesh filename="../fr3/meshes/visual/link7_0.stl" /></geometry><material name="fr3v2_link7_0"><color rgba="1.000 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link7_1.stl" /></geometry><material name="fr3v2_link7_1"><color rgba="0.039 0.051 0.055 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link7_2.stl" /></geometry><material name="fr3v2_link7_2"><color rgba="0.020 0.020 0.020 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link7_3.stl" /></geometry><material name="fr3v2_link7_3"><color rgba="0.969 0.988 0.969 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link7_4.stl" /></geometry><material name="fr3v2_link7_4"><color rgba="0.973 1.000 1.000 1" /></material></visual><visual><geometry><mesh filename="../fr3/meshes/visual/link7_5.stl" /></geometry><material name="fr3v2_link7_5"><color rgba="0.667 0.678 0.682 1" /></material></visual>
     <collision>
       <geometry>
         <mesh filename="../fr3/meshes/collision/link7.stl" />
