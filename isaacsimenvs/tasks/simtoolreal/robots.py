@@ -24,6 +24,10 @@ class RobotCfg:
     fingertip_offset_by_body: dict[str, tuple[float, float, float]] = MISSING
     raycast_link_exprs: tuple[str, ...] = MISSING
     base_quat_wxyz: tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0)
+    # Tight box around the hand at the reset pose, env-local, before the margin. Constant
+    # because the base pose and the reset joint angles are both fixed. Printed by
+    # .output/047-play2perfect-assembly/src/render_hand_box.py.
+    hand_box_local: tuple[tuple[float, float, float], tuple[float, float, float]] = MISSING
     arm_armature: dict[str, float] | None = None
     arm_friction: dict[str, float] | None = None
 
@@ -167,6 +171,7 @@ ROBOT_PROFILES: dict[str, RobotCfg] = {
         # Base yawed -90 deg about z so the robot faces the table instead of
         # spending joint 1's range reaching sideways at it.
         base_quat_wxyz=(0.7071067811865476, 0.0, 0.0, -0.7071067811865476),
+        hand_box_local=((-0.1589, -0.3137, 0.7749), (0.1589, -0.1040, 0.8388)),
         arm_default_pos={
             "fr3_joint1": 0.0, "fr3_joint2": 0.2618, "fr3_joint3": 0.0,
             "fr3_joint4": -2.0071, "fr3_joint5": 0.0, "fr3_joint6": 2.3562,
