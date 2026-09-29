@@ -43,7 +43,7 @@ scene:
 # 3) assets — URDFs, procedural-generation knobs, static per-material frictions
 # -----------------------------------------------------------------------------
 assets:
-  table_urdf: "assets/urdf/table_narrow.urdf"
+  table_urdf: "assets/urdf/table_davian.urdf"
 
   object_name: "handle_head_primitives"
   handle_head_types: ["hammer", "screwdriver", "marker", "spatula", "eraser", "brush"]

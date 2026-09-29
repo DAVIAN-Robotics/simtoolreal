@@ -54,7 +54,7 @@ from isaaclab.utils import configclass
 
 @configclass
 class AssetsCfg:
-    table_urdf: str = "assets/urdf/table_narrow.urdf"
+    table_urdf: str = "assets/urdf/table_davian.urdf"
     # Per-env scale ranges applied to the table mesh at scene-build time.
     # Sampled independently per env: sx ~ U(table_scale_range_x), sy ~ U(table_scale_range_y).
     # Z is held at 1.0 so the table surface height stays at table_reset_z (which the

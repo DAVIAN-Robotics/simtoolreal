@@ -26,7 +26,6 @@ from isaacsimenvs.utils.interactive_viewer import create_html, make_embedded_rob
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 GITHUB_RAW_BASE_MAIN = "https://raw.githubusercontent.com/sibisibi/simtoolreal/main/"
-TABLE_URDF_PATH = REPO_ROOT / "assets" / "urdf" / "table_narrow.urdf"
 
 
 def _to_numpy(value: Any) -> np.ndarray:
@@ -203,7 +202,10 @@ def table_urdf_for_env(env, env_id: int) -> tuple[str, Path]:
     if table_paths:
         urdf_path = Path(table_paths[env_id % len(table_paths)])
         return urdf_path.read_text(encoding="utf-8"), urdf_path
-    return TABLE_URDF_PATH.read_text(encoding="utf-8"), TABLE_URDF_PATH
+    urdf_path = Path(env.cfg.assets.table_urdf)
+    if not urdf_path.is_absolute():
+        urdf_path = REPO_ROOT / urdf_path
+    return urdf_path.read_text(encoding="utf-8"), urdf_path
 
 
 def table_urdf_text_for_env(env, env_id: int) -> str:
