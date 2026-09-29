@@ -24,15 +24,19 @@ def _load_reset_states(env) -> None:
     target is rescaled from Dexonomy's gain to this hand's stiffness and clamped to the joint limits."""
     import numpy as np
 
-    files = [np.load(Path(env.cfg.reset.reset_state_dir) / f"{Path(p).stem}.npz") for p in env._object_urdf_paths]
+    n = env.cfg.reset.reset_state_count or None
+    columns = {k: [] for k in ("obj_pos", "obj_quat_wxyz", "arm_q", "hand_q", "hand_target")}
+    for urdf in env._object_urdf_paths:
+        with np.load(Path(env.cfg.reset.reset_state_dir) / f"{Path(urdf).stem}.npz") as f:
+            for key, rows in columns.items():
+                rows.append(f[key][:n])
+            arm_joints, hand_joints = list(f["arm_joints"]), list(f["hand_joints"])
     names = list(env.robot.data.joint_names)
-    arm_joints, hand_joints = list(files[0]["arm_joints"]), list(files[0]["hand_joints"])
     env._rs_arm_ids = torch.tensor([names.index(j) for j in arm_joints], device=env.device)
     env._rs_hand_ids = torch.tensor([names.index(j) for j in hand_joints], device=env.device)
 
     def stack(key):
-        n = env.cfg.reset.reset_state_count or None
-        return torch.tensor(np.stack([f[key][:n] for f in files]), dtype=torch.float32, device=env.device)
+        return torch.tensor(np.stack(columns[key]), dtype=torch.float32, device=env.device)
 
     env._rs_obj_pos = stack("obj_pos")
     env._rs_obj_quat = stack("obj_quat_wxyz")
