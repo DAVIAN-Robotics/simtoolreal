@@ -31,7 +31,8 @@ def _load_reset_states(env) -> None:
     env._rs_hand_ids = torch.tensor([names.index(j) for j in hand_joints], device=env.device)
 
     def stack(key):
-        return torch.tensor(np.stack([f[key] for f in files]), dtype=torch.float32, device=env.device)
+        n = env.cfg.reset.reset_state_count or None
+        return torch.tensor(np.stack([f[key][:n] for f in files]), dtype=torch.float32, device=env.device)
 
     env._rs_obj_pos = stack("obj_pos")
     env._rs_obj_quat = stack("obj_quat_wxyz")
@@ -529,6 +530,8 @@ def _reset_grasped(env, env_ids: torch.Tensor) -> None:
     env.object.write_root_pose_to_sim(pose, env_ids=env_ids)
     env.object.write_root_velocity_to_sim(torch.zeros(n, 6, device=env.device), env_ids=env_ids)
     env.goal_viz.write_root_pose_to_sim(pose, env_ids=env_ids)
+    if env.cfg.reset.first_goal_random:
+        _reset_goal_pose(env, env_ids, mode="delta")
     env._object_init_z[env_ids] = pos_local[:, 2]
 
 

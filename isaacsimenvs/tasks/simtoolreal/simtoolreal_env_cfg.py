@@ -393,6 +393,10 @@ class ResetCfg:
     # starts grasped from a random one of its object's states, lifted, with the start pose as the
     # first goal.
     reset_state_dir: str = ""
+    # Keep the first this many states of each object's file, 0 keeps all.
+    reset_state_count: int = 0
+    # Draw the first goal from the start pose as after every success, instead of the start pose.
+    first_goal_random: bool = False
 
     # Goal sampling
     goal_sampling_type: str = "delta"  # "delta" | "absolute"
