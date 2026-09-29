@@ -52,7 +52,7 @@ class WandbAlgoObserver(AlgoObserver):
         chosen = getattr(self.cfg, "wandb_name", "") or experiment_name
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         wandb_unique_id = f"{chosen}_{timestamp}"
-        display_name = f"{chosen}_{timestamp}"
+        display_name = chosen
         print(f"[Wandb] unique id: {wandb_unique_id}")
 
         cfg = self.cfg
