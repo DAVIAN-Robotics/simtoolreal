@@ -408,6 +408,14 @@ class ResetCfg:
     # Directory of <stem>.npz with each reset state's palm pose in the env frame (palm_pos, palm_quat_wxyz). When
     # set, the reset-state goal window is measured on the palm pose instead of the object pose.
     goal_wrist_dir: str = ""
+    # Grasp-type adaptive sampling. Every interval each type's weight is clip(mean / type mean, min, max) of the
+    # successes per episode, global over objects, and a reset draws a grasp with its type's weight.
+    type_adaptive_sampling: bool = False
+    # npz with gtype__<stem>, the type index of every delivered grasp, which the reset files' grasp column indexes.
+    grasp_type_file: str = ""
+    type_adaptive_interval: int = 3000
+    type_adaptive_min: float = 0.25
+    type_adaptive_max: float = 4.0
 
     # Goal sampling
     goal_sampling_type: str = "delta"  # "delta" | "absolute" | "reset_state"

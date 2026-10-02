@@ -28,10 +28,16 @@ def _load_reset_states(env) -> None:
 
     n = env.cfg.reset.reset_state_count or None
     columns = {k: [] for k in ("obj_pos", "obj_quat_wxyz", "arm_q", "hand_q", "hand_target")}
+    adaptive = env.cfg.reset.type_adaptive_sampling
+    if adaptive:
+        grasp_types = np.load(env.cfg.reset.grasp_type_file)
+        row_types = []
     for urdf in env._object_urdf_paths:
         with np.load(Path(env.cfg.reset.reset_state_dir) / f"{Path(urdf).stem}.npz") as f:
             for key, rows in columns.items():
                 rows.append(f[key][:n])
+            if adaptive:
+                row_types.append(grasp_types[f"gtype__{Path(urdf).stem}"][f["grasp"][:n]])
             arm_joints, hand_joints = list(f["arm_joints"]), list(f["hand_joints"])
     names = list(env.robot.data.joint_names)
     env._rs_arm_ids = torch.tensor([names.index(j) for j in arm_joints], device=env.device)
@@ -71,6 +77,18 @@ def _load_reset_states(env) -> None:
         env._rs_palm_pos = torch.tensor(np.stack(palm_pos), dtype=torch.float32, device=env.device)
         env._rs_palm_quat = torch.tensor(np.stack(palm_quat), dtype=torch.float32, device=env.device)
         assert env._rs_palm_pos.shape[:2] == env._rs_obj_pos.shape[:2], (env._rs_palm_pos.shape, env._rs_obj_pos.shape)
+
+    if adaptive:
+        env._type_names = [str(t) for t in grasp_types["types"]]
+        n_types = len(env._type_names)
+        env._rs_row_type = torch.tensor(np.stack(row_types), dtype=torch.long, device=env.device)
+        env._rs_row_weight = torch.ones(env._rs_row_type.shape, device=env.device)
+        env._rs_type_env = torch.full((env.num_envs,), -1, dtype=torch.long, device=env.device)
+        env._type_weight = torch.ones(n_types, device=env.device)
+        env._type_succ_sum = torch.zeros(n_types, device=env.device)
+        env._type_ep_count = torch.zeros(n_types, device=env.device)
+        env._type_last_update = 0
+        env._type_log = {}
 
 
 def allocate_state_buffers(env) -> None:
@@ -581,7 +599,11 @@ def _reset_grasped(env, env_ids: torch.Tensor) -> None:
     """Start from a random one of the object's grasped states, with the start pose as the first goal."""
     n = env_ids.numel()
     asset = env._object_asset_index_per_env[env_ids]
-    k = torch.randint(0, env._rs_obj_pos.shape[1], (n,), device=env.device)
+    if env.cfg.reset.type_adaptive_sampling:
+        k = torch.multinomial(env._rs_row_weight[asset], 1).squeeze(-1)
+        env._rs_type_env[env_ids] = env._rs_row_type[asset, k]
+    else:
+        k = torch.randint(0, env._rs_obj_pos.shape[1], (n,), device=env.device)
 
     joint_pos = env.robot.data.default_joint_pos[env_ids].clone()
     joint_pos[:, env._rs_arm_ids] = env._rs_arm_q[asset, k]
@@ -605,12 +627,51 @@ def _reset_grasped(env, env_ids: torch.Tensor) -> None:
     env._object_init_z[env_ids] = pos_local[:, 2]
 
 
+def _record_type_outcomes(env, env_ids: torch.Tensor) -> None:
+    """Add each finished episode's successes to the grasp type it started from, before the new draw."""
+    t = env._rs_type_env[env_ids]
+    played = t >= 0  # the first reset ends no episode
+    n_types = env._type_weight.numel()
+    env._type_succ_sum += torch.bincount(
+        t[played], weights=env._successes[env_ids][played].float(), minlength=n_types
+    )
+    env._type_ep_count += torch.bincount(t[played], minlength=n_types).float()
+
+
+def update_type_adaptive_sampling(env) -> None:
+    """Every interval, weight each grasp type by clip(mean / type mean) of its successes per episode."""
+    cfg = env.cfg.reset
+    if env._frame_counter - env._type_last_update < cfg.type_adaptive_interval:
+        return
+    count = env._type_ep_count
+    mean_t = env._type_succ_sum / count
+    mean_all = env._type_succ_sum.sum() / count.sum()
+    # A type with no episode this interval keeps its weight. A type at zero successes takes the max.
+    weight = torch.where(
+        count > 0, (mean_all / mean_t).clamp(cfg.type_adaptive_min, cfg.type_adaptive_max), env._type_weight
+    )
+    env._type_weight = weight
+    env._rs_row_weight = weight[env._rs_row_type]
+    share = count / count.sum()
+    env._type_log = {}
+    for name, s, w, p in zip(env._type_names, mean_t.tolist(), weight.tolist(), share.tolist()):
+        if p > 0:
+            env._type_log[f"type_successes/{name}"] = s
+        env._type_log[f"type_weight/{name}"] = w
+        env._type_log[f"type_share/{name}"] = p
+    env._type_succ_sum.zero_()
+    env._type_ep_count.zero_()
+    env._type_last_update = env._frame_counter
+
+
 def reset_env_state(env, env_ids: torch.Tensor) -> None:
     """Full per-env reset after ``super()._reset_idx``."""
     n = env_ids.numel()
 
     if env.cfg.reset.reset_state_dir:
         _reset_table_pose(env, env_ids)
+        if env.cfg.reset.type_adaptive_sampling:
+            _record_type_outcomes(env, env_ids)
         _reset_grasped(env, env_ids)
     else:
         _randomize_robot_dof_state(env, env_ids)

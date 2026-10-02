@@ -53,6 +53,8 @@ def log_step_metrics(env) -> None:
     env.extras["episode_final"] = episode_final
     env.extras["successes"] = successes
     env.extras["current_success_tolerance"] = float(env._current_success_tolerance)
+    if env.cfg.reset.type_adaptive_sampling:
+        env.extras.update(env._type_log)
     if term_cfg.tolerance_curriculum_per_object:
         tol = env._object_success_tolerance
         env.extras["current_success_tolerance_min"] = float(tol.min())

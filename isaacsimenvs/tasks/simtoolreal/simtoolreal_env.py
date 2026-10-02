@@ -20,7 +20,7 @@ from .utils.obs_utils import (
     compute_intermediate_values,
     compute_obs_dim,
 )
-from .utils.reset_utils import allocate_state_buffers, reset_env_state
+from .utils.reset_utils import allocate_state_buffers, reset_env_state, update_type_adaptive_sampling
 from .utils.reward_utils import compute_rewards
 from .utils.scene_utils import apply_physx_material_properties, setup_scene
 from .utils.termination_utils import (
@@ -74,6 +74,8 @@ class SimToolRealEnv(DirectRLEnv):
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
         update_tolerance_curriculum(self)
+        if self.cfg.reset.type_adaptive_sampling:
+            update_type_adaptive_sampling(self)
         compute_intermediate_values(self)
         return compute_terminations(self)
 
