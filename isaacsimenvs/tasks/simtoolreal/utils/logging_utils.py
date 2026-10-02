@@ -61,6 +61,9 @@ def log_step_metrics(env) -> None:
         env.extras["current_success_tolerance_is_max"] = float(
             (tol == term_cfg.success_tolerance).float().mean()
         )
+        env.extras["current_success_tolerance_is_min"] = float(
+            (tol == term_cfg.target_success_tolerance).float().mean()
+        )
 
 
 __all__ = ["log_step_metrics"]
