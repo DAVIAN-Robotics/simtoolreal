@@ -6,9 +6,11 @@ import json
 from pathlib import Path
 from xml.etree import ElementTree
 
+import math
+
 import torch
 
-from isaaclab.utils.math import random_orientation
+from isaaclab.utils.math import quat_apply, random_orientation
 
 from .action_utils import sample_log_uniform
 from .goal_sampling import sample_absolute_goal_pose, sample_delta_goal_pose
@@ -46,6 +48,19 @@ def _load_reset_states(env) -> None:
     lo, hi = env.robot.data.joint_pos_limits[0, env._rs_hand_ids].unbind(-1)
     squeeze = env._rs_hand_q + (stack("hand_target") - env._rs_hand_q) * DEXONOMY_HAND_KP / kp
     env._rs_hand_target = torch.maximum(torch.minimum(squeeze, hi), lo)
+
+    if env.cfg.reset.goal_fingertip_dir:
+        names = list(env._fingertip_body_names)
+        ft = []
+        for urdf in env._object_urdf_paths:
+            with np.load(Path(env.cfg.reset.goal_fingertip_dir) / f"{Path(urdf).stem}.npz") as f:
+                bodies = [str(b) for b in f["bodies"]]
+                ft.append(f["ft_obj"][:n][:, [bodies.index(b) for b in names]])
+        env._rs_ft_obj = torch.tensor(np.stack(ft), dtype=torch.float32, device=env.device)
+        assert env._rs_ft_obj.shape[:2] == env._rs_obj_pos.shape[:2], (env._rs_ft_obj.shape, env._rs_obj_pos.shape)
+        env._goal_row = torch.zeros(env.num_envs, dtype=torch.long, device=env.device)
+        env._goal_ft = torch.zeros(env.num_envs, NUM_FINGERTIPS, 3, device=env.device)
+        env._closest_fingertip_max_dist = torch.full((env.num_envs,), -1.0, device=env.device)
 
 
 def allocate_state_buffers(env) -> None:
@@ -447,6 +462,10 @@ def _reset_goal_pose(env, env_ids: torch.Tensor, mode: str) -> None:
         env.goal_viz.write_root_pose_to_sim(pose, env_ids=env_ids)
         return
 
+    if mode == "reset_state":
+        _sample_goal_state(env, env_ids)
+        return
+
     if mode == "delta":
         prev_pos_local = env.goal_viz.data.root_pos_w[env_ids] - env_origins
         prev_quat = env.goal_viz.data.root_quat_w[env_ids]
@@ -505,6 +524,8 @@ def _clear_table(env, env_ids, pos_local, quat_wxyz):
 def _clear_goal_trackers(env, env_ids: torch.Tensor) -> None:
     env._closest_keypoint_max_dist[env_ids] = -1.0
     env._closest_fingertip_dist[env_ids] = -1.0
+    if env.cfg.reset.goal_fingertip_dir:
+        env._closest_fingertip_max_dist[env_ids] = -1.0
     env._near_goal_steps[env_ids] = 0
 
 
@@ -512,6 +533,33 @@ def reset_goal_trackers(env, env_ids: torch.Tensor) -> None:
     """Clear per-goal trackers and sample the next goal."""
     _clear_goal_trackers(env, env_ids)
     _reset_goal_pose(env, env_ids, mode=env.cfg.reset.goal_sampling_type)
+
+
+def _set_goal_state(env, env_ids: torch.Tensor, rows: torch.Tensor) -> None:
+    """Make reset state `rows` of each env's object its goal: the pose to GoalViz, its fingertip points placed there."""
+    asset = env._object_asset_index_per_env[env_ids]
+    pos_local = env._rs_obj_pos[asset, rows]
+    quat = env._rs_obj_quat[asset, rows]
+    env.goal_viz.write_root_pose_to_sim(
+        torch.cat([pos_local + env.scene.env_origins[env_ids], quat], dim=-1), env_ids=env_ids
+    )
+    env._goal_row[env_ids] = rows
+    env._goal_ft[env_ids] = quat_apply(
+        quat.unsqueeze(1).expand(-1, NUM_FINGERTIPS, -1), env._rs_ft_obj[asset, rows]
+    ) + pos_local.unsqueeze(1)
+
+
+def _sample_goal_state(env, env_ids: torch.Tensor) -> None:
+    """Next goal: uniform among the object's reset states inside the delta window around the current goal state."""
+    cfg = env.cfg.reset
+    asset = env._object_asset_index_per_env[env_ids]
+    cur = env._goal_row[env_ids]
+    p, q = env._rs_obj_pos[asset], env._rs_obj_quat[asset]  # (n, states, 3), (n, states, 4)
+    in_pos = ((p - env._rs_obj_pos[asset, cur].unsqueeze(1)).abs() <= cfg.delta_goal_distance).all(dim=-1)
+    cos_half = math.cos(math.radians(cfg.delta_rotation_degrees) / 2.0)
+    in_rot = (q * env._rs_obj_quat[asset, cur].unsqueeze(1)).sum(dim=-1).abs() >= cos_half
+    rows = torch.multinomial((in_pos & in_rot).float(), 1).squeeze(-1)
+    _set_goal_state(env, env_ids, rows)
 
 
 def _reset_grasped(env, env_ids: torch.Tensor) -> None:
@@ -533,7 +581,10 @@ def _reset_grasped(env, env_ids: torch.Tensor) -> None:
     pose = torch.cat([pos_local + env.scene.env_origins[env_ids], env._rs_obj_quat[asset, k]], dim=-1)
     env.object.write_root_pose_to_sim(pose, env_ids=env_ids)
     env.object.write_root_velocity_to_sim(torch.zeros(n, 6, device=env.device), env_ids=env_ids)
-    env.goal_viz.write_root_pose_to_sim(pose, env_ids=env_ids)
+    if env.cfg.reset.goal_fingertip_dir:
+        _set_goal_state(env, env_ids, k)
+    else:
+        env.goal_viz.write_root_pose_to_sim(pose, env_ids=env_ids)
     if env.cfg.reset.first_goal_random:
         _reset_goal_pose(env, env_ids, mode="delta")
     env._object_init_z[env_ids] = pos_local[:, 2]

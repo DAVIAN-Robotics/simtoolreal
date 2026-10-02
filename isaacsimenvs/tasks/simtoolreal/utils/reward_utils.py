@@ -138,7 +138,13 @@ def compute_rewards(env) -> torch.Tensor:
         force_consecutive=term_cfg.force_consecutive_near_goal_steps,
     )
 
-    reward = lift_rew + lift_bonus_rew + ft_rew + kp_rew + kuka_pen + hand_pen + bonus
+    if env.cfg.reset.goal_fingertip_dir:
+        ft_bonus = (env._near_goal & env._near_goal_fingertips).float() * (
+            rew_cfg.fingertip_goal_bonus / term_cfg.success_steps
+        )
+    else:
+        ft_bonus = torch.zeros_like(bonus)
+    reward = lift_rew + lift_bonus_rew + ft_rew + kp_rew + kuka_pen + hand_pen + bonus + ft_bonus
     env._reward_terms = {
         "fingertip_delta_rew": ft_rew,
         "lifting_rew": lift_rew,
@@ -147,6 +153,7 @@ def compute_rewards(env) -> torch.Tensor:
         "kuka_actions_penalty": kuka_pen,
         "hand_actions_penalty": hand_pen,
         "bonus_rew": bonus,
+        "fingertip_bonus_rew": ft_bonus,
         "total_reward": reward,
     }
 

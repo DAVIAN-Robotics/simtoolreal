@@ -341,6 +341,8 @@ class RewardCfg:
 
     distance_delta_rew_scale: float = 50.0
     reach_goal_bonus: float = 1000.0
+    # Paid like reach_goal_bonus, per near-goal step, while the fingertips are also at the goal state's fingertips.
+    fingertip_goal_bonus: float = 0.0
 
     kuka_actions_penalty_scale: float = 0.03
     hand_actions_penalty_scale: float = 0.003
@@ -397,9 +399,12 @@ class ResetCfg:
     reset_state_count: int = 0
     # Draw the first goal from the start pose as after every success, instead of the start pose.
     first_goal_random: bool = False
+    # Directory of <stem>.npz with each reset state's 5 fingertip pad points in the object frame (ft_obj, bodies).
+    # Required by goal_sampling_type "reset_state", where every goal is a reset state: its pose and its fingertips.
+    goal_fingertip_dir: str = ""
 
     # Goal sampling
-    goal_sampling_type: str = "delta"  # "delta" | "absolute"
+    goal_sampling_type: str = "delta"  # "delta" | "absolute" | "reset_state"
     delta_goal_distance: float = 0.1
     delta_rotation_degrees: float = 90.0
     target_volume_mins: tuple[float, float, float] = (-0.35, -0.2, 0.6)

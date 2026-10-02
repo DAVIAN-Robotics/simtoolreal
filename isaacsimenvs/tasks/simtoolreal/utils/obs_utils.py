@@ -30,6 +30,8 @@ OBS_FIELD_SIZES: dict[str, int] = {
     "object_rot": 4,
     "object_vel": 6,
     "fingertip_pos_rel_palm": 3 * NUM_FINGERTIPS,  # 15
+    "fingertip_pos_rel_goal": 3 * NUM_FINGERTIPS,  # 15
+    "closest_fingertip_max_dist": 1,
     "keypoints_rel_palm": 3 * NUM_KEYPOINTS,  # 24
     "keypoints_rel_goal": 3 * NUM_KEYPOINTS,  # 24
     "object_scales": 3,
@@ -176,6 +178,13 @@ def compute_intermediate_values(env) -> None:
     env._curr_fingertip_distances = torch.norm(
         ft_pos - obj_pos.unsqueeze(1), dim=-1
     )  # (N, 5)
+    if env.cfg.reset.goal_fingertip_dir:
+        env._fingertip_goal_max_dist = torch.norm(ft_pos - env._goal_ft, dim=-1).max(dim=-1).values
+        env._closest_fingertip_max_dist = torch.where(
+            env._closest_fingertip_max_dist < 0.0,
+            env._fingertip_goal_max_dist,
+            torch.minimum(env._closest_fingertip_max_dist, env._fingertip_goal_max_dist),
+        )
 
     kp_offsets = env._keypoint_offsets
 
@@ -201,6 +210,8 @@ def compute_intermediate_values(env) -> None:
     else:
         tol = env._current_success_tolerance * rew_cfg.keypoint_scale
     env._near_goal = env._keypoints_max_dist <= tol
+    if env.cfg.reset.goal_fingertip_dir:
+        env._near_goal_fingertips = env._fingertip_goal_max_dist <= tol
     env._near_goal_steps = update_near_goal_steps(
         near_goal=env._near_goal,
         near_goal_steps=env._near_goal_steps,
@@ -332,6 +343,10 @@ def build_observations(env) -> dict[str, torch.Tensor]:
         "successes": torch.log(env._successes.float() + 1.0).unsqueeze(-1),
         "reward": (env.reward_buf * 0.01).unsqueeze(-1),
     }
+
+    if env.cfg.reset.goal_fingertip_dir:
+        obs_clean["fingertip_pos_rel_goal"] = (ft_pos_w - env_origins.unsqueeze(1)) - env._goal_ft
+        obs_clean["closest_fingertip_max_dist"] = env._closest_fingertip_max_dist.unsqueeze(-1)
 
     obs_noisy = dict(obs_clean)
     obs_noisy["object_rot"] = noisy_obj_rot_xyzw
