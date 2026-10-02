@@ -11,7 +11,9 @@ def update_tolerance_curriculum(env) -> None:
     """Shrink success tolerance when completed episodes average enough goals."""
     env._frame_counter += 1
     term = env.cfg.termination
-    if env._frame_counter - env._last_curriculum_update >= term.tolerance_curriculum_interval:
+    if term.tolerance_curriculum_per_object:
+        _update_tolerance_per_object(env)
+    elif env._frame_counter - env._last_curriculum_update >= term.tolerance_curriculum_interval:
         successes = env._prev_episode_successes.float()
         eligible_mask = None
         if hasattr(env, "_curriculum_eligible_mask"):
@@ -34,6 +36,27 @@ def update_tolerance_curriculum(env) -> None:
     # Eval pins the success criterion.
     if term.eval_success_tolerance is not None:
         env._current_success_tolerance = float(term.eval_success_tolerance)
+        if term.tolerance_curriculum_per_object:
+            env._object_success_tolerance.fill_(float(term.eval_success_tolerance))
+
+
+def _update_tolerance_per_object(env) -> None:
+    """Tighten each object whose own envs' last episodes average enough goals, at most once per interval."""
+    term = env.cfg.termination
+    obj = env._object_asset_index_per_env
+    n_obj = env._object_success_tolerance.numel()
+    count = torch.bincount(obj, minlength=n_obj)
+    mean = torch.bincount(obj, weights=env._prev_episode_successes.float(), minlength=n_obj) / count
+    due = env._frame_counter - env._object_last_curriculum_update >= term.tolerance_curriculum_interval
+    tighten = due & (count > 0) & (mean >= term.tolerance_curriculum_success_threshold)
+    tol = env._object_success_tolerance
+    new_tol = (tol * term.tolerance_curriculum_increment).clamp(term.target_success_tolerance, term.success_tolerance)
+    env._object_success_tolerance = torch.where(tighten, new_tol, tol)
+    env._object_last_curriculum_update = torch.where(
+        tighten, torch.full_like(env._object_last_curriculum_update, env._frame_counter),
+        env._object_last_curriculum_update,
+    )
+    env._current_success_tolerance = float(env._object_success_tolerance.mean())
 
 
 def compute_terminations(env) -> tuple[torch.Tensor, torch.Tensor]:

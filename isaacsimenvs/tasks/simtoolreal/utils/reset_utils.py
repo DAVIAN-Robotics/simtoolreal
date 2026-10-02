@@ -105,6 +105,12 @@ def allocate_state_buffers(env) -> None:
     )
     env._frame_counter: int = 0
     env._last_curriculum_update: int = 0
+    if env.cfg.termination.tolerance_curriculum_per_object:
+        n_obj = len(env._object_urdf_paths)
+        env._object_success_tolerance = torch.full(
+            (n_obj,), env.cfg.termination.success_tolerance, device=env.device
+        )
+        env._object_last_curriculum_update = torch.zeros(n_obj, dtype=torch.long, device=env.device)
 
     # --- Object lifted-reward reference z (updated on each _reset_object_pose) ---
     init_z = env.cfg.reset.table_reset_z + env.cfg.reset.table_object_z_offset

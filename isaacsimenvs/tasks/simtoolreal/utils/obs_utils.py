@@ -196,6 +196,8 @@ def compute_intermediate_values(env) -> None:
 
     if hasattr(env, "_keypoint_success_tolerance_m"):
         tol = env._keypoint_success_tolerance_m()
+    elif env.cfg.termination.tolerance_curriculum_per_object:
+        tol = env._object_success_tolerance[env._object_asset_index_per_env] * rew_cfg.keypoint_scale
     else:
         tol = env._current_success_tolerance * rew_cfg.keypoint_scale
     env._near_goal = env._keypoints_max_dist <= tol

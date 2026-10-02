@@ -446,6 +446,8 @@ class TerminationCfg:
     tolerance_curriculum_increment: float = 0.9  # multiplicative per step
     tolerance_curriculum_interval: int = 3000  # env steps across all agents
     tolerance_curriculum_success_threshold: float = 3.0
+    # One tolerance per pool object, each tightened on its own envs' successes.
+    tolerance_curriculum_per_object: bool = False
 
 
 # ----------------------------------------------------------------------------
