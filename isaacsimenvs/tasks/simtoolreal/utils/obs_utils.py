@@ -212,6 +212,8 @@ def compute_intermediate_values(env) -> None:
     env._near_goal = env._keypoints_max_dist <= tol
     if env.cfg.reset.goal_fingertip_dir:
         env._near_goal_fingertips = env._fingertip_goal_max_dist <= tol
+    if term_cfg.success_with_fingertips:
+        env._near_goal = env._near_goal & env._near_goal_fingertips
     env._near_goal_steps = update_near_goal_steps(
         near_goal=env._near_goal,
         near_goal_steps=env._near_goal_steps,

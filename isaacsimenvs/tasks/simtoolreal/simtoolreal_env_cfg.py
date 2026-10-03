@@ -458,6 +458,9 @@ class TerminationCfg:
     success_steps: int = 10
     max_consecutive_successes: int = 50
     force_consecutive_near_goal_steps: bool = False
+    # With reset-state goals, success also needs every fingertip within the same tolerance of the goal state's
+    # fingertip points. The reach bonus, the next goal and the tolerance curriculum then follow both.
+    success_with_fingertips: bool = False
 
     # Tolerance curriculum (the only curriculum in v1).
     tolerance_curriculum_increment: float = 0.9  # multiplicative per step
