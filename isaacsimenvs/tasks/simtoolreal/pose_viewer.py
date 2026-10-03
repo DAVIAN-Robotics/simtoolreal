@@ -229,6 +229,20 @@ def hole_urdf_for_env(env, env_id: int) -> tuple[str, Path] | tuple[None, None]:
     return urdf_path.read_text(encoding="utf-8"), urdf_path
 
 
+FINGERTIP_GOAL_COLORS = {
+    "thumb_rota_link2": (0.90, 0.13, 0.13),
+    "index_rota_link2": (0.13, 0.75, 0.24),
+    "mid_link2": (0.16, 0.42, 0.90),
+    "ring_link2": (0.16, 0.42, 0.90),
+    "pinky_link2": (0.16, 0.42, 0.90),
+}
+
+_TIP_URDF = (
+    '<robot name="{name}"><link name="tip"><visual><geometry>'
+    '<sphere radius="0.010"/></geometry></visual></link></robot>'
+)
+
+
 def capture_pose_viewer_frame(env, env_id: int) -> dict[str, Any]:
     """Capture one env-local frame from a live SimToolRealEnv."""
 
@@ -262,6 +276,10 @@ def capture_pose_viewer_frame(env, env_id: int) -> dict[str, Any]:
     if hole is not None:
         hole_pos = hole.data.root_pos_w[env_id] - origin
         frame["hole_pose"] = _pose_xyzw(hole_pos, hole.data.root_quat_w[env_id])
+    # The fingertip half of the goal, already in the env frame.
+    if hasattr(env, "_goal_ft"):
+        frame["fingertip_goal_names"] = list(env._fingertip_body_names)
+        frame["fingertip_goal_pos"] = _to_numpy(env._goal_ft[env_id])
     return frame
 
 
@@ -329,6 +347,21 @@ def build_pose_viewer_html(
         "object": np.stack([frame["object_pose"] for frame in frames]),
         "goal": np.stack([frame["goal_pose"] for frame in frames]),
     }
+    if all("fingertip_goal_pos" in frame for frame in frames):
+        for i, body in enumerate(frames[0]["fingertip_goal_names"]):
+            name = f"tip_{body}"
+            robots.append(
+                make_embedded_robot(
+                    name=name,
+                    urdf_text=_TIP_URDF.format(name=name),
+                    color_override=FINGERTIP_GOAL_COLORS[body],
+                )
+            )
+            pos = np.stack([frame["fingertip_goal_pos"][i] for frame in frames])
+            pose = np.zeros((len(frames), 7), dtype=np.float32)
+            pose[:, 0:3] = pos
+            pose[:, 6] = 1.0
+            object_poses[name] = pose
     if hole_urdf_text is not None and all("hole_pose" in frame for frame in frames):
         robots.insert(2, make_embedded_robot(name="hole", urdf_text=hole_urdf_text))
         object_poses["hole"] = np.stack([frame["hole_pose"] for frame in frames])
