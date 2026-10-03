@@ -35,6 +35,7 @@ OBS_FIELD_SIZES: dict[str, int] = {
     "keypoints_rel_palm": 3 * NUM_KEYPOINTS,  # 24
     "keypoints_rel_goal": 3 * NUM_KEYPOINTS,  # 24
     "object_scales": 3,
+    "shape_code": 32,
     "closest_keypoint_max_dist": 1,
     "closest_fingertip_dist": NUM_FINGERTIPS,  # 5
     "lifted_object": 1,
@@ -349,6 +350,9 @@ def build_observations(env) -> dict[str, torch.Tensor]:
     if env.cfg.reset.goal_fingertip_dir:
         obs_clean["fingertip_pos_rel_goal"] = (ft_pos_w - env_origins.unsqueeze(1)) - env._goal_ft
         obs_clean["closest_fingertip_max_dist"] = env._closest_fingertip_max_dist.unsqueeze(-1)
+
+    if env.cfg.assets.shape_code_file:
+        obs_clean["shape_code"] = env._shape_code_per_env
 
     obs_noisy = dict(obs_clean)
     obs_noisy["object_rot"] = noisy_obj_rot_xyzw

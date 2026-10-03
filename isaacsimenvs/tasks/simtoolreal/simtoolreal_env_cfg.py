@@ -81,6 +81,9 @@ class AssetsCfg:
     # Persistent dir for converted and baked USDs. Empty keeps the per-launch
     # temp dir, which reconverts the whole pool every time.
     asset_cache_dir: str = ""
+
+    # npz with names (urdf stems) and code (objects, 32) for the shape_code obs. Empty leaves it out.
+    shape_code_file: str = ""
     handle_head_types: tuple[str, ...] = (
         "hammer",
         "screwdriver",

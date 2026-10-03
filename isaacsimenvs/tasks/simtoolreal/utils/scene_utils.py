@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 
@@ -25,6 +26,7 @@ from isaaclab.sim.spawners.wrappers import MultiUsdFileCfg
 from isaaclab.sim.utils import find_matching_prim_paths, get_current_stage
 
 from .generate_objects import generate_handle_head_urdfs
+from .obs_utils import OBS_FIELD_SIZES
 
 
 _CONTACT_OFFSET = 0.002
@@ -1567,6 +1569,16 @@ def _build_object_scale_tensor(env, object_scales_normalized, num_object_usds: i
         env._object_asset_index_per_env[env_id] = asset_index
 
 
+def _build_shape_code_tensor(env) -> None:
+    with np.load(env.cfg.assets.shape_code_file) as f:
+        row = {str(n): i for i, n in enumerate(f["names"])}
+        code = f["code"][[row[Path(p).stem] for p in env._object_urdf_paths]]
+    assert code.shape[1] == OBS_FIELD_SIZES["shape_code"], code.shape
+    env._shape_code_per_env = torch.as_tensor(code, device=env.device, dtype=torch.float32)[
+        env._object_asset_index_per_env
+    ]
+
+
 def setup_scene(env) -> None:
     """Build and register robot, table, object, goal, ground, and light."""
     assets_cfg = env.cfg.assets
@@ -1738,6 +1750,8 @@ def setup_scene(env) -> None:
 
     # 6. Per-env scale tensor for spawned Objects.
     _build_object_scale_tensor(env, object_scales_normalized, len(object_usd_paths))
+    if assets_cfg.shape_code_file:
+        _build_shape_code_tensor(env)
 
     # 7. Register with scene so DirectRLEnv refreshes their tensors each step.
     env.scene.articulations["robot"] = env.robot
