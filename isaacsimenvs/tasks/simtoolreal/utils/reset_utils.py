@@ -62,6 +62,16 @@ def _load_reset_states(env) -> None:
         env._goal_ft = torch.zeros(env.num_envs, NUM_FINGERTIPS, 3, device=env.device)
         env._closest_fingertip_max_dist = torch.full((env.num_envs,), -1.0, device=env.device)
 
+    if env.cfg.reset.goal_wrist_dir:
+        palm_pos, palm_quat = [], []
+        for urdf in env._object_urdf_paths:
+            with np.load(Path(env.cfg.reset.goal_wrist_dir) / f"{Path(urdf).stem}.npz") as f:
+                palm_pos.append(f["palm_pos"][:n])
+                palm_quat.append(f["palm_quat_wxyz"][:n])
+        env._rs_palm_pos = torch.tensor(np.stack(palm_pos), dtype=torch.float32, device=env.device)
+        env._rs_palm_quat = torch.tensor(np.stack(palm_quat), dtype=torch.float32, device=env.device)
+        assert env._rs_palm_pos.shape[:2] == env._rs_obj_pos.shape[:2], (env._rs_palm_pos.shape, env._rs_obj_pos.shape)
+
 
 def allocate_state_buffers(env) -> None:
     """Populate every per-env buffer + index cache used by the hooks.
@@ -550,14 +560,19 @@ def _set_goal_state(env, env_ids: torch.Tensor, rows: torch.Tensor) -> None:
 
 
 def _sample_goal_state(env, env_ids: torch.Tensor) -> None:
-    """Next goal: uniform among the object's reset states inside the delta window around the current goal state."""
+    """Next goal: uniform among the object's reset states inside the delta window around the current goal state,
+    measured on the object pose, or on the palm pose when goal_wrist_dir is set."""
     cfg = env.cfg.reset
     asset = env._object_asset_index_per_env[env_ids]
     cur = env._goal_row[env_ids]
-    p, q = env._rs_obj_pos[asset], env._rs_obj_quat[asset]  # (n, states, 3), (n, states, 4)
-    in_pos = ((p - env._rs_obj_pos[asset, cur].unsqueeze(1)).abs() <= cfg.delta_goal_distance).all(dim=-1)
+    if cfg.goal_wrist_dir:
+        win_pos, win_quat = env._rs_palm_pos, env._rs_palm_quat
+    else:
+        win_pos, win_quat = env._rs_obj_pos, env._rs_obj_quat
+    p, q = win_pos[asset], win_quat[asset]  # (n, states, 3), (n, states, 4)
+    in_pos = ((p - win_pos[asset, cur].unsqueeze(1)).abs() <= cfg.delta_goal_distance).all(dim=-1)
     cos_half = math.cos(math.radians(cfg.delta_rotation_degrees) / 2.0)
-    in_rot = (q * env._rs_obj_quat[asset, cur].unsqueeze(1)).sum(dim=-1).abs() >= cos_half
+    in_rot = (q * win_quat[asset, cur].unsqueeze(1)).sum(dim=-1).abs() >= cos_half
     rows = torch.multinomial((in_pos & in_rot).float(), 1).squeeze(-1)
     _set_goal_state(env, env_ids, rows)
 

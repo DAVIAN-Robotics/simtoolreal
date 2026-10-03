@@ -402,6 +402,9 @@ class ResetCfg:
     # Directory of <stem>.npz with each reset state's 5 fingertip pad points in the object frame (ft_obj, bodies).
     # Required by goal_sampling_type "reset_state", where every goal is a reset state: its pose and its fingertips.
     goal_fingertip_dir: str = ""
+    # Directory of <stem>.npz with each reset state's palm pose in the env frame (palm_pos, palm_quat_wxyz). When
+    # set, the reset-state goal window is measured on the palm pose instead of the object pose.
+    goal_wrist_dir: str = ""
 
     # Goal sampling
     goal_sampling_type: str = "delta"  # "delta" | "absolute" | "reset_state"
