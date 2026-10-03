@@ -23,7 +23,12 @@ from .utils.obs_utils import (
 from .utils.reset_utils import allocate_state_buffers, reset_env_state
 from .utils.reward_utils import compute_rewards
 from .utils.scene_utils import apply_physx_material_properties, setup_scene
-from .utils.termination_utils import compute_terminations, update_tolerance_curriculum
+from .utils.termination_utils import (
+    compute_terminations,
+    get_curriculum_state,
+    set_curriculum_state,
+    update_tolerance_curriculum,
+)
 
 
 __all__ = ["SimToolRealEnv", "SimToolRealEnvCfg"]
@@ -71,6 +76,12 @@ class SimToolRealEnv(DirectRLEnv):
         update_tolerance_curriculum(self)
         compute_intermediate_values(self)
         return compute_terminations(self)
+
+    def get_env_state(self) -> dict:
+        return get_curriculum_state(self)
+
+    def set_env_state(self, env_state: dict) -> None:
+        set_curriculum_state(self, env_state)
 
     def _get_rewards(self) -> torch.Tensor:
         reward = compute_rewards(self)
