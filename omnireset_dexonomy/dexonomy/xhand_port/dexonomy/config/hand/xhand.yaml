@@ -1,0 +1,3 @@
+xml_path: ${asset_root}/hand/xhand/right.xml
+color: [0.67, 0.67, 0.67, 1.0]
+arm_hand:

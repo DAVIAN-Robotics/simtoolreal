@@ -1,0 +1,163 @@
+diff --git a/dexonomy/data/hand_loader.py b/dexonomy/data/hand_loader.py
+index 0e07b8d..e12d0e8 100644
+--- a/dexonomy/data/hand_loader.py
++++ b/dexonomy/data/hand_loader.py
+@@ -66,6 +66,8 @@ class HandTemplateLoader:
+         self.xml_path = xml_path
+         self.init_tmpl_dir = init_tmpl_dir
+         self.new_tmpl_dir = new_tmpl_dir
++        # 051 cap16: pool paths read incrementally from the own-test workers' index files, see _update_data_path
++        self._pool_paths, self._pool_off = set(), {}
+         self.tmpl_name = tmpl_name
+         assert os.path.exists(os.path.join(init_tmpl_dir, tmpl_name + ".npy"))
+ 
+@@ -134,10 +136,18 @@ class HandTemplateLoader:
+             if self.new_tmpl_dir is None:
+                 template_lst = []
+             else:
+-                template_lst = glob(
+-                    os.path.join(self.new_tmpl_dir, self.tmpl_name, "**/*.npy"),
+-                    recursive=True,
+-                )
++                # 051 cap16: the paths the recursive glob of new_tmpl_dir/<tmpl> would return, from the index files
++                # the own-test workers append per (chunk, template), instead of listing the pool on NFS every 60 s
++                index_dir = os.path.join(os.path.dirname(self.new_tmpl_dir), "gsched", "pool")
++                for f in glob(os.path.join(index_dir, f"*__{self.tmpl_name}.txt")):
++                    off = self._pool_off.get(f, 0)
++                    with open(f) as fh:
++                        fh.seek(off)
++                        buf = fh.read()
++                    end = buf.rfind("\n") + 1
++                    self._pool_paths.update(x for x in buf[:end].split("\n")[:-1] if "\x00" not in x)
++                    self._pool_off[f] = off + end
++                template_lst = list(self._pool_paths)
+             template_lst.append(
+                 os.path.join(self.init_tmpl_dir, self.tmpl_name + ".npy")
+             )
+@@ -158,7 +168,7 @@ class HandTemplateLoader:
+                     self.data_path_list.extend(template_lst[:n_new])
+                     self.data_path_condition.notify(n_new)
+ 
+-            time.sleep(1.0)  # Control production rate
++            time.sleep(60.0)  # 051 cap16: 1 s upstream; 150 processes share new_tmpl_dir on NFS
+ 
+     def _update_data_buffer(self):
+         """Consumer thread that load data and stores results in buffer"""
+diff --git a/dexonomy/data/obj_loader.py b/dexonomy/data/obj_loader.py
+index deab279..fbbb8be 100644
+--- a/dexonomy/data/obj_loader.py
++++ b/dexonomy/data/obj_loader.py
+@@ -163,5 +163,6 @@ def get_object_dataloader(cfg, n_worker):
+         shuffle=False,
+         collate_fn=_customized_collate_fn,
+         pin_memory=True,
++        multiprocessing_context="forkserver",  # 051 cap16: no fork while the hand loader's threads hold locks
+     )
+     return dataloader
+diff --git a/dexonomy/op/eval_data.py b/dexonomy/op/eval_data.py
+index 104be7e..3ca74a7 100644
+--- a/dexonomy/op/eval_data.py
++++ b/dexonomy/op/eval_data.py
+@@ -60,7 +60,9 @@ def _single_eval(param):
+             else:
+                 o_info = load_json(o_cfg["info_path"])
+             o_coef = o_info["mass"] / (o_info["density"] * (o_info["scale"] ** 3))
+-            o_cfg["density"] = cfg.obj_mass / (o_coef * np.prod(o_cfg["scale"]))
++            # 051 cap16: per-object mass clip(URDF mass, 0.05, 0.5) kg from the scene cfg, not cfg.obj_mass.
++            # Divided by the summed piece volume MuJoCo integrates, so overlapping pieces do not add mass.
++            o_cfg["density"] = o_cfg["mass_kg"] / (o_info["collision_volume"] * np.prod(o_cfg["scale"]))
+         elif o_cfg["type"] == "plane":
+             plane_flag = True
+     if not cfg.skip_traj and not plane_flag:
+diff --git a/dexonomy/op/gen_init.py b/dexonomy/op/gen_init.py
+index c964c5f..4dc5e99 100644
+--- a/dexonomy/op/gen_init.py
++++ b/dexonomy/op/gen_init.py
+@@ -299,12 +299,49 @@ def operate_init(cfg):
+             n_worker=cfg.n_worker,
+         )
+ 
+-        for eee in range(op_cfg.epoch):
++        # 051 cap16: a job runs epochs [epoch_start, epoch). A fresh process restarts at seed 12, and the loader's
++        # worker seeds come from the main torch generator, so it would redraw epoch 0's start poses; reseed with
++        # 12 + epoch_start here, after the seed-12 object order above is fixed.
++        epoch_start = op_cfg.get("epoch_start", 0)
++        if epoch_start:
++            np.random.seed(12 + epoch_start)
++            torch.manual_seed(12 + epoch_start)
++            random.seed(12 + epoch_start)
++        # 051 cap16: saves on one background thread; see agent4_cap16_patch_asyncsave.py
++        from concurrent.futures import ThreadPoolExecutor
++
++        # 051 cap16: one npz per batch, each member the bytes np.save writes; see agent4_cap16_patch_npzbatch.py
++        tmpl_base = os.path.join(cfg.init_dir, tmpl_name) + os.sep
++
++        def batch_npz(e, j):
++            return os.path.join(cfg.init_dir, tmpl_name, "_batch", str(e), f"{j}.npz")
++
++        def save_batch(rows, npz):
++            members = {}
++            for grasp_dir, path, data in rows:
++                assert path.startswith(tmpl_base) and path.endswith(".npy"), path
++                members[path[len(tmpl_base):-len(".npy")]] = data
++            os.makedirs(os.path.dirname(npz), exist_ok=True)
++            tmp = os.path.join(os.path.dirname(npz), f".{os.path.basename(npz)}.tmp")
++            with open(tmp, "wb") as f:
++                np.savez(f, **members)
++            os.replace(tmp, npz)
++            logging.info(f"Saved {len(rows)} npz {os.path.relpath(npz, cfg.init_dir)}")
++
++        saver, pending = ThreadPoolExecutor(max_workers=1), []
++        logging.info("Async saves")
++        # 051 cap16: see agent4_cap16_patch_initcuts.py; epoch-e files of this pair exist only after an "Epoch e"
++        # line in this pair's log, so without one for this job's epochs every skip_done glob finds nothing
++        main_log = os.path.join(cfg.log_dir, "main.log")
++        prior = open(main_log).read() if os.path.exists(main_log) else ""
++        resume_check = any(f"] - Epoch {e}\n" in prior for e in range(epoch_start, op_cfg.epoch))
++        logging.info(f"Resume check {'on' if resume_check else 'off'}")
++        for eee in range(epoch_start, op_cfg.epoch):
+             logging.info(f"Epoch {eee}")
+-            for obj_sample in obj_loader:
+-                if cfg.skip_done:
++            for bj, obj_sample in enumerate(obj_loader):
++                if cfg.skip_done and resume_check:
+                     # Check if the result already exists
+-                    continue_flag = False
++                    continue_flag = os.path.exists(batch_npz(eee, bj))  # 051 cap16: saved as one npz
+                     for scene_cfg in obj_sample["scene_cfg"]:
+                         check_dir = os.path.join(
+                             cfg.init_dir,
+@@ -344,6 +381,7 @@ def operate_init(cfg):
+                 for k, v in ret_dict.items():
+                     ret_dict[k] = v.cpu().numpy()
+ 
++                rows = []
+                 for count, o_id in enumerate(ret_dict["obj_id"]):
+                     g_pose = ret_dict["grasp_pose"][count]
+                     g_qpos = ret_dict["grasp_qpos"][count]
+@@ -355,8 +393,8 @@ def operate_init(cfg):
+                         tmpl_sample["tmpl_name"],
+                         scene_cfg["scene_id"],
+                     )
+-                    os.makedirs(grasp_dir, exist_ok=True)
+-                    np.save(
++                    rows.append((
++                        grasp_dir,
+                         f"{grasp_dir}/{eee}_{count}_grasp.npy",
+                         {
+                             "hand_name": cfg.hand_name,
+@@ -373,7 +411,13 @@ def operate_init(cfg):
+                             "obj_pose": ret_dict["obj_pose"][count],
+                             "obj_scale": ret_dict["obj_scale"][count],
+                         },
+-                    )
++                    ))
++                while pending and (pending[0].done() or len(pending) >= 2):
++                    pending.pop(0).result()  # raises a save error here
++                pending.append(saver.submit(save_batch, rows, batch_npz(eee, bj)))
++        for f in pending:
++            f.result()
++        saver.shutdown(wait=True)
+         logging.info("Finish initialization.")
+     except BaseException as e:
+         tmpl_loader.stop()

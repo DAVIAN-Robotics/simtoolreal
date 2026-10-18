@@ -1,0 +1,586 @@
+{
+  "vis/image/xhand_dexonomy_templates_rules_corrected.png": {
+    "bytes": 3613345,
+    "sha256": "002d0278f0201407160bd8118ca519991c6d962cbac8a41bacec7d1c60f1ff46"
+  },
+  "vis/xhand_rules_corrected.html": {
+    "bytes": 7400,
+    "sha256": "ba01b9c9bfb161faf0c7c1d0c5fb80287a3c33706962abe26d25204bd38b74e1"
+  },
+  "ASTRA-rules-corrected.md": {
+    "bytes": 5461,
+    "sha256": "bea31038c276edfe3a96b879d5343219c8203d8cf5bd6137bd6a7dcfd3fdd335"
+  },
+  "HANDOFF-astra-repaired.md": {
+    "bytes": 4804,
+    "sha256": "a3fefbe1b0a93fe3977b4d004d924ec571235820ad524b6d05cedc556f9c2882"
+  },
+  "status/repaired_package_contact_audit.json": {
+    "bytes": 35454,
+    "sha256": "33197708809f47323ec1db70d1d580a86091dbf98a7cfde882f1e1ccb6a7ba03"
+  },
+  "status/previous_package_contact_audit.json": {
+    "bytes": 34402,
+    "sha256": "6468cd12981b6f689c6b1b6da05b8d09f0c373aec97960005f3d8a642d919175"
+  },
+  "status/rules_preservation_check.json": {
+    "bytes": 504,
+    "sha256": "a3433fe52da3318dd278541b71f78f3eff3060feca41f4619304d1a0383b21a0"
+  },
+  "src/xhand_templates_rules_corrected.tar.gz": {
+    "bytes": 3545119,
+    "sha256": "2d8710e403131c1c88221e02002d6154dd9370c52bdddedd10e42e3734bc5359"
+  },
+  "src/astra_rules_corrected_xhand_port/README.md": {
+    "bytes": 5153,
+    "sha256": "e0872bf6b4cc90fda4740841c22549c2539abe93e5442e11a7abce2e97aa9204"
+  },
+  "src/astra_rules_corrected_xhand_port/annotation_report.json": {
+    "bytes": 119363,
+    "sha256": "b14ada8127d9d8ddecdc57466a1ca216c0f69890293f06aa1e3c49d2e61e094b"
+  },
+  "src/astra_rules_corrected_xhand_port/arrangement_validation.json": {
+    "bytes": 1524,
+    "sha256": "16bfc7b9b26f27f80617622939df3570a16985feb546c93d8c65b8fa66849a20"
+  },
+  "src/astra_rules_corrected_xhand_port/body_group.yaml": {
+    "bytes": 214,
+    "sha256": "16c68240462e7933e00cce5a3b6dbd84d974f7a41aca31eaee302c153f271e4b"
+  },
+  "src/astra_rules_corrected_xhand_port/cameras.json": {
+    "bytes": 1686,
+    "sha256": "54a51b6f6cbb9e3c5a8e7ca2452a778598bda07dccea0967cfcad5e925921afc"
+  },
+  "src/astra_rules_corrected_xhand_port/check_final.log": {
+    "bytes": 2450,
+    "sha256": "06fe6bfd00cc8d3b591454ad24e28821acebe52f73a014ac26470be3ba0527d1"
+  },
+  "src/astra_rules_corrected_xhand_port/conversion.log": {
+    "bytes": 127,
+    "sha256": "d9a16173ec5eb782ed9cfd1456456858d28ab667a2d7cc32d6ebb6da0b6d6972"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_back_link.obj": {
+    "bytes": 45602,
+    "sha256": "a913881e849d503311e0c1bee1789e4541073a5ed573f387c8bb79867d46494e"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_ee_link.obj": {
+    "bytes": 3697,
+    "sha256": "5f6e85e943f9c0349b92577a3f91fe2a6800ac749825e904771ee32e6c7b15fd"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_index_bend_link.obj": {
+    "bytes": 5155,
+    "sha256": "eebe9d382dfa7bbe454c6397da2c83d6e6eee778b133476ea2686a1f9a6227f1"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_index_rota_link1.obj": {
+    "bytes": 20161,
+    "sha256": "087b580f1203ab3a964465f9d0e32893b1b00b31c16f51d5f9d829efae48b12b"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_index_rota_link2.obj": {
+    "bytes": 69554,
+    "sha256": "079135155c8087a7db9c15f008da8ad4f926662b75e591006b7007c4b535a7cf"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_index_rota_tip.obj": {
+    "bytes": 3697,
+    "sha256": "5f6e85e943f9c0349b92577a3f91fe2a6800ac749825e904771ee32e6c7b15fd"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_index_rotaback_link1.obj": {
+    "bytes": 37329,
+    "sha256": "4670bfdfcc76fa09f078fa98a96301a1aeafff2beaffa71bdab51899f9aa7f5c"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_index_rotaback_link2.obj": {
+    "bytes": 36332,
+    "sha256": "ef79b4b2f171cafcf4518c5bfcbc264655f4004847e772fd565f056c2b9b277a"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_link.obj": {
+    "bytes": 37012,
+    "sha256": "75bcae9de5e35897955995ed9af98d4ecd2bd4e6e7cde4bc042794c6e3ee7066"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_mid_link1.obj": {
+    "bytes": 23517,
+    "sha256": "e25f9775758837a655b5e5b883b076f652ade2a2780adf2366203de402c5d531"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_mid_link2.obj": {
+    "bytes": 69554,
+    "sha256": "079135155c8087a7db9c15f008da8ad4f926662b75e591006b7007c4b535a7cf"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_mid_tip.obj": {
+    "bytes": 3697,
+    "sha256": "5f6e85e943f9c0349b92577a3f91fe2a6800ac749825e904771ee32e6c7b15fd"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_midback_link1.obj": {
+    "bytes": 37329,
+    "sha256": "4670bfdfcc76fa09f078fa98a96301a1aeafff2beaffa71bdab51899f9aa7f5c"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_midback_link2.obj": {
+    "bytes": 36332,
+    "sha256": "ef79b4b2f171cafcf4518c5bfcbc264655f4004847e772fd565f056c2b9b277a"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_pinky_link1.obj": {
+    "bytes": 23517,
+    "sha256": "e25f9775758837a655b5e5b883b076f652ade2a2780adf2366203de402c5d531"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_pinky_link2.obj": {
+    "bytes": 69554,
+    "sha256": "e75c3191509f0da801b6742c5dd765eab248130b8439fb2129179f1f3ca6f76d"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_pinky_tip.obj": {
+    "bytes": 3697,
+    "sha256": "5f6e85e943f9c0349b92577a3f91fe2a6800ac749825e904771ee32e6c7b15fd"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_pinkyback_link1.obj": {
+    "bytes": 37329,
+    "sha256": "4670bfdfcc76fa09f078fa98a96301a1aeafff2beaffa71bdab51899f9aa7f5c"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_pinkyback_link2.obj": {
+    "bytes": 36332,
+    "sha256": "ef79b4b2f171cafcf4518c5bfcbc264655f4004847e772fd565f056c2b9b277a"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_ring_link1.obj": {
+    "bytes": 23517,
+    "sha256": "e25f9775758837a655b5e5b883b076f652ade2a2780adf2366203de402c5d531"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_ring_link2.obj": {
+    "bytes": 69554,
+    "sha256": "e75c3191509f0da801b6742c5dd765eab248130b8439fb2129179f1f3ca6f76d"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_ring_tip.obj": {
+    "bytes": 3697,
+    "sha256": "5f6e85e943f9c0349b92577a3f91fe2a6800ac749825e904771ee32e6c7b15fd"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_ringback_link1.obj": {
+    "bytes": 37329,
+    "sha256": "4670bfdfcc76fa09f078fa98a96301a1aeafff2beaffa71bdab51899f9aa7f5c"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_ringback_link2.obj": {
+    "bytes": 36332,
+    "sha256": "ef79b4b2f171cafcf4518c5bfcbc264655f4004847e772fd565f056c2b9b277a"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_thumb_bend_link.obj": {
+    "bytes": 13160,
+    "sha256": "a803e8ba30617943e6718c76c96f0abba3d3fcd4f3f65f35f24e6845d816ce98"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_thumb_rota_link1.obj": {
+    "bytes": 17174,
+    "sha256": "fac3cc443e254ed87fdb633264b0222d4fc63a4b33b33727eb751619f6c26b1c"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_thumb_rota_link2.obj": {
+    "bytes": 55697,
+    "sha256": "57e02aa5c7531327f8809dd75732df598c52877c3917eea6c5051acd0945a959"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_thumb_rota_tip.obj": {
+    "bytes": 3693,
+    "sha256": "74e06af76e4242243b2fd01fbe79deb81672912a1ba4749f0a43d2e5fc632da3"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_thumb_rotaback_link1.obj": {
+    "bytes": 45521,
+    "sha256": "e7f16fd09f72f414ac6958694ddfef48b30d753f405d42d7a261ad6911b52eff"
+  },
+  "src/astra_rules_corrected_xhand_port/hulls/right_hand_thumb_rotaback_link2.obj": {
+    "bytes": 55803,
+    "sha256": "3a38f0126dffdf3205378b60814537d9cf9e7e89ea5c2d61e2567bc1fc67aa3e"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/10_Power_Disk.npy": {
+    "bytes": 980,
+    "sha256": "ca7f4bf6ae6bcce09377496318743ce18ff8d486bd4bcf5faedb28c60e75bd96"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/11_Power_Sphere.npy": {
+    "bytes": 941,
+    "sha256": "4427ecb57c7b6f0655011c9a1baf9aa87737f8dbc23c0a87c491fed2a5e62354"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/12_Precision_Disk.npy": {
+    "bytes": 984,
+    "sha256": "e6a0a512096eacd36c091786f1a56f8ab10ccf2c1962c6e841ab5beb2b0a61b7"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/13_Precision_Sphere.npy": {
+    "bytes": 882,
+    "sha256": "d5112ba7083b3cc36dc07ae1c1aa1f40c8c074d86db25d7c95145d3dbe5892f7"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/14_Tripod.npy": {
+    "bytes": 764,
+    "sha256": "2f9573d859d8cf06eb68ba611d4dcbaa5b29a4eef5cf6913c5dda3bf64244b38"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/15_Fixed_Hook.npy": {
+    "bytes": 1133,
+    "sha256": "5680a61132dcfb80dbd17dfec39c056cd3cdb60a5c008dac28be3354ff1f8377"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/16_Lateral.npy": {
+    "bytes": 714,
+    "sha256": "e17fa37955754076030c8483dc8f5eaa9f4e31e88f8a9001e6fdd8ddd5a3dda7"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/17_Index_Finger_Extension.npy": {
+    "bytes": 1145,
+    "sha256": "1256ab458f66f771e45494a38e6e62ef0e8f975bfcd53be4ad746dd51c85032f"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/18_Extension_Type.npy": {
+    "bytes": 984,
+    "sha256": "accbe09bf3b6f0774417d17e9071643ddb214cb323de25fdf3d1322ca6110a6d"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/1_Large_Diameter.npy": {
+    "bytes": 1228,
+    "sha256": "c63c1090444eef0ab3e27a9a5d2d4f030f4126e6a70b0e6223fc1b8bff57a35a"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/20_Writing_Tripod.npy": {
+    "bytes": 813,
+    "sha256": "a21302d7ecfd3fa21142844d412208027389abcf0380e8d5a7cb768c37f4406c"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/22_Parallel_Extension.npy": {
+    "bytes": 988,
+    "sha256": "b0936a2cbf91af0180b231abd703c0106c1745127679adadf80dd2d75b4e884f"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/23_Adduction_Grip.npy": {
+    "bytes": 707,
+    "sha256": "4b5cc2b3e5ab6d370f0357aaf96c831e97eb01bc4e5c08963ffddd7f0a87c23f"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/24_Tip_Pinch.npy": {
+    "bytes": 716,
+    "sha256": "58d7d18c027ce48cb8a2e0af6beb3ff4e8e84f62e56980541a7471847737a62f"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/25_Lateral_Tripod.npy": {
+    "bytes": 772,
+    "sha256": "44684410a581138c84fed402afbc9b4bd02575d6c248d105524defc80eaa0959"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/26_Sphere_4_Finger.npy": {
+    "bytes": 1204,
+    "sha256": "cf15de5e9cf91f525631e86f7b6474f948a247068b7cfe2b120200ad36fccdd6"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/27_Quadpod.npy": {
+    "bytes": 818,
+    "sha256": "28a01cc9670d93439ff7b4365afe24dc0ade011cddb373a374d53f41b1624a43"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/28_Sphere_3_Finger.npy": {
+    "bytes": 1093,
+    "sha256": "40aaaedc076b7255fa44d4aa9f425e7c3fd279fbed23744bd2d069e66ad63082"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/29_Stick.npy": {
+    "bytes": 1065,
+    "sha256": "33a8ece795b9268ee0a9968f12cc34e7dd1823586247c15984dad00c2933b49c"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/2_Small_Diameter.npy": {
+    "bytes": 1126,
+    "sha256": "d6c819ae225ca0203ad038d093eb2dcdbd9bbba05ed03003d6ad488149c12e66"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/30_Palmar.npy": {
+    "bytes": 1195,
+    "sha256": "a6a41cdfa623d605571ac3ff30ce8bce3364871ded132988a0745f49094112c9"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/31_Ring.npy": {
+    "bytes": 929,
+    "sha256": "137d3f201447702b0c073b9df3d204c3587abd62e2de23833cd342bb2c1184c7"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/32_Ventral.npy": {
+    "bytes": 914,
+    "sha256": "73489306e5c60d24244eadde7c67557b51ce8c544be51b35332a7810d01a50f6"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/33_Inferior_Pincer.npy": {
+    "bytes": 787,
+    "sha256": "455e78aec47a2883f42746e3aa0ad2e68274ac0c97a42c060fe453962480b3ea"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/3_Medium_Wrap.npy": {
+    "bytes": 1188,
+    "sha256": "80edd8e93c0d91c9bf1fe149cd21d8a166bd97472cba2b7a8e7d45ece256e6bb"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/4_Adducted_Thumb.npy": {
+    "bytes": 1136,
+    "sha256": "75df9f7797b55d9a9295640d59221b39d5291457cb5380da3a938177b47ecbc8"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/5_Light_Tool.npy": {
+    "bytes": 1091,
+    "sha256": "7af2faa79f0f6f37c3565bce5dcfddb5519324fee77bbd31a99d4570b78dfc15"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/6_Prismatic_4_Finger.npy": {
+    "bytes": 883,
+    "sha256": "05907063137dc4aee0dd755afca6c98beb806d89aa08f901eaa2d4131a5b5e55"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/7_Prismatic_3_Finger.npy": {
+    "bytes": 828,
+    "sha256": "e3a50b2266f83d5c80f6610de13b3f3e86a2f1c216cb7e8c696f7f3c61c61ebc"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/8_Prismatic_2_Finger.npy": {
+    "bytes": 775,
+    "sha256": "df4311fdae69ceb3a8494ec5453f7fb32ecf2d0a39da93cce2da0ccff50ef999"
+  },
+  "src/astra_rules_corrected_xhand_port/init_tmpl/9_Palmar_Pinch.npy": {
+    "bytes": 718,
+    "sha256": "b4881e3257227f01c1f8abba4bb55116cb70f4a89cb063d67ab7f9d10352d32e"
+  },
+  "src/astra_rules_corrected_xhand_port/keypoint.yaml": {
+    "bytes": 1133,
+    "sha256": "8cf2621f35809986b097be5869d896e14031a0b5737634738e5aa52ef40e2545"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_back_link.STL": {
+    "bytes": 382884,
+    "sha256": "73bbeb682fddeaf6034b0032a89074a5e94b43f284a62f86c651ed836e406c33"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_ee_link.STL": {
+    "bytes": 6484,
+    "sha256": "d5c68aea36c3ec01ef6256bca427eb1aaf028a39daf8dac8ff1736aac58159c0"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_index_bend_link.STL": {
+    "bytes": 263684,
+    "sha256": "f388863a62d3eb0ebd844b49d567fc4582f352d1a796fe4b2fe290d5e4635f74"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_index_rota_link1.STL": {
+    "bytes": 288584,
+    "sha256": "b9949f53f835d97fc2d3f6c12f700ed8c1c5b09f878441e2110c5dfdba3fb34d"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_index_rota_link2.STL": {
+    "bytes": 318684,
+    "sha256": "1fa056d517a98c8c6f0e624035f2b47710550c82a63957f64a62c28a65a3b973"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_index_rota_tip.STL": {
+    "bytes": 6484,
+    "sha256": "7200d5b8ffa8ec54bf7990b0e222368b9000a67002a24cd9a623589679e79984"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_index_rotaback_link1.STL": {
+    "bytes": 352884,
+    "sha256": "4457236883a16564c5be4fdbf6221968afc140dd7be0324111874a15f906069c"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_index_rotaback_link2.STL": {
+    "bytes": 266684,
+    "sha256": "ac99b76c0edb85f8f9dc2013545a81eaf20613c5aae8ac2f7796dec5dbd4065c"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_link.STL": {
+    "bytes": 878184,
+    "sha256": "c81f5ac529bbe5a789ffb8237e317e45a211b6cc35e8631f7145c049c735fd9f"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_mid_link1.STL": {
+    "bytes": 386584,
+    "sha256": "3901eb5e8e1711454d04b7cdabd1ba9e6a1817f477f67872513975c97f74943d"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_mid_link2.STL": {
+    "bytes": 318684,
+    "sha256": "bc0437cd644858337c9a9fdeb644cfead95c3eaa1eeef1059d2644e0752b5163"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_mid_tip.STL": {
+    "bytes": 6484,
+    "sha256": "e813d1f63455768a718c5c7d6056ff70b05ba1dbd492aacb3e2f26d3879009d8"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_midback_link1.STL": {
+    "bytes": 352884,
+    "sha256": "2189eafc6922abafc9f5800a48c314e0177fed8bc50b1af287696a1500ad5f6c"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_midback_link2.STL": {
+    "bytes": 266684,
+    "sha256": "b85799cd9d28cde6e3fad1f4f346485897927e13427cee8e00479c22398527f8"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_pinky_link1.STL": {
+    "bytes": 386584,
+    "sha256": "73c3bbb5918d6aea10229abbd52312086cc57d51037535b34c33ac138c8e430d"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_pinky_link2.STL": {
+    "bytes": 318684,
+    "sha256": "2496feb195cc69a0fca6ce60c695c5d9dfbb51bfce2c45cb70965ec56376ef56"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_pinky_tip.STL": {
+    "bytes": 6484,
+    "sha256": "5058c94100d6e63f18b5064042287fb9c073ff777b4882b7ef97b48b49513921"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_pinkyback_link1.STL": {
+    "bytes": 352884,
+    "sha256": "4400ce5bd194b4597a99443d595143e5164609434ab5fe331fc03a7d8cd722a2"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_pinkyback_link2.STL": {
+    "bytes": 266684,
+    "sha256": "ed1209ad2da19db9278c807221cfaa4fd52c091e31cac344a5a852b4d0e72b7e"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_ring_link1.STL": {
+    "bytes": 386584,
+    "sha256": "3e72ea74ea1cdd42bf7c312c4a23e4f1c8e0e0b013ba8e3cb282b2b609c32731"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_ring_link2.STL": {
+    "bytes": 318684,
+    "sha256": "ae7ce7cbbe0c2880eea8364338cdd8fc279b4403d8aab3f0519bd36747950f1c"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_ring_tip.STL": {
+    "bytes": 6484,
+    "sha256": "4f97752422dcba57697ef674eaecefabd459f61d02216745cb11a2fbcf769a67"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_ringback_link1.STL": {
+    "bytes": 352884,
+    "sha256": "083719f02bfcfcd61edcbfc834a6178b32e48b7a82a07da1be9db343b2207246"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_ringback_link2.STL": {
+    "bytes": 266684,
+    "sha256": "3eab5ede2783143cdc30de6cd3dd54439b2606a218c5ca1e191c583d621f8a67"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_thumb_bend_link.STL": {
+    "bytes": 284984,
+    "sha256": "fe26f354076a440bfd838250ada7587d5fda0199d864210c293503a690b32148"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_thumb_rota_link1.STL": {
+    "bytes": 497184,
+    "sha256": "30df38923feddec135ef9e1a9ac5570e330c580e0d5fd2ff04ce568091884b01"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_thumb_rota_link2.STL": {
+    "bytes": 315584,
+    "sha256": "ceb6673529e5284e324c756d0279737e847de3921b5d71df5888015b6889a2c7"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_thumb_rota_tip.STL": {
+    "bytes": 6484,
+    "sha256": "6c49d268e518dd4838b5a0afa4e9b001fb0066f2d2898f5fa3d4e878d2b79b68"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_thumb_rotaback_link1.STL": {
+    "bytes": 224884,
+    "sha256": "f4fc4d5b03cb6a0cbe9a7f2090351a5485ce1572f01a970a3410fc16e580ad96"
+  },
+  "src/astra_rules_corrected_xhand_port/meshes/right_hand_thumb_rotaback_link2.STL": {
+    "bytes": 342184,
+    "sha256": "ecd9b2bd0dadf23f81b2ea1128a4a40d89b093e6eb1248c9bf6b4f98a5f5035b"
+  },
+  "src/astra_rules_corrected_xhand_port/profiles.json": {
+    "bytes": 73759,
+    "sha256": "f38d99dc400abdfda93fdb69ea8bedcb78d16b5558d1da7c1e94589be9a19e50"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/10_Power_Disk.yaml": {
+    "bytes": 1616,
+    "sha256": "1d814b310bdcfe632593005299101587c07bc74e4f8962bed3b3a2fdae2c729f"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/11_Power_Sphere.yaml": {
+    "bytes": 1435,
+    "sha256": "fd4eee19563249a685fba1a26bcb01d214d7043506a4cea1a2bbacc7f9062489"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/12_Precision_Disk.yaml": {
+    "bytes": 1605,
+    "sha256": "3236e31f2b6e776de3a99a6f4d86d4995dda53e3a6f09e7d71bcd6e89e62864d"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/13_Precision_Sphere.yaml": {
+    "bytes": 1234,
+    "sha256": "32612fad640a41cf06010e67938ca77d755b88d428ff5a22572e0e3d9284383f"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/14_Tripod.yaml": {
+    "bytes": 788,
+    "sha256": "856c0e78dae8587a2489f0f101002bb13f6a1d64a1a344311392d5f796ee83e8"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/15_Fixed_Hook.yaml": {
+    "bytes": 2171,
+    "sha256": "cd3dbd35abab9e961942d4af6fd1872766f65c9ee65b6178fe078fdde24c79c6"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/16_Lateral.yaml": {
+    "bytes": 592,
+    "sha256": "39e56db00e95c0ff60831ed13b0ccaca429b500e7b8a5b09603e9ae66e6c4638"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/17_Index_Finger_Extension.yaml": {
+    "bytes": 2172,
+    "sha256": "71f6077562c5b4157cb7158e7bbb56dc55f419edfe87cfe25d5d1f390070e822"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/18_Extension_Type.yaml": {
+    "bytes": 1639,
+    "sha256": "56dd19a54e360322e620d099d91f60159068a3e698dae381770be12e707f08c3"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/1_Large_Diameter.yaml": {
+    "bytes": 2515,
+    "sha256": "700684266ca69d7ef533d4e57d298cf61cf74de67aa569b5f00cbe6795204c9e"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/20_Writing_Tripod.yaml": {
+    "bytes": 974,
+    "sha256": "401f78786898a1d84124498ae6660f7284f223c11afbe655bfbdb1c16cadae73"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/22_Parallel_Extension.yaml": {
+    "bytes": 1615,
+    "sha256": "04f854391bc30b540f970903cabdf669268502fc3acb95df62d839bdf33e7d2a"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/23_Adduction_Grip.yaml": {
+    "bytes": 561,
+    "sha256": "60b3d86b79d0aeb18cfe2163dc55d18ad17abdf71586c6c98b1d7295d9065e27"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/24_Tip_Pinch.yaml": {
+    "bytes": 678,
+    "sha256": "8e2ec254c39ae5f9951b3eaee62a0ca2dcd6dae35ed3103090fc0a3c617609cc"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/25_Lateral_Tripod.yaml": {
+    "bytes": 791,
+    "sha256": "f285de38d44a7f7cc4fe122e2786670f3fadb6985bd6fc62ad304ccb459c1a79"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/26_Sphere_4_Finger.yaml": {
+    "bytes": 2362,
+    "sha256": "b67e8a438f054d4e6fd5b8aa456f6fb0a9e03f9e5473d20ca188fd90c3a712d0"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/27_Quadpod.yaml": {
+    "bytes": 1014,
+    "sha256": "929738d4353d9d8c0a7d0ea81d398cc2368de10147561161e6d003ee4b7c9e2b"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/28_Sphere_3_Finger.yaml": {
+    "bytes": 1964,
+    "sha256": "7b873b656aab0a1b82392e05ac7ed0705e084b17952d306f34abcd00bdcfb93a"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/29_Stick.yaml": {
+    "bytes": 1961,
+    "sha256": "c720a77c4867ab04509ac681af4363eaaf66f870d57a5e852901b75a9b7a4d2b"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/2_Small_Diameter.yaml": {
+    "bytes": 2293,
+    "sha256": "56b32da0b519edb07a2f617ac2cba66ff5573c20313c469564830c4da1f78108"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/30_Palmar.yaml": {
+    "bytes": 2389,
+    "sha256": "127385b72132d21800643c136b4fef30121f14a5a4c7837f1c440148cb4dfe2d"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/31_Ring.yaml": {
+    "bytes": 1427,
+    "sha256": "045d8850bb1a629b227d040a3faf453bd5aa5b89865f8be90c49acd4b215b309"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/32_Ventral.yaml": {
+    "bytes": 1423,
+    "sha256": "5a8604d6ae1521a5ccd5330945f4ffb82e62b329c92d1c6c6a09c257b717d497"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/33_Inferior_Pincer.yaml": {
+    "bytes": 879,
+    "sha256": "db33af6d921cef3789dcd19dd8db4e5c320b2c90048885193dfa31a6f668a262"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/3_Medium_Wrap.yaml": {
+    "bytes": 2482,
+    "sha256": "749a599232cae67c2bd8dea70ad541050544a2f4d953bdba1eb3779c29fc941d"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/4_Adducted_Thumb.yaml": {
+    "bytes": 2166,
+    "sha256": "8fe33ced0e10a33dd799d1f8d871cb924a87ab1423b97e97daaa4a5f777a5561"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/5_Light_Tool.yaml": {
+    "bytes": 1999,
+    "sha256": "1a7491654c42b459c525b1cdb39fcb9ef30f928c75979bdd59a010cf84250e93"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/6_Prismatic_4_Finger.yaml": {
+    "bytes": 1246,
+    "sha256": "9424892c90dd75427ef2b367cb115e8143dfd64b1a14cab9d7f770070db2b1ac"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/7_Prismatic_3_Finger.yaml": {
+    "bytes": 1014,
+    "sha256": "e88076927b6e53fe2e122193ed0dc817a33fdca0c07728abd99d15c52952b366"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/8_Prismatic_2_Finger.yaml": {
+    "bytes": 787,
+    "sha256": "0eaa6098056869e99da29d2b189d9f2ae34cfa0b0a2527cd4063a1a7a0b0e23b"
+  },
+  "src/astra_rules_corrected_xhand_port/raw_anno/9_Palmar_Pinch.yaml": {
+    "bytes": 680,
+    "sha256": "00adedc89b502f798fb9d5f9c17ac788e2f458c04a91f9cf24a1b61cef7e0aa1"
+  },
+  "src/astra_rules_corrected_xhand_port/right.xml": {
+    "bytes": 21360,
+    "sha256": "3934a16ceee4efca6ab9ff7a3b7ea50765bc7a5cb8c12f4efca0d5a5eeb0bc4d"
+  },
+  "src/astra_rules_corrected_xhand_port/shadow_contact_contract.json": {
+    "bytes": 22875,
+    "sha256": "3d389998d2699bc4133babdcf58b25e4f7aa3c5380ef5e6fbd6777fd0fc80fa4"
+  },
+  "src/astra_rules_corrected_xhand_port/skeleton.yaml": {
+    "bytes": 819,
+    "sha256": "73b6f8b6556bfbf0850a3d725a08cec18d622bd7aa7d03fd357aa0c2f5be98bc"
+  },
+  "src/astra_rules_corrected_xhand_port/source_contract_audit.json": {
+    "bytes": 35454,
+    "sha256": "33197708809f47323ec1db70d1d580a86091dbf98a7cfde882f1e1ccb6a7ba03"
+  },
+  "src/astra_rules_corrected_xhand_port/validation.json": {
+    "bytes": 43869,
+    "sha256": "ae56313e0bc23caed3fce4ec1dfb8b4ac3a14bdba0b62d6ca0fcb2042aaf792d"
+  },
+  "src/astra_rules_corrected_xhand_port/validation.log": {
+    "bytes": 27201,
+    "sha256": "2071dfdbb11b59d8093d941e8d4fb0391a0fab59d9e17da52b3fcaea707d643d"
+  },
+  "src/astra_rules_corrected_xhand_port/visual_review.json": {
+    "bytes": 9894,
+    "sha256": "6cb2c0c58c52c748c5b8737be6078e4061e019656e537d17678cd438faeac83b"
+  }
+}

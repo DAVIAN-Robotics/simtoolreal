@@ -1,0 +1,928 @@
+[
+ {
+  "id": "A4-D1",
+  "kind": "default",
+  "what": "Run both methods on yj-4, not kait.",
+  "why": "The bk_dexonomy env lives on yj nas5, and grasp refinement and eval are MuJoCo on CPU. yj-4 had 255 idle CPUs and 8 idle A6000s.",
+  "evidence": "nproc 255 and gpustat idle at 07:55Z",
+  "at": "2026-09-27T07:55Z"
+ },
+ {
+  "id": "A4-D2",
+  "kind": "default",
+  "what": "Fresh Dexonomy clone at d561ff9 in yj-4:/home/nas5/sibeenkim/work/_graspoc/dexonomy/Dexonomy, run as python -m dexonomy.main from the clone dir.",
+  "why": "work/Dexonomy carries the untrusted session 012 hand. bk_dexonomy's editable install points at /home/nas_main/sibeenkim/work/grasp-bakeoff/repos/dexonomy, and cwd-first import picks the clone.",
+  "evidence": "dexonomy.sim/op/main __file__ all under _graspoc/dexonomy/Dexonomy",
+  "at": "2026-09-27T08:20Z"
+ },
+ {
+  "id": "A4-D3",
+  "kind": "deviation",
+  "what": "Hand MJCF built from agent 1's reference URDF. Fixed-joint links are merged into their movable parent, and collision geoms are the reference convex hull OBJs, each body's own hull first.",
+  "why": "The training importer merges fixed joints and uses one convex hull per collision mesh. GraspADMM's project_to_hand projects onto a body's first collision geom, so the pad-side own hull must be first.",
+  "evidence": "src/agent4_check_xhand_mjcf.py: all 60 geoms within 1.25e-7 m of the reference at the URDF link pose over 50 random q; joint order, limits, gains and effort equal joint_order.json",
+  "at": "2026-09-27T08:10Z"
+ },
+ {
+  "id": "A4-D4",
+  "kind": "deviation",
+  "what": "Actuators use kp 3.0, joint damping 0.1, armature 0 and frictionloss 0, with forcerange at the URDF effort limits (1.1 and 0.4 N m). The tutorial's starting point is kp 5 with forcerange 3.",
+  "why": "Dexonomy's squeeze is torque / kp, so kp must equal the training drive for q_squeeze to press with the planned torque on the real hand, and the method's own eval should respect the hand's torque limits.",
+  "evidence": "reference/xhand/joint_order.json stiffness 3.0, damping 0.1; tutorial getting_started/1_annotation_tutorial.md",
+  "at": "2026-09-27T08:10Z"
+ },
+ {
+  "id": "A4-D5",
+  "kind": "default",
+  "what": "No contact excludes in the MJCF. Only MuJoCo's parent-child filter applies, as with PhysX in training.",
+  "why": "Hand self-collision is on in training, with only the automatic parent-child filter. The 012 port added 16 excludes.",
+  "evidence": "No self-contact at q=0 or mid-range with the floating root. Index link1 enters the palm hull beyond index_joint1 = 1.419 rad, up to 5.2 mm at full flexion",
+  "at": "2026-09-27T08:15Z"
+ },
+ {
+  "id": "A4-D6",
+  "kind": "default",
+  "what": "body_group: [thumb_bend_link, thumb_rota_link1, thumb_rota_link2], [index_bend_link, index_rota_link1, index_rota_link2], [mid_link1, mid_link2], [ring_link1, ring_link2], [pinky_link1, pinky_link2], [palm].",
+  "why": "Same pattern as every upstream hand, one group per finger plus the palm, which relaxes required contacts to at least one link per group.",
+  "evidence": "src/agent4_xhand_port/body_group.yaml",
+  "at": "2026-09-27T08:20Z"
+ },
+ {
+  "id": "A4-D7",
+  "kind": "default",
+  "what": "Keypoints (tutorial option B) are picked by casting a ray at each link's collision hulls and taking the outer hit point and face normal. Finger link1 has 3 (pad at z 0.038, radial side, ulnar side), finger link2 has 5 (distal pad z 0.028, tip at 60 deg, radial side, ulnar side, proximal pad z 0.010), thumb link1 has 1 pad, thumb link2 has 2 (pad, tip) and the palm has 5 on the +x face. Middle, ring and pinky alias the index.",
+  "why": "This is the scripted equivalent of CloudCompare point picking on the collision mesh. op=tmpl checks each point lies within 2 mm of its body's hull.",
+  "evidence": "src/agent4_xhand_port/keypoint.yaml; op=tmpl converted all templates with no mismatch error",
+  "at": "2026-09-27T08:20Z"
+ },
+ {
+  "id": "A4-D8",
+  "kind": "default",
+  "what": "Skeleton: 5 palm segments, 1 per finger link1 and link2, 1 per thumb link and 1 on index_bend_link, all verified inside the hulls. Distal links are included, which Shadow omits.",
+  "why": "Skeleton lines feed init's ray-crossing collision filter and must sit in the link cores. XHand link2 spans the middle and distal phalanx.",
+  "evidence": "src/agent4_xhand_port/skeleton.yaml; assert in src/agent4_annotate_xhand.py",
+  "at": "2026-09-27T08:25Z"
+ },
+ {
+  "id": "A4-D9",
+  "kind": "deviation",
+  "what": "Template posing is scripted: least squares over the 12 joints, the object centre and size scale (0.6 to 1.6), and from pass 3 the cylinder axis or box rotation. It poses around a hand-chosen canonical object per type (cylinder, sphere or box in the palm frame) so that the contact keypoints touch it with opposing normals, no hull vertex enters it and no self-contact occurs. Upstream has a person pose each template in the MuJoCo GUI.",
+  "why": "No GUI annotator is available. The fit makes each template geometrically consistent with an object of the type's shape.",
+  "evidence": "src/agent4_annotate_xhand.py; per-template numbers in src/agent4_xhand_port/annotation_report.json",
+  "at": "2026-09-27T08:30Z"
+ },
+ {
+  "id": "A4-D10",
+  "kind": "deviation",
+  "what": "Each template's contact link set copies the authors' Shadow template of the same type, mapped proximal to link1, middle and distal to link2, thmiddle to thumb link1, thdistal to thumb link2, lfmetacarpal to palm.",
+  "why": "XHand fingers have 2 phalanges to Shadow's 3, and the Shadow templates are the upstream statement of which links each type touches.",
+  "evidence": "Dexonomy assets/hand/shadow/raw_anno/*.yaml",
+  "at": "2026-09-27T08:30Z"
+ },
+ {
+  "id": "A4-D11",
+  "kind": "default",
+  "what": "Posing caps index_joint1 at 1.40 rad.",
+  "why": "index_rota_link1 enters the palm hull past 1.419 rad. It is a grandparent pair and self-collides in training too, so poses beyond it are infeasible.",
+  "evidence": "self-contact sweep: first contact at index_joint1 1.419, -0.14 mm",
+  "at": "2026-09-27T08:28Z"
+ },
+ {
+  "id": "A4-D12",
+  "kind": "default",
+  "what": "Five posing passes. Pass 1 single start and pass 2 8 starts ran on the workstation. Passes 3 to 5 used 12, 16 and 24 starts on yj-4, with self-collision weight 30 (150 in pass 5). The best status per template over all passes is kept.",
+  "why": "Multi-start least squares out of local minima. Passes 3 to 5 moved to yj-4 after the orchestrator flagged the workstation's 30 GB RAM.",
+  "evidence": "src/agent4_merge_passes.py output 08:30Z",
+  "at": "2026-09-27T08:30Z"
+ },
+ {
+  "id": "A4-D13",
+  "kind": "default",
+  "what": "Acceptance: PASS is contacts within 2 mm and 30 deg, no self-contact and at most 2 mm into the object. NEAR-MISS is no self-contact, within 4 mm and 45 deg and at most 3 mm in. Both are run.",
+  "why": "30 deg mirrors init's normal filter (|n1-n2|^2 < 0.3 is 31.8 deg). The paper shows noisy templates still work through template adding, so the pipeline's own success rate decides near-misses.",
+  "evidence": "dexonomy/config/op/init.yaml filter.loss.normal_thre 0.3; paper Sec. robustness to initial templates",
+  "at": "2026-09-27T08:30Z"
+ },
+ {
+  "id": "A4-D14",
+  "kind": "deviation",
+  "what": "25 of 31 types are run: 14 PASS (1, 4, 6, 7, 8, 9, 14, 16, 18, 20, 23, 24, 31, 32) and 11 NEAR-MISS (3, 5, 10, 11, 12, 13, 17, 22, 26, 27, 29). Not run: 2_Small_Diameter (contact 6.3 mm, 56 deg off), 15_Fixed_Hook (7.5 mm off, index link1 in palm), 25_Lateral_Tripod (5.5 mm into object), 28_Sphere_3_Finger (3.6 mm into object), 30_Palmar (4.7 mm into object), 33_Inferior_Pincer (index link1 1.7 mm in palm).",
+  "why": "No fit meets NEAR-MISS for those six.",
+  "evidence": "vis/image/xhand_dexonomy_templates.png; src/agent4_xhand_port/annotation_report.json",
+  "at": "2026-09-27T08:30Z"
+ },
+ {
+  "id": "A4-D15",
+  "kind": "deviation",
+  "what": "19_Distal and 21_Tripod_Variation are excluded.",
+  "why": "Scissors- and chopsticks-specific. The Dexonomy dataset excludes them too.",
+  "evidence": "paper Sec. Dexonomy Dataset",
+  "at": "2026-09-27T08:12Z"
+ },
+ {
+  "id": "A4-D16",
+  "kind": "ruling",
+  "what": "Sibeen at 08:35Z: \"keep all going for now. i guess just do end to end like this go\". Run with the current 25 templates.",
+  "why": "His ruling, relayed by the orchestrator.",
+  "evidence": "orchestrator message 08:35Z",
+  "at": "2026-09-27T08:35Z"
+ },
+ {
+  "id": "A4-D17",
+  "kind": "deviation",
+  "what": "Object input is kait _graspoc/reference/objects/collision/<obj>.obj, the union of each object's collision hulls, with m07 as agent 1's filled solid from 08:15Z. It is processed by MeshProcess 638d777 task=official unchanged: mesh_normalize, CoACD -mv 1e-10, manifold dualmc level_set 0.1, ACVD 2000 vertices gradation 1.5, tabletop pose, basic info.",
+  "why": "Brief change: the hold test pushes on the hulls, not the visual meshes. MeshProcess is Dexonomy's own object preprocessing.",
+  "evidence": "MeshProcess/src/config/task/official.yaml; hydra log proc_official_2026_09_27_08_38_31",
+  "at": "2026-09-27T08:38Z"
+ },
+ {
+  "id": "A4-D18",
+  "kind": "workaround",
+  "what": "MeshProcess binaries built from source on yj-4: CoACD JYChen18 fork 2e4842c and ACVD b65c74a, the commits MeshProcess pins, in conda env graspoc_meshbuild with cmake<4.",
+  "why": "No prebuilt binaries existed on yj. cmake 4.x rejects the zlib dependency's cmake_minimum_required < 3.5, so try 1 failed.",
+  "evidence": "build_meshprocess.try1.log 'Compatibility with CMake < 3.5 has been removed'; BUILD_DONE at 08:35Z",
+  "at": "2026-09-27T08:35Z"
+ },
+ {
+  "id": "A4-D19",
+  "kind": "deviation",
+  "what": "One floating scene cfg per object, with scale = MeshProcess's normalization half diagonal and pose = its bbox centre. MeshProcess itself writes random scales [0.06, 0.08, 0.10, 0.12].",
+  "why": "Our objects have one real size and a fixed frame, and this makes the run's world frame the object's URDF root frame.",
+  "evidence": "objects/scene_cfg/<obj>/floating/real.npy; extents 1.4 to 24.2 cm",
+  "at": "2026-09-27T08:40Z"
+ },
+ {
+  "id": "A4-D20",
+  "kind": "default",
+  "what": "The method's own eval keeps upstream obj_mass 0.1 kg and friction 0.6 / 0.02.",
+  "why": "Upstream defaults. The 051 hold test applies real masses and training frictions.",
+  "evidence": "dexonomy/config/base.yaml obj_mass, config/op/eval.yaml miu_coef",
+  "at": "2026-09-27T08:40Z"
+ },
+ {
+  "id": "A4-D21",
+  "kind": "deviation",
+  "what": "A driver runs script.py's op sequence op by op. Per method: init with n_worker 4, 10 templates in parallel on 2 GPUs; grasp/grasp_admm with 32 (Dexonomy) or 80 (GraspADMM) workers; eval with n_worker 16 (pool of 48). OMP_NUM_THREADS=1, and the grasp and eval loops also wait for every init to finish.",
+  "why": "script.py would start 25 inits with 32 DataLoader workers each. The extra wait stops an early empty streak from ending the loop.",
+  "evidence": "scripts/agent4_run_dexonomy.sh; scripts/agent4_launch_main.sh",
+  "at": "2026-09-27T08:41Z"
+ },
+ {
+  "id": "A4-D22",
+  "kind": "default",
+  "what": "op.epoch 40 (upstream default 5, dataset 10) with n_final 10 per template per object per epoch, so up to 10,000 inits per object per method over 25 templates.",
+  "why": "Agent 2's hold-test yields were 2 to 10 percent at 08:28Z, so about 2,500 own-eval passes per object are needed for 128 to survive. Epochs are the paper's knob for more attempts.",
+  "evidence": "dexonomy/config/op/init.yaml epoch 5",
+  "at": "2026-09-27T08:41Z"
+ },
+ {
+  "id": "A4-D23",
+  "kind": "default",
+  "what": "GraspADMM config unchanged: step 50, substep 10, rho 1e3, lr_obj 2e-4, square_res True, fix_hand_local_cp False, device cpu. Template update hybrid and tmpl_max_evo 2 unchanged for both methods.",
+  "why": "Upstream defaults. The paper's rho is 1e3.",
+  "evidence": "config/op/grasp_admm.yaml; config/base.yaml",
+  "at": "2026-09-27T08:41Z"
+ },
+ {
+  "id": "A4-D24",
+  "kind": "default",
+  "what": "GraspADMM's silent upstream fallback to Dexonomy refinement on a QP failure is kept, and its rate is measured by src/agent4_admm_fallback_probe.py.",
+  "why": "Faithful to upstream. The probe makes it visible without changing the code.",
+  "evidence": "smoke sphere: 0 of 80 inits hit the fallback",
+  "at": "2026-09-27T08:37Z"
+ },
+ {
+  "id": "A4-D25",
+  "kind": "default",
+  "what": "Common format: hand_pos and hand_quat = grasp_qpos[:7] (palm frame in the object frame, wxyz); q_squeeze = squeeze_qpos; q_pregrasp = the first pregrasp waypoint; rows = grasps passing the method's own eval. Template name and source path go to a sidecar extra/<obj>.npz. Top-ups are <obj>_r<j>.npz with only new grasps.",
+  "why": "Brief format. The hand root can drift during the method's pregrasp (up to 5.4 cm on the smoke sphere), which the format does not carry.",
+  "evidence": "src/agent4_to_common.py",
+  "at": "2026-09-27T08:40Z"
+ },
+ {
+  "id": "A4-D26",
+  "kind": "default",
+  "what": "Dexonomy and GraspADMM run as separate experiments, each growing its own template library.",
+  "why": "Faithful per-method runs, same as dexsyn and dexsyn_admm with separate exp names.",
+  "evidence": "output/dexonomy_xhand, output/graspadmm_xhand",
+  "at": "2026-09-27T08:41Z"
+ },
+ {
+  "id": "A4-D27",
+  "kind": "default",
+  "what": "No yj-3 split.",
+  "why": "Measured refinement costs are 0.40 s (Dexonomy) and 1.2 s (GraspADMM) per init per core, so yj-4 alone finishes in under an hour. A split would fork the template library. The orchestrator agreed.",
+  "evidence": "smoke run 08:32Z",
+  "at": "2026-09-27T08:36Z"
+ },
+ {
+  "id": "A4-D28",
+  "kind": "default",
+  "what": "Session 012 port not reused.",
+  "why": "It dropped the fixed-joint offsets (tip, back and palm-cover meshes 42 to 65 mm off), used kp 5 with no forcerange, added 16 excludes and had one template.",
+  "evidence": "src/agent4_diff_012.py output 08:22Z",
+  "at": "2026-09-27T08:22Z"
+ },
+ {
+  "id": "A4-D29",
+  "kind": "workaround",
+  "what": "CoACD built in conda env graspoc_meshbuild (cmake 3.31.8, conda gcc 15.3). ACVD built in env graspoc_acvdbuild with vtk-base 9.2.6 plus vtk-io-ffmpeg 9.2.6, libgl-devel and libboost-devel 1.85.0, -DPython3_EXECUTABLE set to the env's python, and CONDA_BUILD_SYSROOT pointed at a shim dir linking the env's libGL. No source edited.",
+  "why": "The README builds ACVD against VTK 9.2.0. VTK 9.7 would not configure without split -devel packages. Nine build tries.",
+  "evidence": "scripts/agent4_build_meshprocess.sh; build_meshprocess.try1-9.log; BUILD_DONE",
+  "at": "2026-09-27T08:35Z"
+ },
+ {
+  "id": "A4-D30",
+  "kind": "workaround",
+  "what": "MeshProcess runs from a venv overlay, /home/nas5/sibeenkim/work/_graspoc/dexonomy/venv_meshproc, on bk_dexonomy_meshproc, adding torch 2.14.0+cpu. mujoco stays at 3.2.7 as the README pins, and the shared env is untouched.",
+  "why": "MeshProcess imports torch at startup through its render module, and bk_dexonomy_meshproc has no torch. Torch is not used by the processing functions.",
+  "evidence": "objects/log/proc_official_2026_09_27_08_38_31/main.log: 16 Success, 0 Failure",
+  "at": "2026-09-27T08:38Z"
+ },
+ {
+  "id": "A4-D31",
+  "kind": "default",
+  "what": "CoACD runs with MeshProcess's official arguments, which leave its seed random, so object prep is not bit-reproducible.",
+  "why": "Upstream setting, not changed.",
+  "evidence": "MeshProcess/src/config/task/official.yaml additional_args -mv 1e-10",
+  "at": "2026-09-27T08:38Z"
+ },
+ {
+  "id": "A4-D32",
+  "kind": "default",
+  "what": "MeshProcess output kept as is, though it bridges concave pockets. The coacd collision pieces sit up to 3.5 to 8.7 mm outside our hulls on u02, u03, u04 and u06, simplified.obj up to 12.9 mm, and CoACD volume runs 5 to 16 percent above raw. It never shrinks the object.",
+  "why": "This is the faithful output of CoACD's default 0.05 concavity threshold on the normalized mesh. A grasp touching a bridged pocket can hang off the real hull in the hold test. It is flagged to the orchestrator.",
+  "evidence": "objects/scene_cfg/agent4_scene_cfg_report.json; src/agent4_diag_meshproc_gap.py",
+  "at": "2026-09-27T08:50Z"
+ },
+ {
+  "id": "A4-D33",
+  "kind": "default",
+  "what": "GraspADMM's upstream QP-failure fallback measured at 0 of 200 real inits, 162 of them kept by its grasp filters.",
+  "why": "It keeps the fallback visible without editing upstream.",
+  "evidence": "yj-4 _graspoc/dexonomy/admm_fallback_probe.log, src/agent4_admm_fallback_probe.py",
+  "at": "2026-09-27T08:49Z"
+ },
+ {
+  "id": "A4-D34",
+  "kind": "default",
+  "what": "The method's own eval object mass comes out 0.097 to 0.099 kg, not exactly 0.1.",
+  "why": "Dexonomy rescales density from info mass (simplified.obj) while MuJoCo integrates the coacd pieces. This is upstream behaviour.",
+  "evidence": "agent4_check_scene_cfg.py output",
+  "at": "2026-09-27T08:50Z"
+ },
+ {
+  "id": "A4-D35",
+  "kind": "workaround",
+  "what": "Five template inits share each GPU (10 in parallel on 2 GPUs per method). When init's batched QP filter hits CUDA OOM, the driver retries the template, up to 10 tries as in script.py run_init, and the retry resumes at the first unfinished epoch through skip_done. A template left without 'Finish initialization' is listed by remote_check.sh.",
+  "why": "Upstream runs one template per GPU. Packing five per GPU trades occasional OOM restarts for 5x parallelism, and no data is lost because each epoch batch is saved only on success.",
+  "evidence": "dexonomy_xhand/log/init_17 and graspadmm_xhand/log/init_12 OutOfMemoryError at 08:52-08:58Z, then 'Get 60 valid' after the retry",
+  "at": "2026-09-27T09:04Z"
+ },
+ {
+  "id": "A4-D36",
+  "kind": "default",
+  "what": "Round 2 (<obj>_r2.npz, every own-eval pass after round 1) goes only to objects whose round-1 hold-test result is under 128, starting with m01 for both methods at 09:30Z. Objects already at 128 or more keep their round-1 file.",
+  "why": "The brief says go back for more only if fewer than 128 pass. The shared validator queue is RAM-limited, so re-validating thousands of surplus candidates would slow every method.",
+  "evidence": "validated dexonomy m01 43/1101, graspadmm m01 77/1646; candidates/*/m01_r2.npz 1475 and 2,223 rows",
+  "at": "2026-09-27T09:30Z"
+ },
+ {
+  "id": "A4-D37",
+  "kind": "default",
+  "what": "Epoch top-up with standard MeshProcess geometry: Dexonomy on m01, m03, m05 and m06 from 40 to 80 epochs (epochs 40 to 79 only, via skip_done), init log ids offset by 100. The object glob is passed quoted to Hydra, because m0[1356] would otherwise parse as a list. Delivered as _r3 only where the yield needs it.",
+  "why": "m01 needs about 3,300 own-eval passes at its 3.9 percent yield and had 2,576. The other three had the lowest own-eval counts. GPUs and CPUs were idle, so the extra epochs run speculatively.",
+  "evidence": "run_dexonomy_topup1.log on yj-4; init_1xx logs 'Object number: 4'",
+  "at": "2026-09-27T09:33Z"
+ },
+ {
+  "id": "A4-D38",
+  "kind": "deviation",
+  "what": "O-D23 exact geometry for Dexonomy m05 (experiment dexonomy_exact) and GraspADMM m05 (graspadmm_exact). The world mesh is collision/m05.obj, and the MuJoCo pieces are the 4 URDF collision hulls, built by agent 3's agent3_exact_hulls.py and agent3_exact_meta.py unchanged, at scale 1 with the identity pose. Settings: 80 epochs, 25 templates, starting from the base templates, not the evolved library. Delivered as m05_r3 (Dexonomy) and m05_r2 (GraspADMM).",
+  "why": "m05 is inflated by MeshProcess (coacd up to 5 mm outside, 13.7 percent of the surface beyond 1 mm per O-D23) and under 128: Dexonomy 29/1,486, GraspADMM 21/1,302. Its standard top-up projects to about 108. The list went to the orchestrator before launch, as O-D23 asks.",
+  "evidence": "O-D23; kait work/dexonomy/exact; all 8 inflated objects compile in MuJoCo_EvalEnv at the identity pose",
+  "at": "2026-09-27T09:48Z"
+ },
+ {
+  "id": "A4-D39",
+  "kind": "deviation",
+  "what": "O-D20 hulls-only m07 (object id m07h) for Dexonomy (experiment dexonomy_hulls) and speculatively for GraspADMM (in graspadmm_exact). The world mesh is agent 1's m07_collision_hulls_only.obj (100 URDF hulls unioned, no fill), and the pieces are the 100 hulls. src/agent4_exact_hulls_m07.py is agent 3's step 1 with that world mesh, and its union volume matches the hulls-only mesh (82.286 cm3).",
+  "why": "Dexonomy m07 on the filled solid passes 0 of 1,137. BODex on hulls-only passed 91/6,144 against 8/6,144 on the filled solid.",
+  "evidence": "O-D20 extended 09:49Z; validated/dexonomy/m07.json 0/1137",
+  "at": "2026-09-27T09:49Z"
+ },
+ {
+  "id": "A4-D40",
+  "kind": "default",
+  "what": "GraspADMM m05 O-D23 exact-geometry extension from 80 to 160 epochs in graspadmm_exact (init log ids offset 100, 96 workers), delivered as m05_r3.",
+  "why": "GraspADMM m05 was 21/1302 in round 1. Its m05_r2 (5,621 rows at about 2 to 2.5 percent) may land just under 128. Launched at 10:30Z, before the O-D25 11:00Z cutoff.",
+  "evidence": "validated/graspadmm/m05.json 21/1302; run_graspadmm_exact_m05ext.log",
+  "at": "2026-09-27T10:30Z"
+ },
+ {
+  "id": "A4-D41",
+  "kind": "default",
+  "what": "No further m07 generation. Dexonomy has 9,290 m07 candidates (filled solid r1 plus hulls-only r2) and GraspADMM has 11,071 (r1 plus hulls-only r2).",
+  "why": "The m07 hold-test failure looks like no hand-object contact in the Isaac scene. For GraspADMM m07 r1, 82 percent of grasps show under 0.1 mm settle drift and 56 percent fall freely (19.70 m), and the Dexonomy medians match (0.0 mm settle drift, 19.70 m hold drift), while Dexonomy's own MuJoCo eval held 41 percent of the same m07h inits. More candidates would not change that. Flagged to the orchestrator as an open question for agent 2, cause untested.",
+  "evidence": "validated/{dexonomy,graspadmm}/m07*.npz drift_trans_settle and drift_trans_max; m05 shows 0 percent zero-contact",
+  "at": "2026-09-27T10:31Z"
+ },
+ {
+  "id": "A4-D42",
+  "kind": "ruling",
+  "what": "Sibeen at 10:20Z, relayed by the orchestrator: keep only Dexonomy and GraspADMM, and drop every other method. The validator now serves these two.",
+  "why": "His ruling.",
+  "evidence": "orchestrator message 10:20Z",
+  "at": "2026-09-27T10:20Z"
+ },
+ {
+  "id": "A4-D43",
+  "kind": "ruling",
+  "what": "Sibeen at 11:00Z, relayed by the orchestrator: drop m07. The run is 15 objects, with nothing more for m07. The final table covers 15 objects.",
+  "why": "His ruling. Under validator v5, m07 passes for both methods: Dexonomy 3,321/9,290 and GraspADMM 4,267/11,071. The earlier zero-contact signature (A4-D41) came from the validator, not the grasps.",
+  "evidence": "orchestrator message 11:00Z; src/agent4_final_table_v5.json",
+  "at": "2026-09-27T11:00Z"
+ },
+ {
+  "id": "A4-D44",
+  "kind": "ruling",
+  "what": "Sibeen, relayed at about 11:20Z: stop GraspADMM for now, launch nothing more for it, keep its files and results. Dexonomy stays in focus. Dexonomy on the 3,200-object cap16 pool on the kait login node is under consideration, not launched.",
+  "why": "His ruling.",
+  "evidence": "orchestrator message about 11:20Z",
+  "at": "2026-09-27T11:20Z"
+ },
+ {
+  "id": "A4-D45",
+  "kind": "ruling",
+  "what": "Sibeen's order: build a conda env named dexonomy on Daejeon for Dexonomy generation only, with no Isaac Sim, no MeshProcess C++ builds, no generation runs, no Slurm, and no action yet on the mass cap or template set.",
+  "why": "His order, relayed by the orchestrator.",
+  "evidence": "orchestrator message 2026-09-28",
+  "at": "2026-09-28T12:20Z"
+ },
+ {
+  "id": "A4-D46",
+  "kind": "default",
+  "what": "The dj env /home/nas4_user/sibeenkim/anaconda3/envs/dexonomy was built from yj-4 bk_dexonomy's exact conda spec (conda list --explicit, 31 defaults-channel packages, python 3.10.20) plus its pip freeze installed with --no-deps from PyPI and the PyTorch cu128 index. That includes the unused CUDA 13 nvidia-* wheels bk_dexonomy carries, to stay package for package. The editable Dexonomy line is replaced by the dj clone.",
+  "why": "The order says match bk_dexonomy package for package. --no-deps stops the resolver adding or changing anything.",
+  "evidence": "dj djenv/: pip freeze --all diff exit 0 (106 lines each), conda list diff exit 0 (134), pip check clean",
+  "at": "2026-09-28T12:35Z"
+ },
+ {
+  "id": "A4-D47",
+  "kind": "workaround",
+  "what": "setuptools 81.0.0 was installed explicitly with --no-deps.",
+  "why": "Plain pip freeze omits setuptools, so the pinned list lacked it. triton 3.3.1 requires it, and pip check flagged it. 81.0.0 is the yj-4 version, read from pip freeze --all.",
+  "evidence": "djenv/dexonomy_pip_check.txt before, 'No broken requirements found' after",
+  "at": "2026-09-28T12:36Z"
+ },
+ {
+  "id": "A4-D48",
+  "kind": "default",
+  "what": "The Dexonomy clone at d561ff9 plus the xhand port (assets/hand/xhand with right.xml, hulls, meshes, keypoint, skeleton, body_group, raw_anno, init_tmpl, and config/hand/xhand.yaml) was rsynced from yj-4 into /home/nas4_user/sibeenkim/work/_graspoc/dexonomy/Dexonomy. Run outputs and root helper scripts were left out, and the git origin was set to the GitHub URL. It is installed editable, so import dexonomy resolves to this clone from any cwd.",
+  "why": "One copy of the exact port Sibeen reviewed, so nothing is re-derived. The origin fix makes pip freeze report the GitHub pin, matching yj-4.",
+  "evidence": "git status: only assets/hand/xhand/ and dexonomy/config/hand/xhand.yaml untracked; import from /tmp resolves to the clone",
+  "at": "2026-09-28T12:35Z"
+ },
+ {
+  "id": "A4-D49",
+  "kind": "deviation",
+  "what": "For the smoke profile, all 16 051 objects came over (processed meshes, coacd pieces, info, scene cfgs, 8 MB), not the one object the order named, plus 400 random main-run init files with scene_path in these copies moved from the yj-4 to the dj work dir. The profile script itself changed only its W path (profile_dexonomy_stages_dj.py).",
+  "why": "The script's init stage loads 10 objects (ds[i] for i in range(10)), and its refine and own-test sample init files across all objects and load the scene cfg each file names.",
+  "evidence": "src/agent4_rehome_init_sample.py; dj profile_kaist140.log",
+  "at": "2026-09-28T12:40Z"
+ },
+ {
+  "id": "A4-D50",
+  "kind": "default",
+  "what": "Driver check. Driver 575.57.08 on kaist67, 121, 140, 144, 145, 148 and 149, and 570.158.01 on kaist143. Both support CUDA 12.8, so torch 2.7.1+cu128 runs unchanged on the RTX 3090 (sm_86) and the TITAN RTX (sm_75). Nothing was changed for any host. kaist120, 126 and 146 time out on ssh, and kaist139 accepts ssh but hangs.",
+  "why": "Measured by running the check on each host, not assumed from the driver table.",
+  "evidence": "scripts/agent4_dj_host_check.sh output: 8/8 alive hosts OK",
+  "at": "2026-09-28T12:45Z"
+ },
+ {
+  "id": "A4-D51",
+  "kind": "ruling",
+  "what": "Sibeen's GO: Dexonomy on all 3,200 cap16 entries, 5 epochs, all 31 approved templates, on dj, 'use maximum parallel', 'do everything maximum in parallel optimize wall clock time. use all dj gpu or burn cpu whatever finish fast but properly.' Mass cap clip(URDF mass, 0.05, 0.5) kg for every test. 'No need to match yj'.",
+  "why": "His order, relayed by the orchestrator.",
+  "evidence": "orchestrator message 2026-09-28",
+  "at": "2026-09-27T21:40Z"
+ },
+ {
+  "id": "A4-D52",
+  "kind": "default",
+  "what": "The cap16 pool was pulled to dj cap16/pool and cap16/mesh_root: 3,200 URDFs and 18,058 referenced meshes (770 MB, 14,858 collision pieces, 3,200 visuals over 2,145 mesh dirs), in 12 parallel rsync streams from 7 dj hosts. It matches yj hash for hash, and matches kait's draftrec/assets_040/objects_cap16 on the same 3,200 keys and stems, masses, every collision and visual piece's sha256, order, origin and scale. pool.json and URDF masses agree.",
+  "why": "The hold test uses kait's copy, so generation must see the same geometry.",
+  "evidence": "dj cap16/xfer/*_manifest.json, src/agent4_cap16_compare.py",
+  "at": "2026-09-27T21:45Z"
+ },
+ {
+  "id": "A4-D53",
+  "kind": "deviation",
+  "what": "Object prep per entry named by URDF stem, following the m05 exact-hull path with no MeshProcess C++ step. Each collision element's convex hull goes in the object root frame with origin and scale applied. MeshProcess export_urdf/export_mjcf (its python, run under mujoco 3.3.3 rather than MeshProcess's pinned 3.2.7) writes the pieces model. The manifold union of the pieces is the one outer world mesh, and get_basic_info of the union is the info. The floating scene cfg has scale 1, the identity pose, absolute paths, mass_urdf_kg and mass_kg = clip(URDF mass, 0.05, 0.5).",
+  "why": "The ordered O-D23-style exact geometry. Absolute paths let per-host chunk dirs link the cfg files. Unique stems keep the Warp mesh cache, keyed by name, distinct.",
+  "evidence": "src/agent4_cap16_prep.py; all 3,200 load and compile in MuJoCo_EvalEnv (src/agent4_cap16_prep_check.py); 8 shards took 5 to 42 s",
+  "at": "2026-09-27T21:50Z"
+ },
+ {
+  "id": "A4-D54",
+  "kind": "deviation",
+  "what": "Own-test mass: eval_data.py sets density from the scene cfg's mass_kg = clip(URDF mass, 0.05, 0.5) instead of the global obj_mass 0.1 kg. That moves 505 entries up to 50 g and 42 down to 500 g. From 21:56:55Z it divides by collision_volume, the summed piece volume MuJoCo integrates, instead of the union volume. That makes the MuJoCo mass equal the capped mass exactly: 3,200/3,200 asserted to 1e-6. Density scaling keeps the centre of mass of the piece set.",
+  "why": "Sibeen's ruling. Upstream's formula divides by the union volume, while MuJoCo counts overlaps twice: 259 entries had pieces over 1.01x the union, max 1.123x. In the first ~4 min, own tests on those 259 used an object up to 12% heavier, which was stricter.",
+  "evidence": "src/agent4_cap16_patch_dexonomy.py, src/agent4_cap16_fix_mass.py, git diff of the dj clone",
+  "at": "2026-09-27T21:57Z"
+ },
+ {
+  "id": "A4-D55",
+  "kind": "deviation",
+  "what": "hand_loader.py: the template-library producer re-globs new_tmpl_dir every 60 s instead of 1 s. It still admits up to 100 new templates per refresh, the upstream per-refresh limit, so intake per minute is lower.",
+  "why": "About 150 init processes share one new_tmpl_dir on the nas4 NFS. A recursive glob per process per second would saturate a NAS other users share.",
+  "evidence": "src/agent4_cap16_patch_dexonomy.py",
+  "at": "2026-09-27T21:48Z"
+ },
+ {
+  "id": "A4-D56",
+  "kind": "default",
+  "what": "Multi-host driver: one chunk per host, sized to min(CPU, GPU) capacity from the kaist140 profile, with the TITAN RTX taken at 0.6 of a 3090. Entries are shuffled with seed 0. Each chunk has its own exp dir cap16_<host> and all share new_tmpl_dir cap16/new_tmpl_pool. Upstream algorithm and defaults (n_final 10, 1,024 points x 8 spins, filters), op.epoch 5, op.object.n_cfg=null. Init runs 3 processes per GPU (KPAR = 3 x GPUs), with up to 30 retries per template before reporting it unfinished. Refinement workers get 0.3 and the own-test pool 0.7 of the idle threads left after init.",
+  "why": "3 per GPU rather than 5, because the 3090 and TITAN RTX have 24 GB against the A6000's 48 GB, where 5 per GPU already hit OOMs.",
+  "evidence": "dj cap16/plan.json; scripts/agent4_cap16_run.sh, agent4_cap16_launch.sh",
+  "at": "2026-09-27T21:52Z"
+ },
+ {
+  "id": "A4-D57",
+  "kind": "default",
+  "what": "Delivery to dj cap16_deliver/dexonomy/ as <stem>_r<j>.npz plus extra/, with only new grasps per round. An entry gets a round once it has 256 or more new own-test passes, and whatever remains when its chunk finishes. Writes use a dot-temp name then rename. Sent-row state is kept in cap16/deliver_state outside the relayed dir. DONE is written when every chunk is done and nothing is left. The orchestrator relays to kait.",
+  "why": "dj cannot log into kait. The hold test starts Isaac Sim per file, so rounds are kept to a few per entry.",
+  "evidence": "src/agent4_cap16_deliver.py; kaist140 deliver loop every 3 min",
+  "at": "2026-09-27T21:55Z"
+ },
+ {
+  "id": "A4-D58",
+  "kind": "deviation",
+  "what": "Refinement and own test are rebalanced across hosts. Each chunk driver's grasp and eval loop subshells were stopped by PID at 22:31Z. Their last passes finished and their path_logs were split into per-template done lists. One shared worker per host (src/agent4_cap16_gworker.py) now leases (kind, chunk, template) pairs through mkdir locks on NFS and runs upstream's _single_grasp and _single_eval unchanged. Each worker's pool is sized to its host's idle threads: kaist67 46, kaist121 106, kaist140 220, kaist143 27, kaist144 30, kaist145 65, kaist148 109, kaist149 106. The own test takes only grasps whose refinement has returned. A chunk's GRASP_DONE and EVAL_DONE are written once all 31 of its pairs are final. Init is untouched.",
+  "why": "At 22:06Z refinement ran at 27 to 117 starts per second per host, below init on 7 of 8 hosts. The slowest chunk projected to 4.0 h and the fastest to 1.4 h, while kaist121 and kaist148 sat 57% CPU idle. Sibeen asked for maximum parallelism and to burn CPU. The orchestrator approved on 2026-09-27.",
+  "evidence": "src/agent4_cap16_gworker_test.py passes on chunks kaist140 and kaist145. Both job configs equal the hydra CLI --cfg job --resolve output. 24/24 grasps re-refined through the worker config reproduce the live grasp_data files in every key. 24/24 own-test verdicts match. Handover logs are in cap16/gsched/log/handover_<host>.log.",
+  "at": "2026-09-27T22:31Z"
+ },
+ {
+  "id": "A4-D59",
+  "kind": "deviation",
+  "what": "Shared workers v2 at about 22:58Z. An indexer (src/agent4_cap16_indexer.py, kaist140) turns each template's init log into that pair's refinement queue. Upstream init walks the chunk's objects in np.random.permutation(sorted(glob)) order right after seed 12, 10 per batch, with one Get/Skip line per batch. So each 'Get N valid' line names the 10 object dirs to list, and the indexer asserts that N files are found. Refinement leases append their kept grasps to the pair's own-test queue. Own-test leases write passes to gsched/pass. Own-test pairs are leased before refinement pairs. No worker lists a directory. v1 was stopped by stop files. Each chunk's own-test queue, pass list and counters were bootstrapped from the done lists on its own host.",
+  "why": "v1 scanned by listing directories. One template dir takes 8 s over NFS, so worker main threads stalled. The own test ran at about 134/s against about 1,000/s refinement, and it costs about 1.25 s per grasp against 0.09 to 0.17 s per refinement start. The orchestrator asked to drain both stages together.",
+  "evidence": "src/agent4_cap16_gworker_v2_test.py sandbox: 60 inits, 49 kept (the live run kept the same 49), 49 queued, 37 passed. Done lists, queues, seen sizes, finals and counters are consistent. NFS measured on kaist140: lexists 222/s serial and 1,359/s with 64 threads, listdir 25 dirs/s serial.",
+  "at": "2026-09-27T22:58Z"
+ },
+ {
+  "id": "A4-D60",
+  "kind": "deviation",
+  "what": "Refinement reuses one compiled MuJoCo model per object inside each worker process (src/agent4_cap16_envcache.py). The first start of an object builds the env the upstream way and keeps it as the pristine copy. Every start then gets a deep copy of the model and the sim cfg, plus a new MjData put through the constructor's reset. Upstream's flow then resets the data from the keyframe as before. Lease items go to the pool grouped by object. The own test keeps upstream's per-grasp build.",
+  "why": "The orchestrator measured about 73% of refinement time in the model build. Applied only with bit-identical proof.",
+  "evidence": "src/agent4_cap16_envcache_test.py on chunk kaist140, templates 1, 6, 14 and 24, 6 objects, 270 starts. 150 refined grasps match the fresh build in every key (grasp, squeeze and pregrasp qpos, contacts, ho_c), and 120 starts fail in both. All 150 also match the live run's file. Timing is 167 ms per start fresh against 90 ms reused. The own test is also bit-identical on 150 grasps (verdict, state and ctrl trajectories) but gains nothing (1,254 against 1,515 ms), so it is not applied there.",
+  "at": "2026-09-27T22:58Z"
+ },
+ {
+  "id": "A4-D61",
+  "kind": "fix",
+  "what": "Two templates' inits are being rerun after the chunk driver gave up with INIT_UNFINISHED: 28_Sphere_3_Finger on chunk kaist67 and 29_Stick on chunk kaist121. scripts/agent4_cap16_rerun_init.sh runs the driver's exact command on the host's GPU with the most free memory and no other user's process. It retries until 'Finish initialization' with 30 s between tries, and skip_done resumes. v2 marks those pairs final only after the indexer reads their Finish line.",
+  "why": "All 30 driver tries died at CUDA context creation with 'CUDA error: out of memory' on a GPU its other init processes had filled (kaist67 GPU 4 at 22:15:59Z, kaist121 GPU 2 at 22:49:19Z). The driver's retry loop has no pause, so the tries were spent in seconds, and neither pair had any batch done. Left alone, 2 of the 248 (chunk, template) pairs would have no grasps.",
+  "evidence": "run_kaist67.log and run_kaist121.log INIT_UNFINISHED lines; init_28 and init_29 main.log hold 30 tracebacks each and no 'Get' line. At the rerun, kaist67 had 6 of 7 GPUs free, and kaist121 GPU 5 had 19.4 GB free.",
+  "at": "2026-09-27T22:58Z"
+ },
+ {
+  "id": "A4-D62",
+  "kind": "fix",
+  "what": "Shared workers were restarted by stop file between 23:00:25 and 23:01:30Z. A worker now adds leases while fewer than 2 object groups per pool process are queued, closes finished leases in any order, and waits 10 s after an empty scan before rescanning. kaist67's pool went to 62 now that its init is done. At 23:02Z, 71,757 own tests (from the grasp passes killed at 22:36, whose inits were never logged) were counted per chunk into gsched/count/unlogged_refinement.json. progress.txt prints them explicitly.",
+  "why": "Grouping by object makes a lease a few large tasks. With 2 leases in flight, kaist140 had 61 of 220 processes busy and kaist148 54 of 110 (70% and 43% idle). The orchestrator flagged own-tested above kept on the 23:00 line.",
+  "evidence": "restart log from scripts/agent4_cap16_restart_workers.sh. In the first 30 s, 26,610 refinement starts and 3,689 own tests. The own-tested minus 71,757 is 664,864, at most the 666,695 kept.",
+  "at": "2026-09-27T23:02Z"
+ },
+ {
+  "id": "A4-D63",
+  "kind": "fix",
+  "what": "Delivery reads the v2 pass lists (gsched/pass) by byte offset into per-entry pending lists (cap16/deliver_pending), instead of globbing succ_grasp. The round rule, file format, atomic temp-then-rename and DONE rule are unchanged, except that DONE now waits for EVAL_DONE on all chunks. Delivered state is kept as clone-relative paths, and the extra src column is the clone's realpath plus the relative path. The old loop was killed at 22:52Z with nothing delivered. A first new pass that called realpath per path was killed at 23:01Z before delivering anything.",
+  "why": "The old pass globbed succ_grasp across all chunks and took 16 to 34 min, loading the NAS every worker depends on. Per-path realpath is millions of NFS lookups.",
+  "evidence": "deliver_loop_v1.log: 2 passes, 0 files delivered, 122,036 rows below the 256 threshold at 22:19Z. deliver_state was empty at both kills.",
+  "at": "2026-09-27T23:02Z"
+ },
+ {
+  "id": "A4-D64",
+  "kind": "deviation",
+  "what": "The own test now reuses one compiled model per object per worker process too (agent4_cap16_envcache.install patches MuJoCo_EvalEnv as well), the same mechanism as A4-D60. Workers were restarted by stop file at about 23:10Z. Seen files are written by temp name then rename, and progress reads whole counter lines only (fixes for two races, both of which crashed loud). kaist67's and kaist143's workers died at about 23:02Z on an empty seen file and were relaunched at 23:04:59Z.",
+  "why": "It was proven bit-identical in A4-D60's test: eval_fc verdict, state and ctrl trajectories match on 150 grasps. It was held back because it gave no CPU gain. But under load kaist140 had 141 to 157 of 220 pool processes waiting in NFS rpc_wait. Each fresh own-test build reads the hand XML, 30 hand meshes and the object's pieces from NFS.",
+  "evidence": "ps samples at 23:08Z: kaist140 pool 141 D rpc_wait, 39 D folio_wait, 16 R; kaist121 pool 103 R, 3 D. The 23:05Z progress line: refinement 722/s, own test 200/s, with 30 to 53% CPU idle on every host.",
+  "at": "2026-09-27T23:10Z"
+ },
+ {
+  "id": "A4-D65",
+  "kind": "fix",
+  "what": "Three changes. (1) Lease scans read pair state from 4 directory listings (final/, indexed/, seen/, todo/ with sizes), with seen sizes held in the file name <pair>@<size>, and run at most once per 2 s. (2) Each worker process caches read-only scene cfgs and info jsons, returning deep copies. (3) Pool sizes: kaist121 124, kaist148 120, kaist149 120, kaist67 64, kaist143 40, kaist144 36, kaist145 67, and kaist140 cut from 220 to 110 at 23:49:15Z. Per-group accounting (apply_async per object group) went live at 23:20Z, and the fixes at 23:41 to 23:43Z.",
+  "why": "After 23:20 the per-group fix made scans frequent. Each scan cost about 2,500 per-pair metadata calls, giving LOOKUP 275 to 374/s per host with 107 to 206 ms client queueing, and GETATTR up to 3,352/s. The orchestrator measured D states jump at 23:29Z. kaist140's own NFS client queues LOOKUP 2.7 s against 3 to 19 ms elsewhere, so more processes there only queue.",
+  "evidence": "Running / NFS-wait pool processes, before at 23:36:47Z and after warm-up at 23:47:49Z: kaist145 22/45 then 66/0, kaist121 61/62 then 100/18, kaist149 60/59 then 85/24, kaist148 83/36 then 45/74, kaist140 202/14 then 83/132. The loader cache is proven by agent4_cap16_envcache_test on chunk kaist145, templates 7, 16 and 23: 162 refined grasps exact in every key, 138 fail in both, 162 own tests exact.",
+  "at": "2026-09-27T23:49Z"
+ },
+ {
+  "id": "A4-D66",
+  "kind": "ruling",
+  "what": "Sibeen, relayed at 23:11Z: 'Drop Isaac test from the loop... template evolution and stuff, do own-test. The hold test, is for later when everything is done.' The incremental delivery loop was stopped at 23:12Z. Its 1,532 <entry>_r1.npz files plus 1,532 extra/ files were moved out of the relay dir to dj cap16/superseded_incremental/ (368 MB, kept). There is one delivery at the end (src/agent4_cap16_deliver_final.py): <entry>.npz plus extra/<entry>.npz per entry with at least one pass, dot-temp then rename, sharded over 8 hosts, and DONE last with totals.",
+  "why": "Frees NFS and CPU for refinement and the own test. The final file per entry holds all its passes, which supersedes the _r1 rounds.",
+  "evidence": "Move log: moved 1,532 main and 1,532 extra, 0 left in the relay dir.",
+  "at": "2026-09-27T23:15Z"
+ },
+ {
+  "id": "A4-D67",
+  "kind": "finding",
+  "what": "Refinement is bit-identical on the same CPU model, not across CPU models. kaist143 and kaist144 are Intel Xeon Silver 4210R, and the other six are AMD EPYC. Of 158 grasps on chunk kaist145 recomputed on kaist67 (AMD), 151 are bit-exact against the live files. 7 differ in ho_c.wrench (float64, 3e-9 to 8.7e-8), and one of those also in squeeze_qpos (2.3e-10 on 1 of 19 float32 values). All 7 are on one object refined by kaist143's v1 worker. Refining that item again on kaist143 is bit-exact against the live file.",
+  "why": "Since A4-D58, any host refines any chunk, so these low bits depend on which CPU did the work. Upstream's own run would carry its host's bits too. Model reuse is not involved: its proofs compare fresh and reused builds on the same host.",
+  "evidence": "ec_test2 on kaist67; single-item recompute on kaist143 at about 23:31Z.",
+  "at": "2026-09-27T23:40Z"
+ },
+ {
+  "id": "A4-D68",
+  "kind": "deviation",
+  "what": "The shared worker pools (main process and pool children) on kaist121, kaist140, kaist148 and kaist149 were reniced to nice 10 at about 23:59Z, leaving the chunk drivers' init processes at nice 0. The restart script now launches workers under nice -n 10. kaist140's pool went back from 110 to 180 at 23:54:54Z.",
+  "why": "The run's tail is now a few single-template inits, which cannot be split: upstream skip_done skips a whole batch if any object in it has output. At 23:57Z, 26_Sphere_4_Finger on kaist148 was at 55/275 batches at 2.58/min (about 85 min left), and 28_Sphere_3_Finger on kaist149 at 90/315 at 2.83/min (about 80 min). That is about 23 s per batch against about 5 s on an idle 3090, with CPUs fully busy with 120 pool processes. kaist140's throughput fell from 99.0 to 62.6 CPU-s/s after the 110 cut.",
+  "evidence": "Per-template batch rates from the init logs at 23:57Z; per-host counters 23:44 to 23:49 against 23:49:30 to 23:54:30.",
+  "at": "2026-09-27T23:59Z"
+ },
+ {
+  "id": "A4-D69",
+  "kind": "default",
+  "what": "No split of the slowest single-template inits (offered by the orchestrator at 00:12Z). The tail runs to its natural end.",
+  "why": "All 12 remaining inits have their template buffer at the 1024 cap and are GPU-bound. For example, kaist149 28_Sphere_3_Finger is alone on GPU 1 at 100% utilization, at 8.1 s per batch, and main-process CPU is 55 to 71%. The slowest (kaist148 26_Sphere_4_Finger, 119/275 at 10.9 s per batch while sharing GPU 2) ends about 00:40 to 00:43Z. A split needs a start-epoch or per-(object, epoch) done check in gen_init, plus indexer support for per-subset logs, permutations and finality. That is about 30 min of work on the path that decides which grasps get refined, and it would land no earlier than the natural tail.",
+  "evidence": "Per-template s/batch over the last 10 batches, GPU utilization and process CPU at about 00:13Z.",
+  "at": "2026-09-28T00:15Z"
+ },
+ {
+  "id": "A4-D70",
+  "kind": "fix",
+  "what": "My v2 sandbox test wrote live chunk markers. It narrowed the worker to one template, so mark_final's all-31-final check became 1 of 1, and it wrote GRASP_DONE and EVAL_DONE under the real clone's driver dir: kaist145 at 22:48, kaist148 at 22:59:41, kaist149 at 23:19:32, kaist121 at 23:40Z. At 00:33Z the premature kaist148 pair of markers was removed (30 of 31 pairs final). kaist145, kaist121 and kaist149 had since become final for real, so their markers are correct. The test now points the worker's CLONE at scratch for markers.",
+  "why": "A marker must mean all 31 pairs are final.",
+  "evidence": "Marker mtimes equal the sandbox test times. No worker reads these markers: finality comes from gsched/indexed and gsched/final. The final-delivery trigger and deliver_final both also require 496 final pairs. The only reader was the pass-list delivery loop from 23:04 to 23:12Z. It flushed kaist145's and kaist148's pending rows below the 256 threshold, and all its output was superseded and moved out (A4-D66).",
+  "at": "2026-09-28T00:34Z"
+ },
+ {
+  "id": "A4-D71",
+  "kind": "result",
+  "what": "cap16 Dexonomy finished and delivered. DONE was written at about 00:40Z in dj cap16_deliver/dexonomy/: 3,200 <entry>.npz files plus extra/, 1,583,000 grasps, 1.7 GB, grasps per entry min 6, median 487, max 991. The run: 4,960,000 starts (50,220 batches), 4,960,000 refined, 2,072,045 kept (41.8%), 2,072,045 own-tested, 1,583,000 passed (76.4%). It launched at 21:52:40Z and all 496 pairs were final at 00:36Z.",
+  "why": "Sibeen's GO for the full cap16 pool, and his 23:11Z ruling to deliver once at the end.",
+  "evidence": "src/agent4_cap16_verify_delivery.py: the delivered sources equal the 1,583,000 unique pass-list lines (0 missing, 0 extra, none twice), with formats, finiteness, unit quaternions, extra/main agreement and DONE totals all checked. gsched/index_state.json: 4,960,000 starts, 50,220 batches, 0 crash-kept batches. All 8 hosts showed 0 run processes and 0 GPU afterwards.",
+  "at": "2026-09-28T00:45Z"
+ },
+ {
+  "id": "A4-D72",
+  "kind": "deviation",
+  "what": "Init for epochs 5 to 39 runs as 4,464 jobs over epoch ranges (src/agent4_cap16_init_jobs.py): 1 epoch per job for kaist121 and kaist149, 2 for kaist145 and kaist148, 3 for kaist67 and kaist140, 5 for kaist143 and kaist144, never crossing epoch 20. Each job is upstream init with op.epoch=<end> and +op.epoch_start=<start>. The clone's gen_init.py loop now runs range(epoch_start, epoch). Per-host runners (src/agent4_cap16_init_runner.py) run 2 processes per free GPU (96 slots on 48 GPUs). They take jobs in order of start epoch then length, a job only after its pair's previous one, with 30 s between failed tries and at most 30 tries. The chunk drivers are not used.",
+  "why": "Sibeen's GO for 40 epochs (15 then 20 more). In the first run the second-wave templates started 40 to 70 min late and set the end, at 1 process per template. Re-walking done epochs would make the dataloader load and sample every object of every done epoch.",
+  "evidence": "Smoke test at 01:15Z on 3 objects, epoch 5 only: exit 0 in 68 s, first epoch 5, template buffer from the index, 30 valid, Finish line, files named 5_*. Jobs: 351,540 batches, phase 1 150,660, phase 2 200,880.",
+  "at": "2026-09-28T01:18Z"
+ },
+ {
+  "id": "A4-D73",
+  "kind": "deviation",
+  "what": "A job with epoch_start > 0 reseeds numpy, torch and random with 12 + epoch_start right before its epoch loop, after the seed-12 object order is built. That order, and so the indexer's batch-to-object mapping, is unchanged.",
+  "why": "A fresh process restarts at seed 12, and the dataloader's worker seeds come from the main torch generator, so its first epoch would redraw epoch 0's random start poses.",
+  "evidence": "src/agent4_cap16_rng_test.py with upstream's get_object_dataloader on chunk kaist143: two fresh seed-12 processes give the same first-batch start poses (sha256 3549959bb6e398f5); a reseed with 17 gives 8ec1f79a21714f82.",
+  "at": "2026-09-28T01:18Z"
+ },
+ {
+  "id": "A4-D74",
+  "kind": "deviation",
+  "what": "The hand loader's pool paths come from index files gsched/pool/<chunk>__<tmpl>.txt, read incrementally, instead of glob(new_tmpl_pool/<tmpl>/**/*.npy) on NFS every 60 s. Each own-test lease appends the pool links that upstream's eval made or found for its passes. The index was seeded by a per-object listing of the existing pool: 370,124 paths.",
+  "why": "One template's pool held 3,113 object dirs and 34,673 files, and one listing took 132 s. 96 processes repeating it every 60 s, over a pool 8x larger, would saturate the NAS.",
+  "evidence": "src/agent4_cap16_pool_index.py --check on all 31 templates: the index equals upstream's recursive glob, as a set of the same strings, 31 of 31.",
+  "at": "2026-09-28T01:18Z"
+ },
+ {
+  "id": "A4-D75",
+  "kind": "fix",
+  "what": "Workers read a pair's queue and done list from the offsets saved in its seen file (<pair>@<queue offset>_<done offset>), not in full. The 5-epoch delivery and its DONE moved to cap16/delivered_5epoch/ (3,200 entries plus extra). The final, indexed and chunk markers moved to gsched/prev_5epoch/. The indexer's per-pair state was reopened at the current log offsets, and it now finalises a pair only at the Finish line of the job that ran epoch 39.",
+  "why": "Queue and done lists grow to about 250k lines per pair over 40 epochs. The final DONE must mean the 40-epoch delivery.",
+  "evidence": "Reset log on kaist140 at 01:17Z: 248 pairs reopened, 0 final, 0 indexed, relay dir empty.",
+  "at": "2026-09-28T01:18Z"
+ },
+ {
+  "id": "A4-D76",
+  "kind": "fix",
+  "what": "The clone's object dataloader starts its workers through a forkserver (dexonomy/data/obj_loader.py, multiprocessing_context='forkserver'; src/agent4_cap16_patch_forkserver.py). It went live at 02:03Z for every new init process. 13 hung init processes were killed by PID between 02:03 and 02:04Z, and their jobs retry. The poll (scripts/agent4_cap16_poll6.sh) now kills any init whose template log has not grown for 10 min (scripts/agent4_cap16_hung_init.sh).",
+  "why": "13 of 96 init processes hung at their first batch for 19 to 45 min. In each, one dataloader worker was single-threaded and blocked on a futex (futex_wait_queue) since its fork, and the main thread waited on it. That is a fork while the hand loader's consumer threads held a lock. Upstream hid it because its 132 s pool glob kept the consumers idle at startup, and the A4-D74 index feeds them within 1 s.",
+  "evidence": "agent4_cap16_rng_test through a patched copy: the forkserver dataloader gives the same first-batch start poses as fork, sha256 3549959bb6e398f5 at seed 12 and 8ec1f79a21714f82 at 17. Hung list at 02:02Z with log idle times and ps/wchan of the children.",
+  "at": "2026-09-28T02:03Z"
+ },
+ {
+  "id": "A4-D77",
+  "kind": "fix",
+  "what": "Workers append pool links to one index file per writing host, gsched/pool/<chunk>__w<host>__<tmpl>.txt, which the loader's glob still matches. The hand loader skips index lines that contain a NUL byte (src/agent4_cap16_patch_poolnul.py). Workers were restarted at about 02:07Z.",
+  "why": "8 of 248 pool index files held one NUL run each (630 to 2,361 bytes) between complete lines. These are the files appended from several hosts while about 96 loaders on all hosts re-read them every 60 s. A consumer thread hit 'embedded null byte' on np.load. The queue, done, pass and counter files (1,256) had no NULs.",
+  "evidence": "NUL scan at 01:57Z. In kaist148__15_Fixed_Hook.txt, the 804-byte run sits at offset 90,969 between two complete path lines. Before the final delivery, pass lists will be checked against the succ_grasp links on disk and the kept grasps against the own-test done lists.",
+  "at": "2026-09-28T02:07Z"
+ },
+ {
+  "id": "A4-D78",
+  "kind": "fix",
+  "what": "The hung-init watchdog judges a hang by the age of the last main-flow line (Get, Skip, Epoch, Template name, Finish) in the template's init log, not by the log file's age. PID 1708404 (chunk kaist140, 15_Fixed_Hook, job 5-8) was killed with its children at 02:22:02Z.",
+  "why": "That process was fork-deadlocked from 01:19Z, but its hand loader thread logged a NUL-path error every 60 s, which kept the log file fresh, so the file-age test never flagged it.",
+  "evidence": "Its log from 02:10 to 02:21Z holds only hand-loader tracebacks, 40 'embedded null byte' errors in total. A sweep with the new test at 02:22Z found no other hung process.",
+  "at": "2026-09-28T02:22Z"
+ },
+ {
+  "id": "A4-D79",
+  "kind": "deviation",
+  "what": "Init writes each batch's files on one background saver thread (src/agent4_cap16_patch_asyncsave.py, clone gen_init.py, live at 02:45:52Z for new jobs). The main thread builds each dict with upstream's own expressions. At most 2 batches wait for saving, a save error is raised in the main thread, and all saves finish before 'Finish initialization.'. The process logs 'Async saves' once and 'Saved N' per batch. The indexer (swapped between cycles at 02:44:57Z) closes an async process's batches on 'Saved N' in order, keeps the old rule for sync processes, and closes open batches as possibly partial only on a restart.",
+  "why": "Measured per-batch time on the live stack: filter 4.65 s and matcher 3.38 s on the GPU, NFS saves 1.04 s (np.save 0.66, makedirs 0.38), everything else under 0.2 s. About 9.5 s steady state, so saves are about 11% of a process's batch. The orchestrator asked for it.",
+  "evidence": "src/agent4_cap16_init_profile.py: 15 batches on kaist148 GPU 1 next to 2 live processes. src/agent4_cap16_asyncsave_test.py on a scratch copy of the patched package: 3 batches and 300 files, every file on disk equal to the bytes np.save gives for its dict in the main thread, and 'Saved N' matching 'Get N valid' in order [100, 100, 100]. Two runs cannot be compared with each other, because upstream's template buffer fills asynchronously.",
+  "at": "2026-09-28T02:45Z"
+ },
+ {
+  "id": "A4-D80",
+  "kind": "fix",
+  "what": "Before processing an object group, a worker lists that group's input directory (one listdir per group). Workers were restarted with it at about 02:41Z.",
+  "why": "At 02:33:29Z an own test on kaist143 raised FileNotFoundError for grasp_data/29_Stick/sem__Bowl-4be4184845972fba5ea36d5a57a5a3bb_s006/floating/real/8_72_grasp.npy. The refining host had seen that file exist before queueing it, so kaist143 had a stale negative lookup cached. Upstream's safe_wrapper swallowed the error as a WARNING and the item was logged as done, so that one kept grasp was never really own-tested. Listing the directory reads it from the server first.",
+  "evidence": "kaist143.log line 1054, the only WARNING in 8 worker logs. Before delivery, every item named in a WARNING is run through the own test again.",
+  "at": "2026-09-28T02:41Z"
+ },
+ {
+  "id": "A4-D81",
+  "kind": "deviation",
+  "what": "Host affinity for leases. Each indexer cycle reads the running init jobs' lock owners and writes gsched/aff/grasp__<chunk>__<tmpl>@<host> for the host now writing that pair's init files. Each refinement lease writes gsched/aff/eval__<chunk>__<tmpl>@<its host>. A worker takes own-test pairs, then refinement pairs, marked for its own host first, and other hosts' pairs only when it has no local work. This changes only the lease order, never what is computed. Indexer swapped between cycles at 03:23:17Z; workers restarted from about 03:24Z at unchanged pool sizes, because the worker side was behind (work-model ETA 16:21Z against init 13:08Z).",
+  "why": "Fleet-wide NFS client counters at 03:16 to 03:18Z show NFSv4 delegation recalls dominating: DELEGRETURN 1,450 to 4,400/s, matching OPEN_NOATTR one for one, at 36 to 1,285 ms each. Almost every per-item input is written on one host and read on another, so every read makes the NAS recall the writer's delegation. In the 03:17:27 stall the NAS fell to 11,552 ops/s with DELEGRETURN at 1,285 ms.",
+  "evidence": "scratchpad nfsagg.py log (8-host mountstats sums every 30 s). The sandbox lease-cycle test passes with affinity (60 inits of kaist144/16_Lateral: 41 kept, 37 passed, all lists consistent).",
+  "at": "2026-09-28T03:24Z"
+ },
+ {
+  "id": "A4-D82",
+  "kind": "deviation",
+  "what": "Two init-side NFS cuts, live in the clone at 03:34:01Z for new jobs (src/agent4_cap16_patch_initcuts.py). (1) The saver makes each distinct directory once per batch instead of os.makedirs before each file. (2) A job reads its pair's init log once at start; if no earlier 'Epoch e' line exists for any epoch it will run, it skips upstream's skip_done globs, which could then only find nothing. Any earlier try keeps the check. The decision is logged as 'Resume check on|off'.",
+  "why": "skip_done globs 10 object dirs per batch; on cold NFS dirs that cost 1.07 s, with each batch visiting 10 new objects. The saver made 300 makedirs calls per 3 batches for 30 distinct dirs.",
+  "evidence": "src/agent4_cap16_initcuts_test.py on a scratch copy. Run 1 (fresh job): Resume check off, 3 batches, 300 files byte-equal to their dicts' np.save bytes, 30 makedirs for 30 distinct dirs (upstream 300). Run 2 (same job): Resume check on, 3 of 3 batches skipped, 300 files unchanged byte for byte.",
+  "at": "2026-09-28T03:34Z"
+ },
+ {
+  "id": "A4-D83",
+  "kind": "default",
+  "what": "A worker change that takes up to 8 leases per scan round is built and sandbox-tested (60 inits, lists consistent), staged as agent4_cap16_gworker_next.py, and not deployed.",
+  "why": "At 03:34Z kaist140 had 130 of 180 pool processes waiting for tasks (92% CPU idle) and kaist148 had 40, because one lease per 2 s cannot fill a pool that affinity leaves mostly without local work. By 03:35Z the run ETA already equalled the init ETA (13:27Z, refined 822 starts/s, own test 349/s, 510 busy CPU-s/s), and each worker restart costs a cache-flush burst. It is deployed only if the workers fall behind init again.",
+  "evidence": "Pool state sample at 03:34Z; progress line at 03:35Z.",
+  "at": "2026-09-28T03:38Z"
+ },
+ {
+  "id": "A4-D84",
+  "kind": "diagnostic",
+  "what": "Drain the shared workers on all 8 dj hosts through their stop files for about 12 minutes while init runs, then restart them at the same pool sizes. Template evolution pauses for that window, because the pool index grows only from own-test passes.",
+  "why": "nas4 is a Synology at <nas4 host>, volume2. It froze fleet-wide at 03:40:20, 03:46:02, 03:50:18 and 03:51:20 to 03:52:05. Replies took 12 to 24 s, and kaist139, which is not ours, saw GETATTR at 1.3 s. Init fell from 9.35 to 6.05 batches/s. The test shows whether our worker file load triggers the freezes. Workers keep up with init with about half their pools idle, so they can clear the backlog after.",
+  "evidence": "scratchpad nfsstall.log, 10 s per-host mountstats. At 03:51:28 to 03:51:58 every host ran 0 to 2 ops/s with RTT 4.1 to 24.9 s. At 03:48:42 the time was queue (260 to 390 ms) with RTT at 13 ms.",
+  "at": "2026-09-28T03:53:21Z",
+  "outcome": "The freezes do not come from our workers. With all 8 drained (out by 03:54:41) fleet load fell to about 10k ops/s, and server RTT rose to 10 to 32 ms, against 4 to 6 ms at 28k ops/s at 03:30. nas4 then froze fully from 03:55:48 to 04:04-04:06:20. TCP and the ssh banner answered in 25 to 48 ms, and every login hung because login touches nas4. Sibeen ruled keep going, do not pause. Workers restarted at the same pool sizes at 04:06:56 to 04:07:15. No watchdog kill during the freeze, 0 failed jobs. Another short freeze followed at 04:07:18 to 04:07:38."
+ },
+ {
+  "id": "A4-D85",
+  "kind": "default",
+  "what": "Move the indexer from kaist140 to kaist143, same code, arguments and state, stopped within a second of a new 'cycle:' log line (scripts/agent4_cap16_move_indexer.sh).",
+  "why": "kaist140's NFS client carries the 180-process worker pool, 8 inits and the indexer's 32 listing threads. It queued 42 to 1,572 ms per op, against 0 to 5 ms on kaist143. Indexer cycles grew to 73 to 138 s before the 03:55 freeze. The cycle from 04:03:37 ran over 10 min with all 32 threads in D. That left about 7k batches unindexed, so workers starved and the progress line read 0.00 batches/s. The old swap script waits for nanosleep, which never comes once a cycle passes the 20 s period.",
+  "evidence": "nfsstall.log per-host queue and RTT. Indexer log cycle lines 03:52:57 to 04:03:37. Thread sample at 04:13, 36 threads with 32 in D, 267 CPU ticks in 12 s. Finished-job batches 120,520 against 116,983 indexed.",
+  "at": "2026-09-28T04:14:52Z"
+ },
+ {
+  "id": "A4-D86",
+  "kind": "default",
+  "what": "Cut the shared worker pool on kaist140 from 180 to 60 and on kaist148 from 120 to 60. kaist121 and kaist149 stay at 124 and 120 as controls. Compare GPU use and NFS queue after the cut, and extend the cut to the other big pools if it holds.",
+  "why": "At 04:36 every host was capped at about 1,000 to 1,170 NFS ops/s, at a server RTT of 27 to 33 ms. That fits about 32 RPCs in flight per client. Client queue time ran 0.5 to 2.9 s per op on the big-pool hosts, and their GPUs ran at 0 to 10%. kaist144 (36 workers) queued 14 ms at 84% GPU. Each host's init shares its client with that host's workers. With NFS the binding cap, running workers first starves the GPUs, and GPU time cannot be recovered later. Workers have about 2x spare CPU to catch up once NFS recovers, so init gets the slots. The orchestrator's standing order was to back off if D climbs. D stood at 187 on kaist140 and 122 on kaist148. A4-D83 (more leases) would add NFS demand on saturated clients, so it stays undeployed.",
+  "evidence": "scratchpad hostab.sh at 04:36:42. kaist140 gpu 0%, D 187, 1,053 ops/s, q 2,881 ms, RTT 31 ms. kaist148 gpu 0%, D 122, q 1,533. kaist121 10%, q 1,434. kaist149 2%, q 1,588. kaist143 62%, q 1,113. kaist144 84%, q 14. kaist67 0%, q 529. kaist145 24%, q 870.",
+  "at": "2026-09-28T04:37:35Z"
+ },
+ {
+  "id": "A4-D87",
+  "kind": "diagnostic",
+  "what": "Drained kaist144's worker (36 processes) at 05:04:25 and restarted it at 05:05:03 under strace -f for file syscalls. Detached at 05:06:49 by SIGKILL to strace alone. With '-o FILE PROG' strace blocks fatal signals, and the timeout wrapper was killed first because it would have signalled the worker's process group. The worker has kept running untraced since, with ppid 1 and 36 children at TracerPid 0. Also ran a sandbox lease probe under strace (60 refinements, 24 own tests, scratch outputs removed).",
+  "why": "To size structural NFS levers for the orchestrator with measured per-item syscalls rather than guesses. Nothing was deployed.",
+  "evidence": "Live window 05:05:30 to 05:06:47, 77 s. 117,145 file syscalls for 2,880 refinements and 1,022 own tests, 30.0 per item. Per item: hand assets 14.95 (right.xml stat 14.28, open 0.67), object coacd.xml 2.49 (open 0.89), conda env stats in the parent 0.88, item I/O about 5 to 6. Trace parsed locally and deleted from kaist144.",
+  "at": "2026-09-28T05:08:38Z"
+ },
+ {
+  "id": "A4-D89",
+  "kind": "default",
+  "what": "Extend the A4-D86 pool cut to kaist121 (124 to 60), kaist149 (120 to 60) and kaist67 (64 to 32), at the orchestrator's request. Pools are now kaist67 32, kaist121 60, kaist140 60, kaist143 40, kaist144 36, kaist145 67, kaist148 60, kaist149 60.",
+  "why": "At 05:32 the orchestrator measured kaist121 at 123 runnable on 128 threads with D 16 and GPU 5%, and kaist149 at 135 runnable with D 17 and GPU 21%. The cut hosts kaist140 and kaist148 were at 40 to 43%. With D low, their inits look CPU-starved by the worker pools rather than NFS-bound. My A4-D86 A/B (04:45 to 04:57) was inconclusive (cut hosts 35 to 36% mean GPU against controls 25 to 31%), so it does not argue against the cut.",
+  "evidence": "Orchestrator message at 05:32Z. scratchpad hostab_ab.log.",
+  "at": "2026-09-28T05:40:08Z"
+ },
+ {
+  "id": "A4-D88",
+  "kind": "default",
+  "what": "Workers read every MuJoCo XML once per process and parse it from its text. The hand's meshes, a fixed set of 60 files, are handed to MuJoCo from memory at compile (agent4_cap16_envcache.install_assets, part of install()). Object mesh pieces still load through MuJoCo's own file cache. Deployed by a graceful restart of all 8 workers at their current pool sizes.",
+  "why": "Lever (c), approved by the orchestrator. The live trace (A4-D87) showed about 0.67 env builds per item, because envcache keeps one pristine env per process and groups rotate objects. Each build opened the hand and object XMLs and stat'ed about 21 hand meshes on nas4, about 18 of the roughly 24 nas4 syscalls per item and about 5k RPCs/s fleet-wide. Object-to-process routing is not built. It would save CPU, and CPU is not the cap. Memory-served builds also cut the build itself from 2,453 to 291 ms.",
+  "evidence": "Probe: models byte-identical (46,151,554 bytes), and a cached build made 0 opens on nas4, against 65 opens and 190 nas4 syscalls for upstream's build. agent4_cap16_memassets_test.py 5: 40 objects over 8 chunks byte-identical from files and from memory, build 2,453 ms from files against 291 ms from memory. agent4_cap16_envcache_test.py kaist144, 2 objects, 15_Fixed_Hook and 1_Large_Diameter, on the staged code: 600 inits, 227 refined grasps equal in every key, 373 fail in both. Own test: 227 grasps with eval_fc verdict and state and ctrl trajectories equal, 155 pass in both. Remaining build syscalls are relative ENOENT stats, served from the negative dentry cache (mount lookupcache default).",
+  "at": "2026-09-28T05:41:13Z"
+ },
+ {
+  "id": "A4-D90",
+  "kind": "default",
+  "what": "Resize worker pools by a CPU budget, in steps through graceful restarts, with a GPU check per host before and after each step, backing off any host whose GPU drops. Budget = threads minus init's measured CPU max, minus 10% of threads, minus 1 CPU for the worker's parent process (0.5 more on kaist143 for the indexer). Budgets: kaist67 44, kaist121 99, kaist140 222, kaist143 27, kaist144 27, kaist145 74, kaist148 101, kaist149 101. Step 1: kaist121 60 to 99, kaist148 60 to 101, kaist149 60 to 101, kaist143 40 to 27, kaist144 36 to 27. Step 2: kaist67 32 to 44, kaist145 67 to 74, kaist140 60 to 120. Step 3: kaist140 to 222 only if its GPU holds, because its one NFS client choked at 180 before A4-D88.",
+  "why": "Orchestrator order after A4-D88. Workers cap the run: all 415 processes were busy on about 333 CPUs, with the backlog near 535k starts. Pools are sized so that runnable processes stay below the thread count and init never waits for CPU.",
+  "evidence": "06:06 per-host init CPU% max of 3 samples: kaist67 1194 (14 procs), kaist121 1469 (16), kaist140 719 (8), kaist143 731 (8), kaist144 744 (8), kaist145 1057 (12), kaist148 1241 (14), kaist149 1264 (16). Baseline GPU samples in scratchpad pool_before.log.",
+  "at": "2026-09-28T06:11:13Z"
+ },
+ {
+  "id": "A4-D91",
+  "kind": "default",
+  "what": "Deploy A4-D83, up to 8 leases per scan, by restarting host by host with the A4-D90 pool steps. Step 2a: kaist121 99, kaist67 44, kaist145 74. Step 2b: kaist148, kaist149, kaist143, kaist144 at their step-1 sizes, and kaist140 60 to 120. The previous worker is kept as agent4_cap16_gworker_prev.py.",
+  "why": "The orchestrator pre-approved A4-D83 for when workers are the lag, and at 06:05 they were. After step 1, kaist121's 100-process pool sampled 3 busy at 06:15, while its log showed 15 leases of up to 3,960 items finishing since 06:11 in 27 to 84 s each. One lease per 2 s scan lets a big pool drain between leases.",
+  "evidence": "kaist121 log 06:11 to 06:15. Pool samples at 06:15:47. A4-D83 sandbox test, 60 inits, lists consistent.",
+  "at": "2026-09-28T06:16:31Z"
+ },
+ {
+  "id": "A4-D93",
+  "kind": "default",
+  "what": "Indexer fix after its 06:17:46 crash. Affinity marking now runs before the queue appends. A one-time 'trim' start drops from the first cycle's new lines the prefix already at the end of each grasp queue, then the indexer runs as before. Restarted on kaist143.",
+  "why": "The indexer raised PermissionError reading ijob_lock/kaist145__23_Adduction_Grip__15-17/owner, which the runner was creating. That is an NFS race in the affinity marking, and the affinity marking ran after the cycle's queue appends and before its state save. A plain restart would re-read the logs from the saved offsets and queue that cycle's lines twice. Duplicates can be processed twice across a seen boundary and give duplicate pass lines. The indexer is the grasp queues' only writer and re-derives lines in the same order, so the crashed cycle's appends are exactly each queue's tail.",
+  "evidence": "indexer.out traceback, line 159. Last good cycle 06:17:42. Trim logic unit-tested on synthetic queues (full, partial, none and all overlaps, and a read starting inside a line). The restart logs each pair's trimmed count.",
+  "at": "2026-09-28T06:23:32Z"
+ },
+ {
+  "id": "A4-D94",
+  "kind": "default",
+  "what": "Back off kaist121 99 to 60, kaist148 101 to 60 and kaist67 44 to 32, per the rule to back off any host whose GPU drops. Step 2b is held: kaist148, kaist149, kaist143 and kaist144 keep their sizes on the old code until their next restart, and kaist140 stays at 60. Pools are now kaist67 32, kaist121 60, kaist140 60, kaist143 27, kaist144 27, kaist145 74, kaist148 60, kaist149 101.",
+  "why": "In the 06:30 to 06:35 slow phase (fleet RTT 13 to 17 ms), kaist121 ran 1,590 NFS ops/s at 37 ms queue plus 19 ms RTT, with 97 processes in D, GPU 1 to 26%, and 0 of 100 workers busy. kaist148 had GPU 13 to 29% and D 52, and kaist67 GPU 14 to 29%. kaist143 with 27 workers kept 63 to 100% GPU in the same phase. Each host's roughly 32 NFS slots cap it at about 32 over RTT, near 1,600 ops/s at 20 ms. So in slow phases the right pool size is far below the CPU budget, and big pools starve init.",
+  "evidence": "hostab at 06:35 to 06:36. kaist121 D wait channels 48 rpc_wait gworker. Baseline healthy GPU in pool_before.log.",
+  "at": "2026-09-28T06:36:01Z"
+ },
+ {
+  "id": "A4-D95",
+  "kind": "log",
+  "what": "Watchdog kills during nas4 slow phases and freezes, logged per the orchestrator's ruling (threshold stays at 600 s). 04:59:29 kaist121 (cap16_kaist148 22_Parallel_Extension, 785 s). 04:59:36 kaist149 (cap16_kaist145 3_Medium_Wrap, 670 s). 06:34:57 kaist148 (cap16_kaist148 17_Index_Finger_Extension, 624 s). 06:36:22 kaist121 (cap16_kaist148 13_Precision_Sphere, 805 s). 06:49:08 kaist149, four inits of cap16_kaist121 (18_Extension_Type, 24_Tip_Pinch, 25_Lateral_Tripod, 26_Sphere_4_Finger), 810 s each.",
+  "why": "Each stalled over 10 min with no main-flow line, on hosts whose NFS client was saturated in a slow phase or a freeze. They are likely NFS starvation, not deadlocks, though that is not proven per case. The runner retries each job, 0 failed so far. A false kill costs at most one redone batch.",
+  "evidence": "watchdog_<host>.log KILLED lines. rpcmon.log RTT at those times. Runner logs show try 1 failed with exit -15, then retries.",
+  "at": "2026-09-28T06:52:15Z"
+ },
+ {
+  "id": "A4-D92",
+  "kind": "default",
+  "what": "Lever (b), one npz per init batch. Init writes <init_dir>/<tmpl>/_batch/<epoch>/<j>.npz, each member named by the path of the file upstream would write, holding that file's np.save bytes, and logs 'Saved N npz <path>'. The indexer reads member names from the npz instead of listing 10 object directories, and queues 'path<TAB>npz'. The worker serves those inits from the npz member through a narrow np.load shim, so upstream's _single_grasp reads the same dict under the same path and writes the same outputs. Both formats coexist. Deploy order: worker (this step), then indexer at a cycle boundary, then the gen_init patch, which applies to new jobs.",
+  "why": "Approved by the orchestrator after (c). Init's saver costs about 500 NFS ops per batch (about 100 file creates), which queue behind the host's workers in slow phases. With one npz, init needs about 5 ops per batch, the refinement input opens drop to about 1 per group, and the indexer's 10 listings per batch go away. init_data is not delivered, so delivered bytes do not change.",
+  "evidence": "agent4_cap16_npzworker_test.py kaist144 15_Fixed_Hook: 400 inits, npz-backed run_group equals file-backed in every returned line and output, 66 refined grasps byte-identical, 334 fail in both, files absent during the npz run, a missing member raises in run_group. agent4_cap16_npzbatch_test.py on the scratch clone is running and gates the indexer and init steps.",
+  "at": "2026-09-28T06:52:32Z",
+  "deployed": "Worker on all 8 hosts at 06:52:54 to 06:54:24Z (md5 1e942378). Indexer swapped on kaist143 at 06:59:36 to 37 on its cycle line (md5 668ab914). gen_init.py patched atomically at 06:59:46, byte-identical to the proven scratch copy. The pre-patch file is kept at cap16/gen_init_pre_npzbatch.py. agent4_cap16_npzbatch_test.py passed: 3 npz, 300 members byte-equal to np.save, no per-grasp file, Saved lines match, indexer npz_files gives the 300 lines, and a resumed run skips 3 of 3 with the npz unchanged."
+ },
+ {
+  "id": "A4-D96",
+  "kind": "deviation",
+  "what": "Hung-init watchdog threshold raised from 600 s to 1,800 s (no main-flow line and process older than that), until (b) is fully live, about 07:45Z. Then back to 600 s.",
+  "why": "The orchestrator changed its ruling. 13 kills from 06:34 to 06:53, all in nas4 slow phases or freezes, look like save stalls: about 500 NFS ops per 100-file batch at 1 to 3 s client queue, with at most 2 saves pending. Each kill costs a redone batch plus resume-check globs on NFS. The fork deadlock the watchdog guards against shows no main-flow line for unbounded time, so 1,800 s still catches it.",
+  "evidence": "A4-D95 kill list. rpcmon RTT 21 to 33 ms and a freeze 06:45:50 to 06:51:50.",
+  "at": "2026-09-28T06:58:38Z",
+  "reverted": "Back to 600 s at 07:45:30Z. At 07:45:15 all 96 running init jobs had started after the 06:59:46 patch, so (b) was fully live."
+ },
+ {
+  "id": "A4-D97",
+  "kind": "deviation",
+  "what": "In place of the routing half of (c): each worker process also keeps object mesh pieces in memory, in a 256 MB LRU keyed by file path, and hands every mesh to MuJoCo from memory at compile. Object-to-process routing is not built. The orchestrator did not object.",
+  "why": "A process rebuilds an object's env whenever that object's groups come back to it, and each rebuild opened the object's pieces on nas4 (about 0.6 opens per item after A4-D88). Objects have a median of 3 pieces and 185 KB (max 1.08 MB), so per-process caching removes those reads whichever process gets the group, and no pool rerouting is needed. Routing would only add rebuild CPU savings, about 35 ms per item, and CPU is not the cap.",
+  "evidence": "agent4_cap16_memassets_test.py 5 on the staged code: 40 objects over 8 chunks byte-identical built from files and from memory, build 2,266 ms from files against 257 ms from memory. agent4_cap16_envcache_test.py kaist144, 2 objects, 15_Fixed_Hook and 1_Large_Diameter: 800 inits, 305 refined grasps equal in every key, 495 fail in both. Own test: 305 grasps with verdict and state and ctrl trajectories equal, 210 pass in both.",
+  "at": "2026-09-28T07:37:12Z"
+ },
+ {
+  "id": "A4-D98",
+  "kind": "default",
+  "what": "Re-step worker pools toward the A4-D90 CPU budget now that (b) is fully live. Step A: kaist121 60 to 99, kaist148 60 to 101, kaist149 60 to 101, kaist67 32 to 44. kaist140 (60), kaist143 (27), kaist144 (27) and kaist145 (74) stay unchanged as same-window controls. Check GPU on each host after about 5 min and back off any whose GPU drops against the controls.",
+  "why": "The A4-D94 back-off came from init starving on its saves behind big worker pools in slow phases. (b) removed that: new-code saves take a median 1 s with 0 s blocked. Workers are now the lag. The 07:41 refinement backlog was 1.15M starts, refining 580 starts/s against about 940 produced.",
+  "evidence": "pool2_before.log at 07:46 to 07:49: GPU means kaist121 74, kaist140 80, kaist143 88, kaist144 73, kaist145 66, kaist148 72, kaist149 69, kaist67 87%, RTT 6 to 17 ms.",
+  "at": "2026-09-28T07:48:42Z",
+  "step_A_result": "Kept. At 07:54 to 07:57, RTT 6 ms, GPU means on the raised hosts: kaist121 74 to 78%, kaist148 72 to 69%, kaist149 69 to 66%, kaist67 87 to 85%. Controls: kaist140 80 to 85, kaist143 88 to 65, kaist144 73 to 85, kaist145 66 to 81. No raised host dropped beyond the controls' swing. D on the raised hosts rose to 103 to 116. Workers: 692 to 809 refinement starts/s and 267 to 365 own tests/s, up from 580 and 249. Step B: kaist140 60 to 120.",
+  "step_B_result": "08:03 to 08:05: kaist140 at 120 read 73% (72, 61, 85) against 80 to 85 before, which is borderline, so it holds at 120 with no step to 222. kaist148 at 101 fell to 51% (64, 50, 40) against 72 at baseline and 69 after step A, while controls held (kaist143 87, kaist144 80, kaist145 72). Backed kaist148 off to 80.",
+  "step_C": "08:08 to 09:15 at healthy RTT (median 2 to 3 ms), GPU means: kaist121 79, kaist140 73, kaist143 82, kaist144 85, kaist145 70, kaist148 70, kaist149 65, kaist67 85%. Workers still lag. The refinement backlog grew from 1.15M (07:41) to 1.75M (09:07), about 810 starts/s against about 920 produced. Step C at 09:12Z: kaist140 120 to 180 (budget 222). kaist140 has 256 threads and only 4 of the 48 GPUs, so a few points of GPU there cost under 1% of fleet init, while about 60 more workers add roughly 90 items/s.",
+  "step_D": "Step C held. kaist140 at 180 read 71% (84, 67, 60, 74, 69) at 09:18 to 09:21 against a 73% mean before. Control kaist144 read 95%. Refinement went from 810 to 826 up to 854 to 859 starts/s. The backlog still grew from 1.75M (09:07) to 1.82M (09:27), about 58 starts/s. Step D at 09:32Z: kaist140 180 to 222, its full CPU budget.",
+  "step_D_result": "Backed off. kaist140 at 222 read 60% (73, 55, 52, 76, 43) at 09:40 to 09:43 against 71 to 73% at 180. D reached 104 and client queue 65 ms, while controls held (kaist144 90, kaist149 69). Refinement had risen to 960 starts/s, above init's roughly 855. kaist140 went back to 180 at 09:43Z per the GPU rule."
+ },
+ {
+  "id": "A4-D99",
+  "kind": "default",
+  "what": "Pre-delivery gate (agent4_cap16_predeliver.py), run by the end-of-run trigger after all 496 pairs are final and before the delivery shards. The delivery runs only if the gate exits 0. The gate re-runs every item whose upstream error was swallowed as a WARNING traceback in the worker logs: an own-test item with _single_eval (appending a pass and pool link on success), a refinement item with _single_grasp and then its own test. It fails loud on a traceback that names no input or a missing input. It checks that no pass list holds a line twice, and spot-checks 20,000 random pass lines for their grasp file and succ link. The old trigger (bdihpcxol) was stopped while still in its wait loop, and the revised one is armed.",
+  "why": "Pending before delivery since 02:33: the kaist143 stale-negative-lookup item (A4-D80) was counted done without a real own test. The pass lists also had to be shown free of doubles after the indexer crash (A4-D93).",
+  "evidence": "Run at 08:20:07 on kaist143 (cap16/predeliver.json). 1 WARNING item re-tested, output/cap16_kaist148_xhand/grasp_data/29_Stick/sem__Bowl-4be4184845972fba5ea36d5a57a5a3bb_s006/floating/real/8_72_grasp.npy, own test ran and did not pass. 6,210,377 pass lines, 0 duplicates. 20,000 sampled lines all have their grasp file and succ link.",
+  "at": "2026-09-28T08:20:32Z"
+ },
+ {
+  "id": "A4-D100",
+  "kind": "default",
+  "what": "End-of-init pool raise, per host at the orchestrator's refinement (scripts/agent4_cap16_endinit_pools.sh, armed). Once no init job is left unstarted anywhere (done + running = 4464) and a host runs no init process, that host's worker pool rises to 90% of its threads minus 1 by a graceful restart of that host alone. Targets: kaist67 56, kaist121 114, kaist140 229, kaist143 35, kaist144 35, kaist145 85, kaist148 114, kaist149 114. The pgrep pattern 'dexonomy[.]main op=init' does not match the checking shell's own command line.",
+  "why": "At 10:36 all 632 worker processes were busy (busy almost equal to pool size on every host), so workers are CPU-bound and the refinement backlog was 2.06M starts. While init runs, the GPU rule caps the pools. Once init is done, its CPU, GPU and NFS needs are gone. Raising pools before that would starve the last init jobs, which set the run's end.",
+  "evidence": "10:36 pool check: kaist67 44 of 45 busy, kaist121 99 of 100, kaist140 180 of 181, kaist143 27 of 28, kaist144 27 of 28, kaist145 74 of 75, kaist148 80 of 81, kaist149 101 of 102.",
+  "at": "2026-09-28T10:36:55Z",
+  "change_1400": "At about 14:00 the condition was loosened from done + running = 4464 to >= 4454. The last unstarted jobs were the slowest pair's chained epochs (kaist149__2_Small_Diameter), which would have kept every host waiting until about 14:20. By then the refinement backlog (about 4.3M starts) set the run's end, not the init tail. A chained job that lands on a raised host runs at nice 0 over the nice-10 workers. kaist140's target is 100 (A4-D101)."
+ },
+ {
+  "id": "A4-D101",
+  "kind": "default",
+  "what": "Memory bound on worker pools. kaist140 cut from 180 to 120 at 11:12:11 and held at 120 in the A4-D100 end-of-init targets (was 229). Other targets unchanged. They fit memory at about 1.7 GB per worker.",
+  "why": "At 11:10 kaist140 was out of memory: 251 GB total, 2 GB free, 4 GB available, 7 of 7 GB swap used, 1 GB page cache. Its 184 workers held 240 GB RSS. Init main threads stalled in folio_wait_bit_common, re-reading evicted pages from NFS, and its GPUs swung 0 to 100% while other hosts held 51 to 93%. Worker RSS grows with uptime, from about 0.72 GB fresh to 1.56 to 1.66 GB after 3.4 h, mostly anonymous. That is the forked parent's roughly 0.8 GB heap going private through refcount writes, plus envs and the A4-D97 object LRU (at most 0.26 GB). The step D GPU drop at 222 (09:40) was likely this memory pressure too, not only NFS queueing.",
+  "evidence": "kaist140 free and meminfo at 11:10. Per-host avg worker RSS 1.32 to 1.57 GB. kaist121 children min 1.56, p50 1.63, max 1.66 GB at 12,207 s uptime. kaist140 fresh children 0.62 to 0.75 GB at 45 s. After the cut, kaist140 had 206 GB free and 0 swap.",
+  "at": "2026-09-28T11:13:37Z",
+  "after_init": "kaist140 ran no init after 14:03 (its last jobs finished), so its bound is memory alone: about 1.3 GB PSS per worker, so about 160 workers leave 20+ GB. At the orchestrator's suggestion it went to 150 at 14:14Z, with 160 next if available memory holds above the 20 GB alert."
+ },
+ {
+  "id": "A4-D102",
+  "kind": "deviation",
+  "what": "The indexer's affinity step skips a job lock whose owner file cannot be read (FileNotFoundError or PermissionError), instead of crashing. Restarted on kaist143 at 11:25:14Z without trim.",
+  "why": "A deliberate exception to failing loud. Affinity is a hint, and runners create and remove these lock dirs while the indexer reads them. The same race crashed the indexer twice: at 06:17 a PermissionError on an owner file being created, and at about 11:13:35 a FileNotFoundError on one removed after the listing, which stopped the queue feed for about 15 min. A job with no readable owner has no host to record that cycle, and nothing in the queues depends on it. Since A4-D93 the affinity step runs before the queue appends, so the crash wrote nothing and needed no trim.",
+  "evidence": "indexer.out traceback 2: FileNotFoundError on ijob_lock/kaist121__2_Small_Diameter__29-30/owner at line 198. Last good cycle 11:13:29. Indexed batches were flat at about 310,366 from 11:14 to 11:23.",
+  "at": "2026-09-28T11:25:14Z"
+ },
+ {
+  "id": "A4-D103",
+  "kind": "default",
+  "what": "The end-of-run trigger now launches the pre-delivery gate and the 8 delivery shards detached on dj (nohup bash -c ... ; echo $? > <name>.rc), and polls the exit-status files: predeliver.rc, then deliver_final/shard_<i>.rc. Delivery runs only if the gate exits 0, and the trigger reports any shard that fails. The previous trigger was stopped while still in its wait loop, and the revised one is armed.",
+  "why": "The VPN to dj dropped at about 09:19 and again at about 13:08 to 13:18, and all ssh sessions from the workstation timed out. The old trigger ran the gate and the shards as foreground ssh sessions, so a drop mid-delivery would have hung them up and killed the shards halfway.",
+  "evidence": "Poll output at 13:09 and 13:15 shows ssh connect timeouts to all 8 hosts. tun0 back at 13:18.",
+  "at": "2026-09-28T13:19:10Z",
+  "restart_path": "Worker restarts now run detached on each host (scripts/agent4_cap16_restart_one.sh under a mkdir lock: stop file, wait for exit, start, log a token). restart_workers.sh only launches it, retrying until ssh succeeds, and waits for the token. The old loop 'while ssh ... kill -0' ended early on an ssh failure, which could start a second worker while the first was still draining. Tested at 13:20:31 on kaist144 at an unchanged 27: worker 3499137 exited, 4072318 started, no stop file or lock left."
+ },
+ {
+  "id": "A4-D104",
+  "kind": "deviation",
+  "what": "One-host pool-size test of the delivery, ordered by the orchestrator. kaist67's shard 0 is killed by PID (wrapper first, so it writes no exit status, then the python parent and its 64 children) and relaunched at 16 processes. The 7 other shards stay at 64 as the control. agent4_cap16_deliver_final.py now keeps an entry whose main npz is already on disk, after asserting its row count equals the entry's passes and its extra file exists. The main file is renamed into place after the extra file, so its presence means both are complete. Metrics come from 5 min windows of mountstats on all 8 hosts, before and after (scripts/agent4_cap16_shardtest.sh, agent4_cap16_nfsrates.sh).",
+  "why": "nas4 froze fleet-wide during the delivery, from about 15:45 to 15:55:35Z, and another user's threads hung with ours. One open hypothesis is that our read storm pushed nas4 over. Sibeen decides any fleet-wide pool change from these numbers.",
+  "evidence": "Pre-freeze kaist145: 350 files/s, 4.5 RPCs per file, one DELEGRETURN per file. During the freeze kaist67 completed 0 RPCs in 15 s while nas4 answered ping in 0.14 ms. After recovery kaist67 and kaist145 each held 31 RPCs on the wire, the session slot cap, at 364 and 371 files/s.",
+  "at": "2026-09-28T15:57:00Z",
+  "correction": "My first message on the pre-freeze numbers read mountstats $6 (bytes received) as queue and $7 (queue) as RTT. The orchestrator got the corrected columns: $7 queue, $8 RTT."
+ },
+ {
+  "id": "A4-D105",
+  "kind": "default",
+  "what": "Delivery stopped entirely on Sibeen's order ('Stop the delivery entirely first. Then see if that was issue.'). All 8 shards were SIGKILLed by PID, wrapper first, then the python parent and pool children, done by 16:21:14.5Z. Also killed by PID: the kaist140 progress loop (434823), 18 orphaned multiprocessing forkserver and resource_tracker processes left by watchdog-killed init jobs (12 on kaist67, 6 on kaist140), and the window-B mountstats loops. The trigger agent4_cap16_final.sh and all local watchers were stopped. Our load reached zero at 16:21:54Z. Renamed entries and temp files stay for the skip. Sibeen's own VS Code servers on kaist121, kaist140 and kaist144 were left alone. A minimal probe runs detached on kaist143 (/tmp/a4_nas4probe.sh, log /tmp/a4_nas4probe.log, local disk) every 30 s with a 20 s timeout.",
+  "why": "Two fleet-wide nas4 freezes within 36m of delivery (about 15:45 to 15:55:35, and about 16:09 to 16:18:43). The second covered kaist139, which runs no shard. The test is whether nas4 stays healthy with zero load from us.",
+  "evidence": "At 16:22:50 on all 8 hosts: 0 sibeenkim python processes, 0 threads of any user in D, nas4 replies 0 to 10/s per host.",
+  "deviation": "The ordered probe was a stat of one small file. That stat can be answered from the NFS attribute cache (acregmax 60 s) and would read OK during a freeze. So each probe also stats a fresh name that does not exist, which always costs one LOOKUP RPC to nas4. Both latencies are logged, and the probe is judged on the lookup. Reading the log costs one ssh session per 10 min, and a session may statfs the mount.",
+  "at": "2026-09-28T16:23:00Z"
+ },
+ {
+  "id": "A4-D106",
+  "kind": "default",
+  "what": "Resume the cap16 final delivery on Sibeen's ramp rule, driven by src/agent4_cap16_ramp.py, detached on kaist143. The controller starts 2 hosts, adds one about every 10 min while nas4 is healthy, stops adding at the first rise, drops the newest host at a stall, and stops every shard by PID at a freeze, resuming one host lower after recovery. The fresh-name probe was restarted on kaist143 first. kaist143 runs no shard, so its probe measures nas4 and not its own client queue, which leaves 7 delivery hosts, under the cap of 8. The order is kaist140, kaist121, kaist148, kaist149, kaist145, kaist144, then kaist67, which runs another session's curobo job. The work is 16 shards of agent4_cap16_deliver_final.py (skip-on-disk, md5 1690c51d), one per host at a time at 64 processes, and a host takes the next pending shard when its shard exits 0. RAMP_STATUS.txt is rewritten every 5 min by a writer thread, and decisions go to /tmp/a4_ramp.log on kaist143. The controller runs agent4_cap16_verify_delivery.py 32 on kaist121 after DONE.",
+  "why": "Sibeen's go, relayed by the orchestrator, for the 2,616 entries not yet delivered, with a ramp instead of 8 hosts at once, after the 09-28 freezes. Shards are 16 rather than 8 so the last wave is short and a dropped host loses less. The existing script's skip keeps the 584 entries already on disk, which the orchestrator verified.",
+  "evidence": "Probe restarted at 06:35:24Z, idle lookup 10 to 11 ms. The controller's sample call tested from kaist143 over ssh by IP against kaist140 and kaist67. deliver_final/ held no rc or json files.",
+  "thresholds": "rise = 2 or more probe lookups over 20 ms in 5 min, or a host active 10+ min whose mean DELEGRETURN backlog grew over 1.5x its previous 5 min and above 200. stall = a probe lookup over 1,000 ms, or a host's files/s per busy process under 0.3 of its previous 5 min. freeze = a probe HANG. recovery = 10 straight probes at or under 20 ms.",
+  "at": "2026-09-29T06:45:00Z"
+ },
+ {
+  "id": "A4-D107",
+  "kind": "deviation",
+  "what": "The ramp controller added the third host, kaist148 with shard 2, at 06:49:53Z on the probe alone. The per-client DELEGRETURN backlog comparison did not exist yet, because it needs two full 5-min windows per host. One tick later, at 06:51:02Z, the backlog rise stopped adding at level 3, and the ramp holds there. A fixed controller is staged in src/agent4_cap16_ramp.py but not deployed. Its add waits for a backlog comparison on every active host, with the baseline window starting after warm-up. Its level, add state and events persist in /tmp/a4_ramp_state.json on kaist143, and a one-shot relaunch file supports a fewer-processes test. The running controller is the first version, kept at scratchpad ramp_v1.py (md5 3ad0e716).",
+  "why": "Sibeen's rule requires both signals to be healthy before an add. My first controller gated the add on a check that could not yet be evaluated.",
+  "evidence": "Controller log on kaist143. At 06:51:02Z the RISE read kaist140 backlog 7,004 against 950 and kaist121 4,297 against 1,175, where the earlier window was the first 5 min after launch. Backlog after warm-up on kaist140 was 6,167, 7,530, 7,688 and 7,004. Probe lookup was 10 to 12 ms throughout. Files/s were kaist140 925 and kaist121 522 at 06:51.",
+  "at": "2026-09-29T06:53:00Z"
+ },
+ {
+  "id": "A4-D108",
+  "kind": "default",
+  "what": "Stopped the ramped delivery on a freeze of the active clients, under Sibeen's rule. The ramp controller was stopped at 07:00:42Z first, so it would not count the kills as crashes. Then every shard was SIGKILLed by PID, wrapper first, kaist121 at 07:00:45Z and kaist140 at 07:01:14Z. kaist148 had already been dropped by the stall rule at 06:58:50Z. RAMP_STATUS.txt was set to STOPPED. No relaunch until the orchestrator decides.",
+  "why": "kaist121's files/s fell from 405 to 25 between 06:54 and 06:59:54. At 07:00:10 to 07:00:20 both active clients, kaist121 and kaist140, completed 0 NFS calls in 10 s, with 54 of kaist121's processes in rpc_wait. The fresh-name probe on kaist143 stayed at 10 to 11 ms, so the controller's HANG trigger never fired. The freeze hit only the loaded clients, like the staggered onset on 09-28.",
+  "evidence": "Controller TICK lines 06:54:20 to 06:59:54Z, nfsrates at 07:00:10 to 20Z on kaist121, kaist140, kaist148 and kaist67, probe log to 07:00:56. Both clients drained at about 1,800 and 4,100 calls/s right after the kills. Entries delivered 784 of 3,200. kaist121 also carried 8 orphaned python processes of another session, stuck in D or defunct since 06:35, which were left untouched.",
+  "at": "2026-09-29T07:03:00Z"
+ },
+ {
+  "id": "A4-D109",
+  "kind": "default",
+  "what": "Resume the ramped delivery one level lower on the orchestrator's order, at 1 host, kaist140 first, with 24 processes per host instead of 64. The controller src/agent4_cap16_ramp.py now samples every active host every 15 s. It adds a per-client freeze trigger, where under 5% of the host's previous NFS calls per busy process for 30 s, or a host unreachable for 60 s, stops every shard by PID. A DELEGRETURN wait over 5 s in a window after a 180 s warm-up counts as a rise. An add needs a backlog comparison and wait check after warm-up on every active host. Level, add state and events persist in /tmp/a4_ramp_state.json. At level 1 a freeze stops without resuming.",
+  "why": "The 07:00 freeze was per client and the probe on kaist143 missed it. At 64 processes each client sat at its slot cap with a DELEGRETURN backlog of 4,000 to 7,000 before freezing. The orchestrator's rule allows fewer processes when files/s holds, and this is that test, to compare with 632 (kaist140) and 299 (kaist121) at 64.",
+  "evidence": "client_frozen checked on synthetic samples. Healthy gives none, 30 s near zero gives a trigger at 0.21 against 62.5 calls/s per busy process, and a 3-process tail gives none. Controller v3 (md5 c3e1a8fc) started 07:05:00Z on kaist143, shard 0 on kaist140 at 24 processes 07:05:01Z.",
+  "at": "2026-09-29T07:05:00Z"
+ },
+ {
+  "id": "A4-D110",
+  "kind": "finding",
+  "what": "Reader processes per dj host for a small-file read from nas4 should be about 24, not 64. One host reading one small npy per task went 2.5 to 3.6 times faster at 24 processes than at 64, with its client queue and DELEGRETURN backlog near empty. By the orchestrator's order the delivery holds at 1 host, kaist140, with 24 processes to the end. The controller was restarted at about 07:17Z with its saved state set to level 1 and adding off, adopting the running shard 2.",
+  "why": "The orchestrator's rule allowed fewer processes when files/s holds, and this was that test. A future large run needs the number. 64 readers fill every client slot, about 31 to 52 in flight, and starve the async DELEGRETURNs into a queue thousands deep. Around 24 synchronous readers leave room for the returns and keep the round trip low.",
+  "evidence": "24 processes, kaist140, shard 2, 07:13:53 to 07:14:53Z (scripts/agent4_cap16_nfsrates.sh, 60 s). 2,268 files/s, 9,908 NFS calls/s, 4.37 calls per file, 22.9 on the wire, 6.9 waiting in the client queue, DELEGRETURN wait 3 ms, OPEN RTT 8 ms, READ RTT 2 ms, all 24 busy, probe 10 to 11 ms. 64 processes on 09-29 06:4x to 06:5x from the controller ticks: kaist140 632 to 925 files/s, kaist121 299 to 532, DELEGRETURN backlog 4,000 to 7,700 waiting at 7.6 to 24 s each, 34 to 52 on the wire, OPEN RTT 13 to 37 ms. The loaded clients froze at 07:00. On 09-28, 8 hosts at 64 read 295 to 328 files/s each, 2,507 fleet-wide, with 1,100 to 2,800 queued per client.",
+  "at": "2026-09-29T07:18:00Z"
+ },
+ {
+  "id": "A4-D111",
+  "kind": "default",
+  "what": "The delivery stopped at level 1 on a per-client freeze, with no resume per Sibeen's rule. At 07:18:16Z the controller's per-client trigger saw kaist140 complete 0.00 NFS calls per busy process over 30 s against 105.88 before, and it killed shard 2 by PID at 07:18:22Z. The controller stays up idle, with RAMP_STATUS.txt at FROZEN. Only the probe runs. 1,000 of 3,200 entries are delivered, and shards 0 and 1 are complete.",
+  "why": "A genuine freeze of the one loaded client, about 12.5 min after the 07:05 start at about 2,268 files/s with 24 processes. It is the fourth freeze of a loaded client in the per-file delivery. Across them the files read before freezing differ by up to about 7x, so no simple per-client count explains it. Server-side per-client state from sustained per-file opens is a hypothesis only.",
+  "evidence": "Right after the kill, kaist140's completed calls had round trips of OPEN 34,560 ms and READ 72,424 ms. The kaist143 probe stayed at 10 to 11 ms. At 07:19:30 kaist140's fresh-name lookup answered in 12 ms with no D threads. The earlier freezes were 09-28 at 8 hosts and 64 processes, about 7 min in, and 09-29 at 06:5x to 07:00 on kaist121 and kaist140 at 64 processes, at 14 and 21 min.",
+  "at": "2026-09-29T07:21:00Z"
+ },
+ {
+  "id": "A4-D112",
+  "kind": "ruling",
+  "what": "Sibeen's GO, relayed at about 07:27Z. Restart on all 8 dj hosts at 24 processes with per-host kill and relaunch, never a global stop. Shards 2 to 9 were launched on kaist140, 121, 148, 149, 145, 144, 67 and 143 at 07:29:09Z, and all 8 pools were up at 07:30:08Z. The per-host controller src/agent4_cap16_hostctl.py was written, but its deploy hung on nas4, so it never ran. nas4 froze server-wide from about 07:30:30. The kaist143 probe hung, with a 139.8 s HANG at 07:30:58, and all 8 clients read 0 files/s at 07:33:19 to 29. Under the per-host rule I killed kaist143's readers at 07:33:17 and the other 7 hosts' at 07:34:01 to 07:34:33Z by PID, which left zero readers.",
+  "why": "His order after the A4-D111 stop, and the orchestrator withdrew the 1-host hold.",
+  "evidence": "Launch lines 07:29:09Z. Pool check 07:30:08Z, 26 processes on each host. nfsrates 07:33:19 to 29Z on 7 hosts, all at about 0 files/s. At 07:35:23 fresh lookups from all 8 hosts timed out at 12 s.",
+  "at": "2026-09-29T07:35:00Z"
+ },
+ {
+  "id": "A4-D113",
+  "kind": "ruling",
+  "what": "Sibeen replaced per-host kills with AIMD control of the total readers on nas4, never zero readers, then a split cut, 50% on a freeze and 30% on a slowdown. src/agent4_cap16_aimd.py was written and run from kaist143's local /tmp at 07:37:51 and 07:38:17Z. It launched nothing, because every fresh lookup timed out at 12 s. The orchestrator then relayed that Sibeen wants no scripted controller and will set the reader count by hand. The controller was stopped by PID at 07:38:23Z. I sent the orchestrator the exact shard launch and kill commands and how the skip works. No reader and no controller of mine runs.",
+  "why": "His orders, relayed by the orchestrator. The per-file delivery froze nas4 whatever the host count and process count, from 1 host at 24 to 8 at 24.",
+  "evidence": "a4_aimd.log on kaist143, with windows at 07:38:04 showing readers 0 and lookup median 12,000 ms on all 8 hosts. The 07:38 pgrep on all 8 hosts found 0 deliver_final processes.",
+  "at": "2026-09-29T07:39:00Z"
+ },
+ {
+  "id": "A4-D114",
+  "kind": "result",
+  "what": "The cap16 40-epoch delivery is DONE and verified. The orchestrator drove the remaining shards by hand from its own session at about 16 readers in total, 12 on kaist140 and 4 on kaist148. All 16 shards exited 0, the last being shard 15 at 10:47:01Z. DONE was written at 10:47:02Z on 09-29, and it reads 3,200 of 3,200 entries and 12,899,466 grasps. Then agent4_cap16_verify_delivery.py 32 on kaist121 printed 3,200 entries and 12,899,466 grasps on disk, pass lists of 12,899,466 lines all unique, 0 missing, 0 not in the pass lists, DONE totals equal, and 'delivery verified' at 10:50:15Z. The delivery dir is 14 GB. My nas4 probe on kaist143, PID 1732696 and child 1763010, was stopped by PID at about 10:51Z. Nothing of mine runs on dj.",
+  "why": "Per-file reading of 12.9M small files froze nas4 at every scale tried by a controller. The finish held at a load nas4 tolerated, about 10 to 20 objects a minute.",
+  "evidence": "The orchestrator's report of the verify output. DONE, verify.out and verify.rc read on kaist121, with the mtimes above. Shard json and rc mtimes run from 08:51Z (shard 7) to 10:47Z (shard 15). The orchestrator reports nas4 stalled every host whenever the total went past about 16 to 20 readers.",
+  "at": "2026-09-29T10:52:00Z"
+ }
+]
