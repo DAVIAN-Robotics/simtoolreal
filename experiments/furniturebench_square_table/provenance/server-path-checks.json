@@ -1,0 +1,148 @@
+{
+  "checked_date": "2026-10-19",
+  "method": "read-only Path.exists through SSH on each named server",
+  "paths": {
+    "kait": [
+      {
+        "path": "/home/nas_main",
+        "exists": true
+      },
+      {
+        "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015",
+        "exists": true
+      },
+      {
+        "path": "/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_contact_termination_2s_20261017",
+        "exists": true
+      },
+      {
+        "path": "/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_contact_termination_2s_20261017/training/0_furniturebench-square_table-contact_termination_2s/best/model.pth",
+        "exists": true
+      },
+      {
+        "path": "/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_leg4_20261017/screw_resets.npz",
+        "exists": true
+      },
+      {
+        "path": "/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_reproduction_20261019",
+        "exists": true
+      },
+      {
+        "path": "/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_reproduction_20261019/checkpoints/best-step-2584608768.pth",
+        "exists": true
+      },
+      {
+        "path": "/home/nas_main/sibeenkim/draftrec/_graspoc/cap16/reset_full/grasps/",
+        "exists": true
+      },
+      {
+        "path": "/home/nas_main/sibeenkim/draftrec/_rl_degradation_audit_20261019",
+        "exists": true
+      },
+      {
+        "path": "/home/nas_main/sibeenkim/draftrec/repos/simtoolreal-050/assets",
+        "exists": true
+      },
+      {
+        "path": "/home/nas_main/sibeenkim/draftrec/syslibs/usr/lib/x86_64-linux-gnu",
+        "exists": true
+      },
+      {
+        "path": "/home/nas_main/sibeenkim/draftrec/venv_isaacsim/bin/python",
+        "exists": true
+      }
+    ],
+    "kaist140": [
+      {
+        "path": "/home/nas2",
+        "exists": true
+      },
+      {
+        "path": "/home/nas2/sibeenkim/_dexagent_table_rl_eval_20261018",
+        "exists": true
+      },
+      {
+        "path": "/home/nas2/sibeenkim/_dexagent_table_rl_eval_20261018/leg1",
+        "exists": true
+      },
+      {
+        "path": "/home/nas2/sibeenkim/_table_fourleg_diverse_20261019",
+        "exists": true
+      },
+      {
+        "path": "/home/nas2/sibeenkim/_table_fourleg_example_20261019/attempt-006-direct",
+        "exists": true
+      },
+      {
+        "path": "/home/nas2/sibeenkim/_table_fourleg_example_20261019/attempt-006-direct/episodes/3170.npz",
+        "exists": true
+      },
+      {
+        "path": "/home/nas2/sibeenkim/_table_fourleg_example_20261019/chains",
+        "exists": true
+      },
+      {
+        "path": "/home/nas2/sibeenkim/_table_oneleg_480k_20261018/production",
+        "exists": true
+      },
+      {
+        "path": "/home/nas4_user",
+        "exists": true
+      },
+      {
+        "path": "/home/nas4_user/sibeenkim/work/_033_venv_isaacsim/bin/python",
+        "exists": true
+      },
+      {
+        "path": "/home/nas4_user/sibeenkim/work/_dexagent_stage1_003_e2e10k/cpu_env/bin/python",
+        "exists": true
+      },
+      {
+        "path": "/home/nas4_user/sibeenkim/work/_dexagent_stage1_003_fresh3_20261015",
+        "exists": true
+      },
+      {
+        "path": "/home/nas4_user/sibeenkim/work/_dexagent_table_rl_eval_20261018",
+        "exists": true
+      },
+      {
+        "path": "/home/nas4_user/sibeenkim/work/_dexagent_table_rl_eval_20261018/checkpoint.pth",
+        "exists": true
+      },
+      {
+        "path": "/home/nas4_user/sibeenkim/work/_furniturebench_square_table_publish_20261019",
+        "exists": true
+      },
+      {
+        "path": "/home/nas4_user/sibeenkim/work/_graspoc/dexonomy/cap16_deliver/dexonomy/",
+        "exists": true
+      },
+      {
+        "path": "/home/nas4_user/sibeenkim/work/_table_fourleg_diverse_20261019",
+        "exists": true
+      },
+      {
+        "path": "/home/nas4_user/sibeenkim/work/_table_fourleg_example_20261019",
+        "exists": true
+      },
+      {
+        "path": "/home/nas4_user/sibeenkim/work/_table_oneleg_480k_20261018",
+        "exists": true
+      }
+    ],
+    "yj-3-A6000": [
+      {
+        "path": "/home/nas5",
+        "exists": true
+      },
+      {
+        "path": "/home/nas5/minhopark/_053/eigen/eigen_dexonomy_xhand.npz",
+        "exists": true
+      },
+      {
+        "path": "/home/nas5/sibeenkim/work/_dexagent_stage1_003_fresh3_20261015",
+        "exists": true
+      }
+    ]
+  }
+}

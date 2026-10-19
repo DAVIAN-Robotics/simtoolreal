@@ -1,0 +1,14 @@
+{
+  "run_id": "furniturebench-square_table-contact_termination_2s_20261017_062847",
+  "source": "/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_contact_termination_2s_20261017/training/0_furniturebench-square_table-contact_termination_2s/best/model.pth",
+  "frozen_checkpoint": "/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_reproduction_20261019/checkpoints/best-step-2584608768.pth",
+  "global_steps": 2584608768,
+  "bytes": 408188001,
+  "sha256": "baa40c076ca5519912bcbbd376b76d973c44e2cf924be7d4b2a506d730c64c15",
+  "saved_utc": "2026-10-18T12:36:30.230591+00:00",
+  "captured_utc": "2026-10-19T05:16:31.718914+00:00",
+  "checkpoint_policy_key": 0,
+  "contains_sgs_state": true,
+  "selection": "Run best by training reward; recommended over later latest after observed degradation",
+  "published_training_source_commit": "266ca1bc71a3294e36a5a7a5490e67e453bdeea7"
+}

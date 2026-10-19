@@ -1,0 +1,18 @@
+{
+  "source": "/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_contact_termination_2s_20261017",
+  "checkpoint_source": "/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_contact_termination_2s_20261017/training/0_furniturebench-square_table-contact_termination_2s/last/model.pth",
+  "checkpoint_sha256": "e54d8f3cb08e1d931c6ed694cb5da56bdc9184c726087929b3fefe433bc658e4",
+  "source_size": 408176515,
+  "source_mtime_ns": 1792303227108010411,
+  "time_unix": 1792304016.5441399,
+  "global_steps": 2044723200,
+  "checkpoint_epoch": 5200,
+  "task_assets_sha256": "5d929b0fbee089cc6ab443738ba15c47882eaef94e8a8ff7a570d8e326ac38a9",
+  "local_payload_sha256": "c4c8eb7c0e6b72598de6a3dd5facf2b6c83e7617ec17773af7939e6bc6f485d7",
+  "evaluation_code_sha256": "03a4f2766d690666520f1dd3ff50bc4f8b5e266383ebda703c8b068a7f75ee5f",
+  "frozen_checkpoint": "/home/nas4_user/sibeenkim/work/_dexagent_table_rl_eval_20261018/checkpoint.pth",
+  "runtime_root": "/home/nas4_user/sibeenkim/work/_dexagent_table_rl_eval_20261018",
+  "recordings_root": "/home/nas2/sibeenkim/_dexagent_table_rl_eval_20261018",
+  "role": "Exact 2.04B checkpoint used for existing direct-reset evaluation and assembly results; recommended best for new work is separately listed in best-checkpoint.json",
+  "hash_reverified_date": "2026-10-19"
+}

@@ -4,6 +4,8 @@ This branch contains the code, 636,023-state reset pool, goals, assets, and laun
 
 **[Training guide and reproduction commands](experiments/furniturebench_square_table/README.md)** · [Recorded W&B run](https://forge.coreweave.com/wandb/draftrec/simtoolreal/runs/furniturebench-square_table-contact_termination_2s_20261017_062847)
 
+**[Checkpoints, server/data locations, and reproduction map](experiments/furniturebench_square_table/REPRODUCE.md)** — recommended best checkpoint: **2,584,608,768 global steps**. Use the frozen best copy linked there; later training performance declined.
+
 Start with [`adapters/train_screw.py`](adapters/train_screw.py) and [`adapters/reference_screw_env.py`](adapters/reference_screw_env.py). Use the experiment launcher linked above for this training setup. The general upstream project documentation follows.
 
 ---

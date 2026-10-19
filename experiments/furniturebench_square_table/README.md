@@ -2,6 +2,8 @@
 
 This branch packages the training code and inputs used by [furniturebench-square_table-contact_termination_2s_20261017_062847](https://forge.coreweave.com/wandb/draftrec/simtoolreal/runs/furniturebench-square_table-contact_termination_2s_20261017_062847).
 
+**For checkpoint downloads, exact server paths, upstream data, and evaluation commands, start with [REPRODUCE.md](REPRODUCE.md).** The recommended checkpoint is the preserved best at **2,584,608,768 global steps**, rather than a later latest checkpoint after performance declined. The earlier 2.04B checkpoint used for existing evaluation and assembly results is listed separately.
+
 It trains one shared finger policy for screwing a leg into any of the four sockets. The arm holds the pose from the sampled reset. Episodes start from saved grasped states at engagement or intermediate screw progress. Acquisition, arm transport, and chaining four completed legs are outside this RL training task.
 
 **Start with [`adapters/train_screw.py`](../../adapters/train_screw.py), then [`adapters/reference_screw_env.py`](../../adapters/reference_screw_env.py).** The bundled inputs are sufficient to start training; generating new grasps or running Astra is unnecessary.
@@ -46,7 +48,7 @@ The task uses the prepared `body3x` leg/thread geometry and the open four-socket
 | Initial weights | Fresh training |
 | Reset pool | 636,023 rows across four legs and eight progress stages |
 | Reset sampling | One global SGS distribution over individual rows |
-| Goal acceptance | Fixed 0.01; reward tolerance has a separate curriculum |
+| Goal acceptance and goal-reaching reward | Fixed insertion tolerance 0.01 for every screw goal |
 | Retract | Disabled |
 | Board pose / support height | Fixed; support z = 0.38 m |
 | Reset velocities | Zero |
@@ -71,7 +73,9 @@ Observation/action delays, object/goal pose noise, joint-velocity observation no
 
 The pool stores `arm_q`, `hand_q`, `hand_target`, `object_xyzw`, `progress`, and `leg_id`, alongside provenance fields. Pose arrays in these inputs use **xyz + quaternion xyzw**. The adapter converts to Isaac's wxyz representation.
 
-A reset at progress `p` has `8 - p` remaining goals. SGS records success when those remaining goals are completed. Training success therefore includes intermediate starts; it is not a measurement of engagement-to-finish success from progress zero. The reward tolerance curriculum and the fixed screw-goal acceptance threshold are distinct.
+A reset at progress `p` has `8 - p` remaining goals. SGS records success when those remaining goals are completed. Training success therefore includes intermediate starts; it is not a measurement of engagement-to-finish success from progress zero.
+
+The inherited `current_success_tolerance` curriculum is still updated and logged, but this run's `goal_mode=preInsertAndFinal` and `random_goal_fraction=0` select the **fixed** insertion tolerance for all eight screw goals. The goal-reaching reward uses that same acceptance mask; it does not use a looser curriculum threshold. The configured 0.01 is multiplied by the inherited `keypoint_scale=1.5` when comparing scaled keypoint distances. See [`_keypoint_success_tolerance_m`](../../isaacsimenvs/tasks/precise_assembly/precise_assembly_env.py) and [`obs_utils.py`](../../isaacsimenvs/tasks/simtoolreal/utils/obs_utils.py).
 
 SGS uses the most recent 100 outcomes per reset row, target success rate 0.5, temperature 2, concentration 1, and epsilon 0.0001. Rows without observations use success rate zero, so all rows initially receive equal weight. There is no leg/stage sampling hierarchy. [`sgs.py`](../../adapters/sgs.py) contains the exact weighting formula and duplicate-row update handling. This is the implementation used for the run, not a later upstream SGS implementation.
 
@@ -147,7 +151,7 @@ The run directory contains copied inputs, source provenance, resolved environmen
 
 The default mesh URLs point at this published branch. If moving the code/assets to another repository, pass `--viewer-raw-base https://raw.githubusercontent.com/OWNER/REPO/BRANCH/`. Keep the trailing slash. URL checks remain enabled.
 
-The trainer retains last, best, and periodic checkpoint behavior. Periodic saving is configured every 1,000 updates, with best-checkpoint consideration after update 100. SGS state is attached through the existing environment-state checkpoint interface.
+The vendored multi-policy training loop saves `last/model.pth` every 200 updates. With `save_frequency=1000`, numbered periodic snapshots are retained at updates 1,000, 4,000, 9,000, 16,000, and so on (square multiples of 1,000). Best is saved on an improvement in training reward from update 10 onward, with `best/model.pth` pointing to the named checkpoint in `nn/`. This loop does not use the configured `save_best_after=100` value. Final-limit saves are separate. See [`a2c_common.py`](../../rl_games/rl_games/common/a2c_common.py). SGS state is attached through the existing environment-state checkpoint interface. For this run, one update corresponds to 393,216 global environment steps.
 
 ## Provenance and changes for sharing
 
