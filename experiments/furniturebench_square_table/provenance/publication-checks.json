@@ -13,7 +13,21 @@
   "preparation_with_git": "passed",
   "preparation_without_git": "passed",
   "shell_syntax": "passed",
-  "fresh_gpu_smoke": "not_run_compute_unavailable",
+  "fresh_gpu_smoke": "passed",
   "original_run_gpu_smoke_report": "original-rl_smoke.json",
-  "asset_whitespace": "Retained byte-for-byte from run assets; source/docs whitespace check passed."
+  "asset_whitespace": "Retained byte-for-byte from run assets; source/docs whitespace check passed.",
+  "fresh_gpu_smoke_report": "publication-rl_smoke.json",
+  "fresh_gpu_actuator_report": "publication-rl_runtime_model.json",
+  "tested_source_commit": "266ca1bc71a3294e36a5a7a5490e67e453bdeea7",
+  "gpu": "NVIDIA RTX 3090",
+  "simulation_environments": 96,
+  "simulation_policy_steps": 120,
+  "publication_gpu_check_date": "2026-10-19",
+  "simulation_runtime": {
+    "python": "3.11.15",
+    "isaaclab": "2.3.2.post1",
+    "isaacsim": "5.1.0.0",
+    "torch": "2.7.0",
+    "numpy": "1.26.0"
+  }
 }
