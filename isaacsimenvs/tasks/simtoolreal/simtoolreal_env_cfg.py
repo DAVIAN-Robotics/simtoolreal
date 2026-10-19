@@ -73,17 +73,6 @@ class AssetsCfg:
     # convention: metric bbox / object_base_size) and is required with it.
     object_urdf: str = ""
     object_scale: tuple[float, float, float] | None = None
-
-    # A pool staged on disk, one urdf per object, with pool.json carrying the
-    # box extents each urdf was written against.
-    object_pool_dir: str = ""
-
-    # Persistent dir for converted and baked USDs. Empty keeps the per-launch
-    # temp dir, which reconverts the whole pool every time.
-    asset_cache_dir: str = ""
-
-    # npz with names (urdf stems) and code (objects, 32) for the shape_code obs. Empty leaves it out.
-    shape_code_file: str = ""
     handle_head_types: tuple[str, ...] = (
         "hammer",
         "screwdriver",
@@ -115,6 +104,11 @@ class AssetsCfg:
 @configclass
 class ObsCfg:
     """Asymmetric actor-critic obs layout + clamping."""
+
+    # Which of the object box's eight corners the keypoint fields carry. The a4h1 baseline was
+    # pretrained on these four, the tactile pretraining on all eight, so this is what separates the
+    # two observations. None takes all eight.
+    keypoint_corner_ids: tuple[int, ...] | None = (0, 1, 6, 7)
 
     # Critic sees the full state list; actor sees the obs list subset.
     state_list: tuple[str, ...] = (
@@ -337,6 +331,8 @@ class RewardCfg:
     keypoint_rew_scale: float = 200.0
     keypoint_scale: float = 1.5
     object_base_size: float = 0.04
+    fixed_size: tuple[float, float, float] = (0.141, 0.03025, 0.0271)
+    fixed_size_keypoint_reward: bool = True
 
     lifting_rew_scale: float = 20.0
     lifting_bonus: float = 300.0
@@ -344,8 +340,6 @@ class RewardCfg:
 
     distance_delta_rew_scale: float = 50.0
     reach_goal_bonus: float = 1000.0
-    # Paid like reach_goal_bonus, per near-goal step, while the fingertips are also at the goal state's fingertips.
-    fingertip_goal_bonus: float = 0.0
 
     kuka_actions_penalty_scale: float = 0.03
     hand_actions_penalty_scale: float = 0.003
@@ -394,31 +388,8 @@ class ResetCfg:
     # Default 0.0 preserves the identity quat (legacy behavior).
     table_reset_yaw_range_deg: float = 0.0
 
-    # One <object urdf stem>.npz of grasped reset states per pool object. When set, every episode
-    # starts grasped from a random one of its object's states, lifted, with the start pose as the
-    # first goal.
-    reset_state_dir: str = ""
-    # Keep the first this many states of each object's file, 0 keeps all.
-    reset_state_count: int = 0
-    # Draw the first goal from the start pose as after every success, instead of the start pose.
-    first_goal_random: bool = False
-    # Directory of <stem>.npz with each reset state's 5 fingertip pad points in the object frame (ft_obj, bodies).
-    # Required by goal_sampling_type "reset_state", where every goal is a reset state: its pose and its fingertips.
-    goal_fingertip_dir: str = ""
-    # Directory of <stem>.npz with each reset state's palm pose in the env frame (palm_pos, palm_quat_wxyz). When
-    # set, the reset-state goal window is measured on the palm pose instead of the object pose.
-    goal_wrist_dir: str = ""
-    # Grasp-type adaptive sampling. Every interval each type's weight is clip(mean / type mean, min, max) of the
-    # successes per episode, global over objects, and a reset draws a grasp with its type's weight.
-    type_adaptive_sampling: bool = False
-    # npz with gtype__<stem>, the type index of every delivered grasp, which the reset files' grasp column indexes.
-    grasp_type_file: str = ""
-    type_adaptive_interval: int = 3000
-    type_adaptive_min: float = 0.25
-    type_adaptive_max: float = 4.0
-
     # Goal sampling
-    goal_sampling_type: str = "delta"  # "delta" | "absolute" | "reset_state"
+    goal_sampling_type: str = "delta"  # "delta" | "absolute"
     delta_goal_distance: float = 0.1
     delta_rotation_degrees: float = 90.0
     target_volume_mins: tuple[float, float, float] = (-0.35, -0.2, 0.6)
@@ -469,16 +440,11 @@ class TerminationCfg:
     success_steps: int = 10
     max_consecutive_successes: int = 50
     force_consecutive_near_goal_steps: bool = False
-    # With reset-state goals, success also needs every fingertip within the same tolerance of the goal state's
-    # fingertip points. The reach bonus, the next goal and the tolerance curriculum then follow both.
-    success_with_fingertips: bool = False
 
     # Tolerance curriculum (the only curriculum in v1).
     tolerance_curriculum_increment: float = 0.9  # multiplicative per step
     tolerance_curriculum_interval: int = 3000  # env steps across all agents
     tolerance_curriculum_success_threshold: float = 3.0
-    # One tolerance per pool object, each tightened on its own envs' successes.
-    tolerance_curriculum_per_object: bool = False
 
 
 # ----------------------------------------------------------------------------
@@ -589,8 +555,8 @@ class SimToolRealEnvCfg(DirectRLEnvCfg):
     # Obs/state sizes are derived from obs.obs_list / obs.state_list at env init.
     # Placeholder keeps the configclass instantiable before the env computes the
     # final spaces.
-    observation_space: int = 164
-    state_space: int = 186
+    observation_space: int = 140
+    state_space: int = 140
 
     # --- Isaac Lab base fields ---
     sim: SimulationCfg = _default_sim_cfg()

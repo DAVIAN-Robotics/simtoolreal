@@ -1,3 +1,13 @@
+# FurnitureBench square-table RL training
+
+This branch contains the code, 636,023-state reset pool, goals, assets, and launch instructions for the four-leg fixed-arm policy trained with SGS and 2-second contact-loss termination.
+
+**[Training guide and reproduction commands](experiments/furniturebench_square_table/README.md)** · [Recorded W&B run](https://forge.coreweave.com/wandb/draftrec/simtoolreal/runs/furniturebench-square_table-contact_termination_2s_20261017_062847)
+
+Start with [`adapters/train_screw.py`](adapters/train_screw.py) and [`adapters/reference_screw_env.py`](adapters/reference_screw_env.py). Use the experiment launcher linked above for this training setup. The general upstream project documentation follows.
+
+---
+
 # SimToolReal: An Object-Centric Policy for Zero-Shot Dexterous Tool Manipulation
 
 [Project Page](https://simtoolreal.github.io/)

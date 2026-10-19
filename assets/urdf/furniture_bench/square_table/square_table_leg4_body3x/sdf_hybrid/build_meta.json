@@ -1,0 +1,26 @@
+{
+  "stretch": 3.0,
+  "density_kg_m3": 626.1768925491536,
+  "origin_shift_m": [
+    -0.063359375,
+    -0.0,
+    -0.0
+  ],
+  "extent_m": [
+    0.21421875,
+    0.03068804,
+    0.0306875
+  ],
+  "mass_kg": 0.04760252789063648,
+  "com_m": [
+    -0.0034133131540070305,
+    -0.0003151776145243464,
+    0.0003330351763900584
+  ],
+  "scale_field": [
+    5.35546875,
+    0.75,
+    0.75
+  ],
+  "urdf": "assets/urdf/furniture_bench/square_table/square_table_leg4_body3x/sdf_hybrid/square_table_leg4_body3x_matchedmass_sdf_hybrid.urdf"
+}

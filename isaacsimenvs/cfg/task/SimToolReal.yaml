@@ -83,6 +83,8 @@ reward:
   keypoint_rew_scale: 200.0
   keypoint_scale: 1.5
   object_base_size: 0.04
+  fixed_size: [0.141, 0.03025, 0.0271]
+  fixed_size_keypoint_reward: true
 
   lifting_rew_scale: 20.0
   lifting_bonus: 300.0

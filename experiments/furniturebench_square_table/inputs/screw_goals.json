@@ -1,0 +1,3959 @@
+{
+  "objects": [
+    "leg1",
+    "leg2",
+    "leg3",
+    "leg4"
+  ],
+  "instances": [
+    {
+      "object": "leg1",
+      "events": [
+        {
+          "kind": "thread_engaged",
+          "label": "Thread engaged",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Thread is engaged with 2 turns remaining.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6621063736868434,
+            -1.7319121124709863e-16,
+            -0.7071067811865475,
+            -1.7319121124709868e-16,
+            0.7071067811865476
+          ],
+          "pose_source": "leg1.goals_xyzw[1]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.0,
+          "turns_remaining": 2.0,
+          "unwrapped_rotation_from_engagement_rad": -0.0,
+          "depth_from_engagement_m": 0.0,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg1/thread_engaged",
+          "order": 7,
+          "active_object": "leg1",
+          "previously_assembled": [
+            "leg4",
+            "leg3"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.6621063736868434,
+              -1.7319121124709863e-16,
+              -0.7071067811865475,
+              -1.7319121124709868e-16,
+              0.7071067811865476
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg1/turn_1"
+          ]
+        },
+        {
+          "kind": "turn_1",
+          "label": "\u00bc turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.25 turns from engagement and descends 2.34 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.659762951975988,
+            -0.5000000000000002,
+            -0.4999999999999999,
+            -0.5000000000000002,
+            0.49999999999999994
+          ],
+          "pose_source": "leg1.goals_xyzw[2]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.25,
+          "turns_remaining": 1.75,
+          "unwrapped_rotation_from_engagement_rad": -1.5707963267948966,
+          "depth_from_engagement_m": 0.0023434217108554275,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg1/turn_1",
+          "order": 8,
+          "active_object": "leg1",
+          "previously_assembled": [
+            "leg4",
+            "leg3"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.659762951975988,
+              -0.5000000000000002,
+              -0.4999999999999999,
+              -0.5000000000000002,
+              0.49999999999999994
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg1/turn_2"
+          ]
+        },
+        {
+          "kind": "turn_2",
+          "label": "\u00bd turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.5 turns from engagement and descends 4.69 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6574195302651326,
+            -0.7071067811865475,
+            1.2989340843532398e-16,
+            -0.7071067811865476,
+            -1.29893408435324e-16
+          ],
+          "pose_source": "leg1.goals_xyzw[3]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.5,
+          "turns_remaining": 1.5,
+          "unwrapped_rotation_from_engagement_rad": -3.141592653589793,
+          "depth_from_engagement_m": 0.004686843421710855,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg1/turn_2",
+          "order": 9,
+          "active_object": "leg1",
+          "previously_assembled": [
+            "leg4",
+            "leg3"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.6574195302651326,
+              -0.7071067811865475,
+              1.2989340843532398e-16,
+              -0.7071067811865476,
+              -1.29893408435324e-16
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg1/turn_3"
+          ]
+        },
+        {
+          "kind": "turn_3",
+          "label": "\u00be turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.75 turns from engagement and descends 7.03 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6550761085542771,
+            -0.4999999999999999,
+            0.5000000000000001,
+            -0.5,
+            -0.5000000000000001
+          ],
+          "pose_source": "leg1.goals_xyzw[4]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.75,
+          "turns_remaining": 1.25,
+          "unwrapped_rotation_from_engagement_rad": -4.71238898038469,
+          "depth_from_engagement_m": 0.0070302651325662826,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg1/turn_3",
+          "order": 10,
+          "active_object": "leg1",
+          "previously_assembled": [
+            "leg4",
+            "leg3"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.6550761085542771,
+              -0.4999999999999999,
+              0.5000000000000001,
+              -0.5,
+              -0.5000000000000001
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg1/turn_4"
+          ]
+        },
+        {
+          "kind": "turn_4",
+          "label": "1 turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1 turn from engagement and descends 9.37 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6527326868434217,
+            8.659560562354932e-17,
+            0.7071067811865475,
+            8.659560562354934e-17,
+            -0.7071067811865476
+          ],
+          "pose_source": "leg1.goals_xyzw[5]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.0,
+          "turns_remaining": 1.0,
+          "unwrapped_rotation_from_engagement_rad": -6.283185307179586,
+          "depth_from_engagement_m": 0.00937368684342171,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg1/turn_4",
+          "order": 11,
+          "active_object": "leg1",
+          "previously_assembled": [
+            "leg4",
+            "leg3"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.6527326868434217,
+              8.659560562354932e-17,
+              0.7071067811865475,
+              8.659560562354934e-17,
+              -0.7071067811865476
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg1/turn_5"
+          ]
+        },
+        {
+          "kind": "turn_5",
+          "label": "1\u00bc turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.25 turns from engagement and descends 11.72 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6503892651325663,
+            0.5,
+            0.4999999999999999,
+            0.5000000000000001,
+            -0.5
+          ],
+          "pose_source": "leg1.goals_xyzw[6]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.25,
+          "turns_remaining": 0.75,
+          "unwrapped_rotation_from_engagement_rad": -7.853981633974483,
+          "depth_from_engagement_m": 0.011717108554277138,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg1/turn_5",
+          "order": 12,
+          "active_object": "leg1",
+          "previously_assembled": [
+            "leg4",
+            "leg3"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.6503892651325663,
+              0.5,
+              0.4999999999999999,
+              0.5000000000000001,
+              -0.5
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg1/turn_6"
+          ]
+        },
+        {
+          "kind": "turn_6",
+          "label": "1\u00bd turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.5 turns from engagement and descends 14.06 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6480458434217109,
+            0.7071067811865475,
+            -4.329780281177466e-17,
+            0.7071067811865476,
+            4.329780281177467e-17
+          ],
+          "pose_source": "leg1.goals_xyzw[7]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.5,
+          "turns_remaining": 0.5,
+          "unwrapped_rotation_from_engagement_rad": -9.42477796076938,
+          "depth_from_engagement_m": 0.014060530265132565,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg1/turn_6",
+          "order": 13,
+          "active_object": "leg1",
+          "previously_assembled": [
+            "leg4",
+            "leg3"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.6480458434217109,
+              0.7071067811865475,
+              -4.329780281177466e-17,
+              0.7071067811865476,
+              4.329780281177467e-17
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg1/turn_7"
+          ]
+        },
+        {
+          "kind": "turn_7",
+          "label": "1\u00be turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.75 turns from engagement and descends 16.40 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6457024217108555,
+            0.4999999999999999,
+            -0.5,
+            0.5,
+            0.5000000000000001
+          ],
+          "pose_source": "leg1.goals_xyzw[8]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.75,
+          "turns_remaining": 0.25,
+          "unwrapped_rotation_from_engagement_rad": -10.995574287564276,
+          "depth_from_engagement_m": 0.016403951975987992,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg1/turn_7",
+          "order": 14,
+          "active_object": "leg1",
+          "previously_assembled": [
+            "leg4",
+            "leg3"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.6457024217108555,
+              0.4999999999999999,
+              -0.5,
+              0.5,
+              0.5000000000000001
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg1/fully_screwed"
+          ]
+        },
+        {
+          "kind": "fully_screwed",
+          "label": "Fully screwed",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg reaches its supplied final screw pose.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.643359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ],
+          "pose_source": "leg1.goals_xyzw[9]",
+          "grasp_group": "turn",
+          "turns_advanced": 2.0,
+          "turns_remaining": 0.0,
+          "unwrapped_rotation_from_engagement_rad": -12.566370614359172,
+          "depth_from_engagement_m": 0.01874737368684342,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg1/fully_screwed",
+          "order": 15,
+          "active_object": "leg1",
+          "previously_assembled": [
+            "leg4",
+            "leg3"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg1/release"
+          ]
+        }
+      ]
+    },
+    {
+      "object": "leg2",
+      "events": [
+        {
+          "kind": "thread_engaged",
+          "label": "Thread engaged",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Thread is engaged with 2 turns remaining.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6621063736868434,
+            -1.7319121124709863e-16,
+            -0.7071067811865475,
+            -1.7319121124709868e-16,
+            0.7071067811865476
+          ],
+          "pose_source": "leg2.goals_xyzw[1]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.0,
+          "turns_remaining": 2.0,
+          "unwrapped_rotation_from_engagement_rad": -0.0,
+          "depth_from_engagement_m": 0.0,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg2/thread_engaged",
+          "order": 7,
+          "active_object": "leg2",
+          "previously_assembled": [
+            "leg4",
+            "leg3",
+            "leg1"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg2": [
+              0.056250000000000015,
+              0.05686750000000001,
+              0.6621063736868434,
+              -1.7319121124709863e-16,
+              -0.7071067811865475,
+              -1.7319121124709868e-16,
+              0.7071067811865476
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg2/turn_1"
+          ]
+        },
+        {
+          "kind": "turn_1",
+          "label": "\u00bc turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.25 turns from engagement and descends 2.34 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.659762951975988,
+            -0.5000000000000002,
+            -0.4999999999999999,
+            -0.5000000000000002,
+            0.49999999999999994
+          ],
+          "pose_source": "leg2.goals_xyzw[2]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.25,
+          "turns_remaining": 1.75,
+          "unwrapped_rotation_from_engagement_rad": -1.5707963267948966,
+          "depth_from_engagement_m": 0.0023434217108554275,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg2/turn_1",
+          "order": 8,
+          "active_object": "leg2",
+          "previously_assembled": [
+            "leg4",
+            "leg3",
+            "leg1"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg2": [
+              0.056250000000000015,
+              0.05686750000000001,
+              0.659762951975988,
+              -0.5000000000000002,
+              -0.4999999999999999,
+              -0.5000000000000002,
+              0.49999999999999994
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg2/turn_2"
+          ]
+        },
+        {
+          "kind": "turn_2",
+          "label": "\u00bd turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.5 turns from engagement and descends 4.69 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6574195302651326,
+            -0.7071067811865475,
+            1.2989340843532398e-16,
+            -0.7071067811865476,
+            -1.29893408435324e-16
+          ],
+          "pose_source": "leg2.goals_xyzw[3]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.5,
+          "turns_remaining": 1.5,
+          "unwrapped_rotation_from_engagement_rad": -3.141592653589793,
+          "depth_from_engagement_m": 0.004686843421710855,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg2/turn_2",
+          "order": 9,
+          "active_object": "leg2",
+          "previously_assembled": [
+            "leg4",
+            "leg3",
+            "leg1"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg2": [
+              0.056250000000000015,
+              0.05686750000000001,
+              0.6574195302651326,
+              -0.7071067811865475,
+              1.2989340843532398e-16,
+              -0.7071067811865476,
+              -1.29893408435324e-16
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg2/turn_3"
+          ]
+        },
+        {
+          "kind": "turn_3",
+          "label": "\u00be turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.75 turns from engagement and descends 7.03 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6550761085542771,
+            -0.4999999999999999,
+            0.5000000000000001,
+            -0.5,
+            -0.5000000000000001
+          ],
+          "pose_source": "leg2.goals_xyzw[4]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.75,
+          "turns_remaining": 1.25,
+          "unwrapped_rotation_from_engagement_rad": -4.71238898038469,
+          "depth_from_engagement_m": 0.0070302651325662826,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg2/turn_3",
+          "order": 10,
+          "active_object": "leg2",
+          "previously_assembled": [
+            "leg4",
+            "leg3",
+            "leg1"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg2": [
+              0.056250000000000015,
+              0.05686750000000001,
+              0.6550761085542771,
+              -0.4999999999999999,
+              0.5000000000000001,
+              -0.5,
+              -0.5000000000000001
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg2/turn_4"
+          ]
+        },
+        {
+          "kind": "turn_4",
+          "label": "1 turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1 turn from engagement and descends 9.37 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6527326868434217,
+            8.659560562354932e-17,
+            0.7071067811865475,
+            8.659560562354934e-17,
+            -0.7071067811865476
+          ],
+          "pose_source": "leg2.goals_xyzw[5]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.0,
+          "turns_remaining": 1.0,
+          "unwrapped_rotation_from_engagement_rad": -6.283185307179586,
+          "depth_from_engagement_m": 0.00937368684342171,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg2/turn_4",
+          "order": 11,
+          "active_object": "leg2",
+          "previously_assembled": [
+            "leg4",
+            "leg3",
+            "leg1"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg2": [
+              0.056250000000000015,
+              0.05686750000000001,
+              0.6527326868434217,
+              8.659560562354932e-17,
+              0.7071067811865475,
+              8.659560562354934e-17,
+              -0.7071067811865476
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg2/turn_5"
+          ]
+        },
+        {
+          "kind": "turn_5",
+          "label": "1\u00bc turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.25 turns from engagement and descends 11.72 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6503892651325663,
+            0.5,
+            0.4999999999999999,
+            0.5000000000000001,
+            -0.5
+          ],
+          "pose_source": "leg2.goals_xyzw[6]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.25,
+          "turns_remaining": 0.75,
+          "unwrapped_rotation_from_engagement_rad": -7.853981633974483,
+          "depth_from_engagement_m": 0.011717108554277138,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg2/turn_5",
+          "order": 12,
+          "active_object": "leg2",
+          "previously_assembled": [
+            "leg4",
+            "leg3",
+            "leg1"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg2": [
+              0.056250000000000015,
+              0.05686750000000001,
+              0.6503892651325663,
+              0.5,
+              0.4999999999999999,
+              0.5000000000000001,
+              -0.5
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg2/turn_6"
+          ]
+        },
+        {
+          "kind": "turn_6",
+          "label": "1\u00bd turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.5 turns from engagement and descends 14.06 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6480458434217109,
+            0.7071067811865475,
+            -4.329780281177466e-17,
+            0.7071067811865476,
+            4.329780281177467e-17
+          ],
+          "pose_source": "leg2.goals_xyzw[7]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.5,
+          "turns_remaining": 0.5,
+          "unwrapped_rotation_from_engagement_rad": -9.42477796076938,
+          "depth_from_engagement_m": 0.014060530265132565,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg2/turn_6",
+          "order": 13,
+          "active_object": "leg2",
+          "previously_assembled": [
+            "leg4",
+            "leg3",
+            "leg1"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg2": [
+              0.056250000000000015,
+              0.05686750000000001,
+              0.6480458434217109,
+              0.7071067811865475,
+              -4.329780281177466e-17,
+              0.7071067811865476,
+              4.329780281177467e-17
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg2/turn_7"
+          ]
+        },
+        {
+          "kind": "turn_7",
+          "label": "1\u00be turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.75 turns from engagement and descends 16.40 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6457024217108555,
+            0.4999999999999999,
+            -0.5,
+            0.5,
+            0.5000000000000001
+          ],
+          "pose_source": "leg2.goals_xyzw[8]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.75,
+          "turns_remaining": 0.25,
+          "unwrapped_rotation_from_engagement_rad": -10.995574287564276,
+          "depth_from_engagement_m": 0.016403951975987992,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg2/turn_7",
+          "order": 14,
+          "active_object": "leg2",
+          "previously_assembled": [
+            "leg4",
+            "leg3",
+            "leg1"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg2": [
+              0.056250000000000015,
+              0.05686750000000001,
+              0.6457024217108555,
+              0.4999999999999999,
+              -0.5,
+              0.5,
+              0.5000000000000001
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg2/fully_screwed"
+          ]
+        },
+        {
+          "kind": "fully_screwed",
+          "label": "Fully screwed",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg reaches its supplied final screw pose.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.643359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ],
+          "pose_source": "leg2.goals_xyzw[9]",
+          "grasp_group": "turn",
+          "turns_advanced": 2.0,
+          "turns_remaining": 0.0,
+          "unwrapped_rotation_from_engagement_rad": -12.566370614359172,
+          "depth_from_engagement_m": 0.01874737368684342,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg2/fully_screwed",
+          "order": 15,
+          "active_object": "leg2",
+          "previously_assembled": [
+            "leg4",
+            "leg3",
+            "leg1"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.05624999999999999,
+              0.05686750000000001,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg2": [
+              0.056250000000000015,
+              0.05686750000000001,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg2/release"
+          ]
+        }
+      ]
+    },
+    {
+      "object": "leg3",
+      "events": [
+        {
+          "kind": "thread_engaged",
+          "label": "Thread engaged",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Thread is engaged with 2 turns remaining.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6621063736868434,
+            -1.7319121124709863e-16,
+            -0.7071067811865475,
+            -1.7319121124709868e-16,
+            0.7071067811865476
+          ],
+          "pose_source": "leg3.goals_xyzw[1]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.0,
+          "turns_remaining": 2.0,
+          "unwrapped_rotation_from_engagement_rad": -0.0,
+          "depth_from_engagement_m": 0.0,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg3/thread_engaged",
+          "order": 7,
+          "active_object": "leg3",
+          "previously_assembled": [
+            "leg4"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.6621063736868434,
+              -1.7319121124709863e-16,
+              -0.7071067811865475,
+              -1.7319121124709868e-16,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg3/turn_1"
+          ]
+        },
+        {
+          "kind": "turn_1",
+          "label": "\u00bc turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.25 turns from engagement and descends 2.34 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.659762951975988,
+            -0.5000000000000002,
+            -0.4999999999999999,
+            -0.5000000000000002,
+            0.49999999999999994
+          ],
+          "pose_source": "leg3.goals_xyzw[2]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.25,
+          "turns_remaining": 1.75,
+          "unwrapped_rotation_from_engagement_rad": -1.5707963267948966,
+          "depth_from_engagement_m": 0.0023434217108554275,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg3/turn_1",
+          "order": 8,
+          "active_object": "leg3",
+          "previously_assembled": [
+            "leg4"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.659762951975988,
+              -0.5000000000000002,
+              -0.4999999999999999,
+              -0.5000000000000002,
+              0.49999999999999994
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg3/turn_2"
+          ]
+        },
+        {
+          "kind": "turn_2",
+          "label": "\u00bd turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.5 turns from engagement and descends 4.69 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6574195302651326,
+            -0.7071067811865475,
+            1.2989340843532398e-16,
+            -0.7071067811865476,
+            -1.29893408435324e-16
+          ],
+          "pose_source": "leg3.goals_xyzw[3]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.5,
+          "turns_remaining": 1.5,
+          "unwrapped_rotation_from_engagement_rad": -3.141592653589793,
+          "depth_from_engagement_m": 0.004686843421710855,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg3/turn_2",
+          "order": 9,
+          "active_object": "leg3",
+          "previously_assembled": [
+            "leg4"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.6574195302651326,
+              -0.7071067811865475,
+              1.2989340843532398e-16,
+              -0.7071067811865476,
+              -1.29893408435324e-16
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg3/turn_3"
+          ]
+        },
+        {
+          "kind": "turn_3",
+          "label": "\u00be turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.75 turns from engagement and descends 7.03 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6550761085542771,
+            -0.4999999999999999,
+            0.5000000000000001,
+            -0.5,
+            -0.5000000000000001
+          ],
+          "pose_source": "leg3.goals_xyzw[4]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.75,
+          "turns_remaining": 1.25,
+          "unwrapped_rotation_from_engagement_rad": -4.71238898038469,
+          "depth_from_engagement_m": 0.0070302651325662826,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg3/turn_3",
+          "order": 10,
+          "active_object": "leg3",
+          "previously_assembled": [
+            "leg4"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.6550761085542771,
+              -0.4999999999999999,
+              0.5000000000000001,
+              -0.5,
+              -0.5000000000000001
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg3/turn_4"
+          ]
+        },
+        {
+          "kind": "turn_4",
+          "label": "1 turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1 turn from engagement and descends 9.37 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6527326868434217,
+            8.659560562354932e-17,
+            0.7071067811865475,
+            8.659560562354934e-17,
+            -0.7071067811865476
+          ],
+          "pose_source": "leg3.goals_xyzw[5]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.0,
+          "turns_remaining": 1.0,
+          "unwrapped_rotation_from_engagement_rad": -6.283185307179586,
+          "depth_from_engagement_m": 0.00937368684342171,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg3/turn_4",
+          "order": 11,
+          "active_object": "leg3",
+          "previously_assembled": [
+            "leg4"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.6527326868434217,
+              8.659560562354932e-17,
+              0.7071067811865475,
+              8.659560562354934e-17,
+              -0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg3/turn_5"
+          ]
+        },
+        {
+          "kind": "turn_5",
+          "label": "1\u00bc turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.25 turns from engagement and descends 11.72 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6503892651325663,
+            0.5,
+            0.4999999999999999,
+            0.5000000000000001,
+            -0.5
+          ],
+          "pose_source": "leg3.goals_xyzw[6]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.25,
+          "turns_remaining": 0.75,
+          "unwrapped_rotation_from_engagement_rad": -7.853981633974483,
+          "depth_from_engagement_m": 0.011717108554277138,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg3/turn_5",
+          "order": 12,
+          "active_object": "leg3",
+          "previously_assembled": [
+            "leg4"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.6503892651325663,
+              0.5,
+              0.4999999999999999,
+              0.5000000000000001,
+              -0.5
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg3/turn_6"
+          ]
+        },
+        {
+          "kind": "turn_6",
+          "label": "1\u00bd turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.5 turns from engagement and descends 14.06 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6480458434217109,
+            0.7071067811865475,
+            -4.329780281177466e-17,
+            0.7071067811865476,
+            4.329780281177467e-17
+          ],
+          "pose_source": "leg3.goals_xyzw[7]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.5,
+          "turns_remaining": 0.5,
+          "unwrapped_rotation_from_engagement_rad": -9.42477796076938,
+          "depth_from_engagement_m": 0.014060530265132565,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg3/turn_6",
+          "order": 13,
+          "active_object": "leg3",
+          "previously_assembled": [
+            "leg4"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.6480458434217109,
+              0.7071067811865475,
+              -4.329780281177466e-17,
+              0.7071067811865476,
+              4.329780281177467e-17
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg3/turn_7"
+          ]
+        },
+        {
+          "kind": "turn_7",
+          "label": "1\u00be turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.75 turns from engagement and descends 16.40 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6457024217108555,
+            0.4999999999999999,
+            -0.5,
+            0.5,
+            0.5000000000000001
+          ],
+          "pose_source": "leg3.goals_xyzw[8]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.75,
+          "turns_remaining": 0.25,
+          "unwrapped_rotation_from_engagement_rad": -10.995574287564276,
+          "depth_from_engagement_m": 0.016403951975987992,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg3/turn_7",
+          "order": 14,
+          "active_object": "leg3",
+          "previously_assembled": [
+            "leg4"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.6457024217108555,
+              0.4999999999999999,
+              -0.5,
+              0.5,
+              0.5000000000000001
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg3/fully_screwed"
+          ]
+        },
+        {
+          "kind": "fully_screwed",
+          "label": "Fully screwed",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg reaches its supplied final screw pose.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.643359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ],
+          "pose_source": "leg3.goals_xyzw[9]",
+          "grasp_group": "turn",
+          "turns_advanced": 2.0,
+          "turns_remaining": 0.0,
+          "unwrapped_rotation_from_engagement_rad": -12.566370614359172,
+          "depth_from_engagement_m": 0.01874737368684342,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg3/fully_screwed",
+          "order": 15,
+          "active_object": "leg3",
+          "previously_assembled": [
+            "leg4"
+          ],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              -0.05624999999999999,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg3/release"
+          ]
+        }
+      ]
+    },
+    {
+      "object": "leg4",
+      "events": [
+        {
+          "kind": "thread_engaged",
+          "label": "Thread engaged",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Thread is engaged with 2 turns remaining.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6621063736868434,
+            -1.7319121124709863e-16,
+            -0.7071067811865475,
+            -1.7319121124709868e-16,
+            0.7071067811865476
+          ],
+          "pose_source": "leg4.goals_xyzw[1]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.0,
+          "turns_remaining": 2.0,
+          "unwrapped_rotation_from_engagement_rad": -0.0,
+          "depth_from_engagement_m": 0.0,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg4/thread_engaged",
+          "order": 7,
+          "active_object": "leg4",
+          "previously_assembled": [],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              0.18076001318719842,
+              -0.16808440705949795,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.9992308347169744,
+              0.0392140147245673
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.6621063736868434,
+              -1.7319121124709863e-16,
+              -0.7071067811865475,
+              -1.7319121124709868e-16,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg4/turn_1"
+          ]
+        },
+        {
+          "kind": "turn_1",
+          "label": "\u00bc turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.25 turns from engagement and descends 2.34 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.659762951975988,
+            -0.5000000000000002,
+            -0.4999999999999999,
+            -0.5000000000000002,
+            0.49999999999999994
+          ],
+          "pose_source": "leg4.goals_xyzw[2]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.25,
+          "turns_remaining": 1.75,
+          "unwrapped_rotation_from_engagement_rad": -1.5707963267948966,
+          "depth_from_engagement_m": 0.0023434217108554275,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg4/turn_1",
+          "order": 8,
+          "active_object": "leg4",
+          "previously_assembled": [],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              0.18076001318719842,
+              -0.16808440705949795,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.9992308347169744,
+              0.0392140147245673
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.659762951975988,
+              -0.5000000000000002,
+              -0.4999999999999999,
+              -0.5000000000000002,
+              0.49999999999999994
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg4/turn_2"
+          ]
+        },
+        {
+          "kind": "turn_2",
+          "label": "\u00bd turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.5 turns from engagement and descends 4.69 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6574195302651326,
+            -0.7071067811865475,
+            1.2989340843532398e-16,
+            -0.7071067811865476,
+            -1.29893408435324e-16
+          ],
+          "pose_source": "leg4.goals_xyzw[3]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.5,
+          "turns_remaining": 1.5,
+          "unwrapped_rotation_from_engagement_rad": -3.141592653589793,
+          "depth_from_engagement_m": 0.004686843421710855,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg4/turn_2",
+          "order": 9,
+          "active_object": "leg4",
+          "previously_assembled": [],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              0.18076001318719842,
+              -0.16808440705949795,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.9992308347169744,
+              0.0392140147245673
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.6574195302651326,
+              -0.7071067811865475,
+              1.2989340843532398e-16,
+              -0.7071067811865476,
+              -1.29893408435324e-16
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg4/turn_3"
+          ]
+        },
+        {
+          "kind": "turn_3",
+          "label": "\u00be turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 0.75 turns from engagement and descends 7.03 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6550761085542771,
+            -0.4999999999999999,
+            0.5000000000000001,
+            -0.5,
+            -0.5000000000000001
+          ],
+          "pose_source": "leg4.goals_xyzw[4]",
+          "grasp_group": "turn",
+          "turns_advanced": 0.75,
+          "turns_remaining": 1.25,
+          "unwrapped_rotation_from_engagement_rad": -4.71238898038469,
+          "depth_from_engagement_m": 0.0070302651325662826,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg4/turn_3",
+          "order": 10,
+          "active_object": "leg4",
+          "previously_assembled": [],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              0.18076001318719842,
+              -0.16808440705949795,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.9992308347169744,
+              0.0392140147245673
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.6550761085542771,
+              -0.4999999999999999,
+              0.5000000000000001,
+              -0.5,
+              -0.5000000000000001
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg4/turn_4"
+          ]
+        },
+        {
+          "kind": "turn_4",
+          "label": "1 turn",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1 turn from engagement and descends 9.37 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6527326868434217,
+            8.659560562354932e-17,
+            0.7071067811865475,
+            8.659560562354934e-17,
+            -0.7071067811865476
+          ],
+          "pose_source": "leg4.goals_xyzw[5]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.0,
+          "turns_remaining": 1.0,
+          "unwrapped_rotation_from_engagement_rad": -6.283185307179586,
+          "depth_from_engagement_m": 0.00937368684342171,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg4/turn_4",
+          "order": 11,
+          "active_object": "leg4",
+          "previously_assembled": [],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              0.18076001318719842,
+              -0.16808440705949795,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.9992308347169744,
+              0.0392140147245673
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.6527326868434217,
+              8.659560562354932e-17,
+              0.7071067811865475,
+              8.659560562354934e-17,
+              -0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg4/turn_5"
+          ]
+        },
+        {
+          "kind": "turn_5",
+          "label": "1\u00bc turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.25 turns from engagement and descends 11.72 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6503892651325663,
+            0.5,
+            0.4999999999999999,
+            0.5000000000000001,
+            -0.5
+          ],
+          "pose_source": "leg4.goals_xyzw[6]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.25,
+          "turns_remaining": 0.75,
+          "unwrapped_rotation_from_engagement_rad": -7.853981633974483,
+          "depth_from_engagement_m": 0.011717108554277138,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg4/turn_5",
+          "order": 12,
+          "active_object": "leg4",
+          "previously_assembled": [],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              0.18076001318719842,
+              -0.16808440705949795,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.9992308347169744,
+              0.0392140147245673
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.6503892651325663,
+              0.5,
+              0.4999999999999999,
+              0.5000000000000001,
+              -0.5
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg4/turn_6"
+          ]
+        },
+        {
+          "kind": "turn_6",
+          "label": "1\u00bd turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.5 turns from engagement and descends 14.06 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6480458434217109,
+            0.7071067811865475,
+            -4.329780281177466e-17,
+            0.7071067811865476,
+            4.329780281177467e-17
+          ],
+          "pose_source": "leg4.goals_xyzw[7]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.5,
+          "turns_remaining": 0.5,
+          "unwrapped_rotation_from_engagement_rad": -9.42477796076938,
+          "depth_from_engagement_m": 0.014060530265132565,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg4/turn_6",
+          "order": 13,
+          "active_object": "leg4",
+          "previously_assembled": [],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              0.18076001318719842,
+              -0.16808440705949795,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.9992308347169744,
+              0.0392140147245673
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.6480458434217109,
+              0.7071067811865475,
+              -4.329780281177466e-17,
+              0.7071067811865476,
+              4.329780281177467e-17
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg4/turn_7"
+          ]
+        },
+        {
+          "kind": "turn_7",
+          "label": "1\u00be turns",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg advances 1.75 turns from engagement and descends 16.40 mm.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6457024217108555,
+            0.4999999999999999,
+            -0.5,
+            0.5,
+            0.5000000000000001
+          ],
+          "pose_source": "leg4.goals_xyzw[8]",
+          "grasp_group": "turn",
+          "turns_advanced": 1.75,
+          "turns_remaining": 0.25,
+          "unwrapped_rotation_from_engagement_rad": -10.995574287564276,
+          "depth_from_engagement_m": 0.016403951975987992,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg4/turn_7",
+          "order": 14,
+          "active_object": "leg4",
+          "previously_assembled": [],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              0.18076001318719842,
+              -0.16808440705949795,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.9992308347169744,
+              0.0392140147245673
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.6457024217108555,
+              0.4999999999999999,
+              -0.5,
+              0.5,
+              0.5000000000000001
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg4/fully_screwed"
+          ]
+        },
+        {
+          "kind": "fully_screwed",
+          "label": "Fully screwed",
+          "hand": "Fingers turn and reposition on the shaft sides or free-end rim; the arm holds its sampled configuration.",
+          "object": "Leg reaches its supplied final screw pose.",
+          "fixed": [
+            "Maintain thread-compatible axis, phase and depth.",
+            "Arm and palm pose stay fixed during one screwing rollout.",
+            "Keep the threaded end clear; use off-axis side or rim contacts to produce turning torque.",
+            "The fixed-palm finger workspace covers the remaining axial descent: up to 18.75 mm from engagement.",
+            "Do not require one rigid hand\u2013object grasp throughout screwing.",
+            "A weak or absent hand contact is allowed only while thread support keeps the state meaningful and recoverable."
+          ],
+          "vary": [
+            "Shaft-side or free-end-rim contact family",
+            "Finger-contact set and finger joint configuration",
+            "Drive or reposition posture",
+            "Arm/palm placement between rollouts"
+          ],
+          "representative_object_xyzw": [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.643359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ],
+          "pose_source": "leg4.goals_xyzw[9]",
+          "grasp_group": "turn",
+          "turns_advanced": 2.0,
+          "turns_remaining": 0.0,
+          "unwrapped_rotation_from_engagement_rad": -12.566370614359172,
+          "depth_from_engagement_m": 0.01874737368684342,
+          "hand_contact_modes": [
+            "torque-producing contact",
+            "partial contact while repositioning",
+            "thread-supported temporary release"
+          ],
+          "stable_grasp_required": false,
+          "arm_during_skill": "fixed at sampled configuration",
+          "attainment_requires": "Physical thread contact consistent with the pose; pose alone does not establish engagement.",
+          "id": "leg4/fully_screwed",
+          "order": 15,
+          "active_object": "leg4",
+          "previously_assembled": [],
+          "object_poses_xyzw": {
+            "leg1": [
+              -0.22952453981179724,
+              0.05871414891735077,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.4755137283143218,
+              0.8797083006227765
+            ],
+            "leg2": [
+              0.16820410368097694,
+              0.06975298933155838,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.6229599692165964,
+              0.782253716356565
+            ],
+            "leg3": [
+              0.18076001318719842,
+              -0.16808440705949795,
+              0.54584375,
+              0.0,
+              0.0,
+              -0.9992308347169744,
+              0.0392140147245673
+            ],
+            "leg4": [
+              0.056250000000000015,
+              -0.055632499999999994,
+              0.643359,
+              0.0,
+              -0.7071067811865475,
+              0.0,
+              0.7071067811865476
+            ]
+          },
+          "expanded_event_count": 1,
+          "next": [
+            "leg4/release"
+          ]
+        }
+      ]
+    }
+  ],
+  "scene": {
+    "robot_urdf": "assets/urdf/fr3_xhand_description/fr3_xhand/fr3_xhand.urdf",
+    "robot_profile": "fr3-xhand-a4hs",
+    "control_hz": 60,
+    "physics_hz": 120,
+    "support_urdf": "assets/urdf/table_davian.urdf",
+    "support_xyzw": [
+      0,
+      0,
+      0.38,
+      0,
+      0,
+      0,
+      1
+    ],
+    "fixture_fixed": true,
+    "all_task_objects_dynamic": true,
+    "goal_quaternion_convention": "xyzw",
+    "goal_frame": "world",
+    "prompt": "Do four-leg table assembly",
+    "fixture_urdf": "assets/urdf/furniture_bench/square_table/insertion_fixtures/four_leg_sdf_hybrid.urdf",
+    "fixture_xyzw": [
+      0.0,
+      0.0,
+      0.545625,
+      0,
+      0,
+      0,
+      1
+    ],
+    "objects": [
+      {
+        "name": "leg1",
+        "urdf": "assets/urdf/furniture_bench/square_table/square_table_leg4_body3x/sdf_hybrid/square_table_leg4_body3x_matchedmass_sdf_hybrid.urdf",
+        "initial_xyzw": [
+          -0.22952453981179724,
+          0.05871414891735077,
+          0.54584375,
+          0.0,
+          0.0,
+          -0.4755137283143218,
+          0.8797083006227765
+        ],
+        "assembled_xyzw": [
+          -0.05624999999999999,
+          0.05686750000000001,
+          0.643359,
+          0.0,
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865476
+        ],
+        "goals_xyzw": [
+          [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.668359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ],
+          [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6621063736868434,
+            -1.7319121124709863e-16,
+            -0.7071067811865475,
+            -1.7319121124709868e-16,
+            0.7071067811865476
+          ],
+          [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.659762951975988,
+            -0.5000000000000002,
+            -0.4999999999999999,
+            -0.5000000000000002,
+            0.49999999999999994
+          ],
+          [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6574195302651326,
+            -0.7071067811865475,
+            1.2989340843532398e-16,
+            -0.7071067811865476,
+            -1.29893408435324e-16
+          ],
+          [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6550761085542771,
+            -0.4999999999999999,
+            0.5000000000000001,
+            -0.5,
+            -0.5000000000000001
+          ],
+          [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6527326868434217,
+            8.659560562354932e-17,
+            0.7071067811865475,
+            8.659560562354934e-17,
+            -0.7071067811865476
+          ],
+          [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6503892651325663,
+            0.5,
+            0.4999999999999999,
+            0.5000000000000001,
+            -0.5
+          ],
+          [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6480458434217109,
+            0.7071067811865475,
+            -4.329780281177466e-17,
+            0.7071067811865476,
+            4.329780281177467e-17
+          ],
+          [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.6457024217108555,
+            0.4999999999999999,
+            -0.5,
+            0.5,
+            0.5000000000000001
+          ],
+          [
+            -0.05624999999999999,
+            0.05686750000000001,
+            0.643359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ]
+        ],
+        "socket_translation_from_source_m": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "leg2",
+        "urdf": "assets/urdf/furniture_bench/square_table/square_table_leg4_body3x/sdf_hybrid/square_table_leg4_body3x_matchedmass_sdf_hybrid.urdf",
+        "initial_xyzw": [
+          0.16820410368097694,
+          0.06975298933155838,
+          0.54584375,
+          0.0,
+          0.0,
+          -0.6229599692165964,
+          0.782253716356565
+        ],
+        "assembled_xyzw": [
+          0.056250000000000015,
+          0.05686750000000001,
+          0.643359,
+          0.0,
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865476
+        ],
+        "goals_xyzw": [
+          [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.668359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ],
+          [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6621063736868434,
+            -1.7319121124709863e-16,
+            -0.7071067811865475,
+            -1.7319121124709868e-16,
+            0.7071067811865476
+          ],
+          [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.659762951975988,
+            -0.5000000000000002,
+            -0.4999999999999999,
+            -0.5000000000000002,
+            0.49999999999999994
+          ],
+          [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6574195302651326,
+            -0.7071067811865475,
+            1.2989340843532398e-16,
+            -0.7071067811865476,
+            -1.29893408435324e-16
+          ],
+          [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6550761085542771,
+            -0.4999999999999999,
+            0.5000000000000001,
+            -0.5,
+            -0.5000000000000001
+          ],
+          [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6527326868434217,
+            8.659560562354932e-17,
+            0.7071067811865475,
+            8.659560562354934e-17,
+            -0.7071067811865476
+          ],
+          [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6503892651325663,
+            0.5,
+            0.4999999999999999,
+            0.5000000000000001,
+            -0.5
+          ],
+          [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6480458434217109,
+            0.7071067811865475,
+            -4.329780281177466e-17,
+            0.7071067811865476,
+            4.329780281177467e-17
+          ],
+          [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.6457024217108555,
+            0.4999999999999999,
+            -0.5,
+            0.5,
+            0.5000000000000001
+          ],
+          [
+            0.056250000000000015,
+            0.05686750000000001,
+            0.643359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ]
+        ],
+        "socket_translation_from_source_m": [
+          0.1125,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "leg3",
+        "urdf": "assets/urdf/furniture_bench/square_table/square_table_leg4_body3x/sdf_hybrid/square_table_leg4_body3x_matchedmass_sdf_hybrid.urdf",
+        "initial_xyzw": [
+          0.18076001318719842,
+          -0.16808440705949795,
+          0.54584375,
+          0.0,
+          0.0,
+          -0.9992308347169744,
+          0.0392140147245673
+        ],
+        "assembled_xyzw": [
+          -0.05624999999999999,
+          -0.055632499999999994,
+          0.643359,
+          0.0,
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865476
+        ],
+        "goals_xyzw": [
+          [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.668359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ],
+          [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6621063736868434,
+            -1.7319121124709863e-16,
+            -0.7071067811865475,
+            -1.7319121124709868e-16,
+            0.7071067811865476
+          ],
+          [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.659762951975988,
+            -0.5000000000000002,
+            -0.4999999999999999,
+            -0.5000000000000002,
+            0.49999999999999994
+          ],
+          [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6574195302651326,
+            -0.7071067811865475,
+            1.2989340843532398e-16,
+            -0.7071067811865476,
+            -1.29893408435324e-16
+          ],
+          [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6550761085542771,
+            -0.4999999999999999,
+            0.5000000000000001,
+            -0.5,
+            -0.5000000000000001
+          ],
+          [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6527326868434217,
+            8.659560562354932e-17,
+            0.7071067811865475,
+            8.659560562354934e-17,
+            -0.7071067811865476
+          ],
+          [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6503892651325663,
+            0.5,
+            0.4999999999999999,
+            0.5000000000000001,
+            -0.5
+          ],
+          [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6480458434217109,
+            0.7071067811865475,
+            -4.329780281177466e-17,
+            0.7071067811865476,
+            4.329780281177467e-17
+          ],
+          [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.6457024217108555,
+            0.4999999999999999,
+            -0.5,
+            0.5,
+            0.5000000000000001
+          ],
+          [
+            -0.05624999999999999,
+            -0.055632499999999994,
+            0.643359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ]
+        ],
+        "socket_translation_from_source_m": [
+          0.0,
+          -0.1125,
+          0.0
+        ]
+      },
+      {
+        "name": "leg4",
+        "urdf": "assets/urdf/furniture_bench/square_table/square_table_leg4_body3x/sdf_hybrid/square_table_leg4_body3x_matchedmass_sdf_hybrid.urdf",
+        "initial_xyzw": [
+          -0.1130885952323464,
+          -0.1578088210150767,
+          0.54584375,
+          0.0,
+          0.0,
+          -0.5221079677195141,
+          0.8528793994720466
+        ],
+        "assembled_xyzw": [
+          0.056250000000000015,
+          -0.055632499999999994,
+          0.643359,
+          0.0,
+          -0.7071067811865475,
+          0.0,
+          0.7071067811865476
+        ],
+        "goals_xyzw": [
+          [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.668359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ],
+          [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6621063736868434,
+            -1.7319121124709863e-16,
+            -0.7071067811865475,
+            -1.7319121124709868e-16,
+            0.7071067811865476
+          ],
+          [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.659762951975988,
+            -0.5000000000000002,
+            -0.4999999999999999,
+            -0.5000000000000002,
+            0.49999999999999994
+          ],
+          [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6574195302651326,
+            -0.7071067811865475,
+            1.2989340843532398e-16,
+            -0.7071067811865476,
+            -1.29893408435324e-16
+          ],
+          [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6550761085542771,
+            -0.4999999999999999,
+            0.5000000000000001,
+            -0.5,
+            -0.5000000000000001
+          ],
+          [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6527326868434217,
+            8.659560562354932e-17,
+            0.7071067811865475,
+            8.659560562354934e-17,
+            -0.7071067811865476
+          ],
+          [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6503892651325663,
+            0.5,
+            0.4999999999999999,
+            0.5000000000000001,
+            -0.5
+          ],
+          [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6480458434217109,
+            0.7071067811865475,
+            -4.329780281177466e-17,
+            0.7071067811865476,
+            4.329780281177467e-17
+          ],
+          [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.6457024217108555,
+            0.4999999999999999,
+            -0.5,
+            0.5,
+            0.5000000000000001
+          ],
+          [
+            0.056250000000000015,
+            -0.055632499999999994,
+            0.643359,
+            0.0,
+            -0.7071067811865475,
+            0.0,
+            0.7071067811865476
+          ]
+        ],
+        "socket_translation_from_source_m": [
+          0.1125,
+          -0.1125,
+          0.0
+        ]
+      }
+    ],
+    "initial_layouts": [
+      {
+        "name": "layout_1",
+        "seed": 20261215,
+        "objects_xyzw": {
+          "leg1": [
+            -0.22952453981179724,
+            0.05871414891735077,
+            0.54584375,
+            0.0,
+            0.0,
+            -0.4755137283143218,
+            0.8797083006227765
+          ],
+          "leg2": [
+            0.16820410368097694,
+            0.06975298933155838,
+            0.54584375,
+            0.0,
+            0.0,
+            -0.6229599692165964,
+            0.782253716356565
+          ],
+          "leg3": [
+            0.18076001318719842,
+            -0.16808440705949795,
+            0.54584375,
+            0.0,
+            0.0,
+            -0.9992308347169744,
+            0.0392140147245673
+          ],
+          "leg4": [
+            -0.1130885952323464,
+            -0.1578088210150767,
+            0.54584375,
+            0.0,
+            0.0,
+            -0.5221079677195141,
+            0.8528793994720466
+          ]
+        }
+      },
+      {
+        "name": "layout_2",
+        "seed": 20261216,
+        "objects_xyzw": {
+          "leg1": [
+            -0.18597731900419176,
+            -0.23987282495533302,
+            0.54584375,
+            0.0,
+            0.0,
+            -0.9926188482904328,
+            0.12127580970075905
+          ],
+          "leg2": [
+            -0.06429914846436693,
+            0.20449784645323532,
+            0.54584375,
+            0.0,
+            0.0,
+            -0.11429496537162391,
+            0.9934468586143395
+          ],
+          "leg3": [
+            0.20987585322212765,
+            -0.005687173166611159,
+            0.54584375,
+            0.0,
+            0.0,
+            0.5051175329279208,
+            0.8630505651054351
+          ],
+          "leg4": [
+            -0.14902370450041688,
+            0.03652383056582165,
+            0.54584375,
+            0.0,
+            0.0,
+            -0.8335657774949164,
+            0.5524202155870978
+          ]
+        }
+      },
+      {
+        "name": "layout_3",
+        "seed": 20261217,
+        "objects_xyzw": {
+          "leg1": [
+            -0.2701553628074105,
+            -0.14364537076049463,
+            0.54584375,
+            0.0,
+            0.0,
+            0.7693059332664774,
+            0.6388805686832196
+          ],
+          "leg2": [
+            -0.2070270355163497,
+            -0.058078361889543406,
+            0.54584375,
+            0.0,
+            0.0,
+            -0.5022302815958164,
+            0.8647339152873483
+          ],
+          "leg3": [
+            -0.04063620318159469,
+            0.15360978164322847,
+            0.54584375,
+            0.0,
+            0.0,
+            0.17196041882542065,
+            0.9851038596804836
+          ],
+          "leg4": [
+            0.2753070818991827,
+            -0.10802170880426187,
+            0.54584375,
+            0.0,
+            0.0,
+            0.6936503413897375,
+            0.7203118795979285
+          ]
+        }
+      }
+    ],
+    "layout_sampling": {
+      "position": "uniform xy",
+      "orientation": "uniform yaw on resting side",
+      "fixture": "fixed",
+      "minimum_footprint_gap_m": 0.025,
+      "support_top_z_m": 0.53
+    }
+  }
+}

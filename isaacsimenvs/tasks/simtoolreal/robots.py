@@ -30,9 +30,6 @@ class RobotCfg:
     hand_box_local: tuple[tuple[float, float, float], tuple[float, float, float]] = MISSING
     arm_armature: dict[str, float] | None = None
     arm_friction: dict[str, float] | None = None
-    hand_friction: dict[str, float] | None = None
-    hand_dynamic_friction: dict[str, float] | None = None
-    hand_effort_limit: dict[str, float] | None = None
 
 
 _FR3_XHAND_HAND_JOINTS = (
@@ -62,24 +59,6 @@ _SHARPA_FINGERTIP_BODIES = (
     "left_index_DP", "left_middle_DP", "left_ring_DP",
     "left_thumb_DP", "left_pinky_DP",
 )
-
-# The real XHand, identified 29-30 Sep 2026 at the deploy settings kp 100, kd 0, tor_max 400
-# (deployment/fr3_xhand/sysid/HAND_MODEL_20260930.md). Friction is an effort in Nm in Isaac Sim 5.
-# stiffness, damping, static friction, dynamic friction, armature, effort limit
-_HAND_SYSID = {
-    "thumb_joint0": (1.56, 0.093, 0.027, 0.027, 0.0, 0.86),
-    "thumb_joint1": (1.58, 0.067, 0.018, 0.0095, 0.0, 0.91),
-    "thumb_joint2": (0.32, 0.012, 0.0038, 0.0038, 5e-4, 0.175),
-    "index_joint0": (0.31, 0.015, 0.0072, 0.0072, 0.0, 0.18),
-    "index_joint1": (1.28, 0.070, 0.014, 0.0088, 0.0, 0.77),
-    "index_joint2": (0.28, 0.010, 0.0028, 0.0028, 5e-4, 0.165),
-    "middle_joint0": (1.93, 0.124, 0.023, 0.012, 1e-4, 0.93),
-    "middle_joint1": (0.30, 0.009, 0.0041, 0.0041, 5e-4, 0.196),
-    "ring_joint0": (1.39, 0.082, 0.017, 0.012, 1.5e-3, 0.79),
-    "ring_joint1": (0.32, 0.010, 0.0038, 0.0036, 5e-4, 0.205),
-    "pinky_joint0": (1.61, 0.099, 0.017, 0.011, 0.0, 0.85),
-    "pinky_joint1": (0.31, 0.005, 0.023, 0.023, 5e-4, 0.148),
-}
 
 ROBOT_PROFILES: dict[str, RobotCfg] = {
     "kuka-sharpa": RobotCfg(
@@ -199,16 +178,12 @@ ROBOT_PROFILES: dict[str, RobotCfg] = {
             "fr3_joint7": -0.7854,
         },
         palm_center_offset=(0.0, 0.0, 0.16),
-        # The centroid of that fingertip's 120 vendor taxels, not the vendor tip point. The tip
-        # sits 12.5 mm past the pad centroid on a finger and 15.5 mm on the thumb, and it is off
-        # the pad face, so every distance measured from it rewards a tip pose over a pad grasp.
-        # T16 centroid (4.874, 0, 30.7745) mm, T30 centroid (0, 35.083167, 3.4695) mm.
         fingertip_offset_by_body={
-            "thumb_rota_link2": (0.0, 0.035083167, 0.0034695),
-            "index_rota_link2": (0.004874, 0.0, 0.0307745),
-            "mid_link2": (0.004874, 0.0, 0.0307745),
-            "ring_link2": (0.004874, 0.0, 0.0307745),
-            "pinky_link2": (0.004874, 0.0, 0.0307745),
+            "thumb_rota_link2": (0.0, 0.0502276499414863, 0.0),
+            "index_rota_link2": (0.0, 0.0, 0.0422482924089424),
+            "mid_link2": (0.0, 0.0, 0.042248),
+            "ring_link2": (0.0, 0.0, 0.0422482924089404),
+            "pinky_link2": (0.0, 0.0, 0.0422482924089405),
         },
         raycast_link_exprs=(
             "/World/envs/env_.*/Robot/fr3_link.*/visuals",
@@ -221,13 +196,3 @@ ROBOT_PROFILES: dict[str, RobotCfg] = {
         ),
     ),
 }
-
-# The fr3-xhand arm (a4) with the identified hand.
-ROBOT_PROFILES["fr3-xhand-a4hs"] = ROBOT_PROFILES["fr3-xhand"].replace(
-    hand_stiffness={j: v[0] for j, v in _HAND_SYSID.items()},
-    hand_damping={j: v[1] for j, v in _HAND_SYSID.items()},
-    hand_friction={j: v[2] for j, v in _HAND_SYSID.items()},
-    hand_dynamic_friction={j: v[3] for j, v in _HAND_SYSID.items()},
-    hand_armature={j: v[4] for j, v in _HAND_SYSID.items()},
-    hand_effort_limit={j: v[5] for j, v in _HAND_SYSID.items()},
-)

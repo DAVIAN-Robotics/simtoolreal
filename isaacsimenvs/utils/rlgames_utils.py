@@ -293,22 +293,10 @@ def register_rlgames_env(
                 return gym.spaces.Box(-self._clip_obs, self._clip_obs, spec.shape, dtype=spec.dtype)
         wrapper_cls = _DAggerRlGamesVecEnvWrapper
 
-    gpu_env_cls = RlGamesGpuEnv
-    if hasattr(env.unwrapped, "get_env_state"):
-        class _StatefulRlGamesGpuEnv(RlGamesGpuEnv):
-            """Carries the env's own state into each checkpoint and back on restore."""
-
-            def get_env_state(self):
-                return self.env.unwrapped.get_env_state()
-
-            def set_env_state(self, env_state):
-                self.env.unwrapped.set_env_state(env_state)
-        gpu_env_cls = _StatefulRlGamesGpuEnv
-
     wrapped = wrapper_cls(env, rl_device, clip_obs, clip_actions)
     vecenv.register(
         "IsaacRlgWrapper",
-        lambda config_name, num_actors, **kw: gpu_env_cls(config_name, num_actors, **kw),
+        lambda config_name, num_actors, **kw: RlGamesGpuEnv(config_name, num_actors, **kw),
     )
     env_configurations.register(
         name,

@@ -10,6 +10,8 @@ from isaaclab.utils.math import convert_quat, quat_apply, quat_from_angle_axis, 
 
 from dextoolbench.oriented_box import CORNER_SIGNS, NUM_CORNERS
 
+from . import tactile_utils
+
 
 # ----------------------------------------------------------------------------
 # Constants
@@ -19,8 +21,9 @@ from dextoolbench.oriented_box import CORNER_SIGNS, NUM_CORNERS
 NUM_FINGERTIPS: int = 5
 NUM_KEYPOINTS: int = NUM_CORNERS
 
-# All eight corners of the object's own box, one definition shared with every
-# other consumer so no two of them can drift apart.
+# All eight corners of the object's own box. Which of them the observation carries is
+# `ObsCfg.keypoint_corner_ids`, because the two pretrainings differ there. The a4h1 baseline sees
+# indices 0, 1, 6, 7, the four this tree used to hardcode. The tactile pretraining sees all eight.
 KEYPOINT_CORNERS: tuple[tuple[int, int, int], ...] = CORNER_SIGNS
 
 OBS_FIELD_SIZES: dict[str, int] = {
@@ -30,14 +33,13 @@ OBS_FIELD_SIZES: dict[str, int] = {
     "object_rot": 4,
     "object_vel": 6,
     "fingertip_pos_rel_palm": 3 * NUM_FINGERTIPS,  # 15
-    "fingertip_pos_rel_goal": 3 * NUM_FINGERTIPS,  # 15
-    "closest_fingertip_max_dist": 1,
-    "keypoints_rel_palm": 3 * NUM_KEYPOINTS,  # 24
-    "keypoints_rel_goal": 3 * NUM_KEYPOINTS,  # 24
+    "keypoints_rel_palm": 3 * NUM_KEYPOINTS,  # 12
+    "keypoints_rel_goal": 3 * NUM_KEYPOINTS,  # 12
     "object_scales": 3,
-    "shape_code": 32,
     "closest_keypoint_max_dist": 1,
     "closest_fingertip_dist": NUM_FINGERTIPS,  # 5
+    "active_taxel_ratio": NUM_FINGERTIPS,  # 5
+    "contact_center": 3 * NUM_FINGERTIPS,  # 15
     "lifted_object": 1,
     "progress": 1,
     "successes": 1,
@@ -48,9 +50,41 @@ OBS_FIELD_SIZES: dict[str, int] = {
 _JOINT_SCALED_FIELDS = ("joint_pos", "joint_vel", "prev_action_targets")
 
 
-def compute_obs_dim(field_list, num_joints) -> int:
-    """Return total tensor dim for an ordered list of obs field names."""
-    return sum(num_joints if f in _JOINT_SCALED_FIELDS else OBS_FIELD_SIZES[f] for f in field_list)
+_KEYPOINT_FIELDS = ("keypoints_rel_palm", "keypoints_rel_goal")
+
+
+def compute_obs_dim(field_list, num_joints, n_keypoints: int = NUM_KEYPOINTS) -> int:
+    """Return total tensor dim for an ordered list of obs field names.
+
+    `n_keypoints` is however many corners the configured set carries, so the two keypoint fields
+    follow the observation rather than the module constant.
+    """
+    def size(f):
+        if f in _JOINT_SCALED_FIELDS:
+            return num_joints
+        if f in _KEYPOINT_FIELDS:
+            return 3 * n_keypoints
+        return OBS_FIELD_SIZES[f]
+
+    return sum(size(f) for f in field_list)
+
+
+def _log_tactile(env, ratio: torch.Tensor) -> None:
+    """Ten batch statistics per step, which EnvStatsAlgoObserver forwards as direct_info scalars.
+
+    contact_ratio is the fraction of envs where that finger touches. active_taxel_ratio is the mean
+    over just those envs, so it reads as how much of the pad engages when the finger does touch.
+    """
+    short = {"thumb": "thumb", "index": "index", "mid": "mid", "ring": "ring", "pinky": "pinky"}
+    out = {}
+    for i, body in enumerate(env._fingertip_body_names):
+        name = next(v for k, v in short.items() if body.startswith(k))
+        touching = ratio[:, i] > 0.0
+        out[f"contact_ratio_{name}"] = touching.float().mean()
+        out[f"active_taxel_ratio_{name}"] = (
+            ratio[touching, i].mean() if bool(touching.any()) else ratio.new_zeros(())
+        )
+    env.extras["tactile"] = out
 
 
 def _stack_obs_dict(obs_dict: dict[str, torch.Tensor], field_list) -> torch.Tensor:
@@ -179,15 +213,11 @@ def compute_intermediate_values(env) -> None:
     env._curr_fingertip_distances = torch.norm(
         ft_pos - obj_pos.unsqueeze(1), dim=-1
     )  # (N, 5)
-    if env.cfg.reset.goal_fingertip_dir:
-        env._fingertip_goal_max_dist = torch.norm(ft_pos - env._goal_ft, dim=-1).max(dim=-1).values
-        env._closest_fingertip_max_dist = torch.where(
-            env._closest_fingertip_max_dist < 0.0,
-            env._fingertip_goal_max_dist,
-            torch.minimum(env._closest_fingertip_max_dist, env._fingertip_goal_max_dist),
-        )
 
-    kp_offsets = env._keypoint_offsets
+    if rew_cfg.fixed_size_keypoint_reward:
+        kp_offsets = env._keypoint_offsets_fixed
+    else:
+        kp_offsets = env._keypoint_offsets
 
     obj_kp = _keypoints_world(obj_pos, obj_rot, kp_offsets)
     goal_kp = _keypoints_world(goal_pos, goal_rot, kp_offsets)
@@ -206,15 +236,9 @@ def compute_intermediate_values(env) -> None:
 
     if hasattr(env, "_keypoint_success_tolerance_m"):
         tol = env._keypoint_success_tolerance_m()
-    elif env.cfg.termination.tolerance_curriculum_per_object:
-        tol = env._object_success_tolerance[env._object_asset_index_per_env] * rew_cfg.keypoint_scale
     else:
         tol = env._current_success_tolerance * rew_cfg.keypoint_scale
     env._near_goal = env._keypoints_max_dist <= tol
-    if env.cfg.reset.goal_fingertip_dir:
-        env._near_goal_fingertips = env._fingertip_goal_max_dist <= tol
-    if term_cfg.success_with_fingertips:
-        env._near_goal = env._near_goal & env._near_goal_fingertips
     env._near_goal_steps = update_near_goal_steps(
         near_goal=env._near_goal,
         near_goal_steps=env._near_goal_steps,
@@ -347,12 +371,12 @@ def build_observations(env) -> dict[str, torch.Tensor]:
         "reward": (env.reward_buf * 0.01).unsqueeze(-1),
     }
 
-    if env.cfg.reset.goal_fingertip_dir:
-        obs_clean["fingertip_pos_rel_goal"] = (ft_pos_w - env_origins.unsqueeze(1)) - env._goal_ft
-        obs_clean["closest_fingertip_max_dist"] = env._closest_fingertip_max_dist.unsqueeze(-1)
-
-    if env.cfg.assets.shape_code_file:
-        obs_clean["shape_code"] = env._shape_code_per_env
+    if hasattr(env, "_tactile_cloud_pos"):
+        obs_clean["active_taxel_ratio"], obs_clean["contact_center"] = tactile_utils.compute_tactile(
+            env, ft_body_pos_w, ft_body_rot_w,
+            env.object.data.root_pos_w, env.object.data.root_quat_w, palm_pos, env_origins,
+        )
+        _log_tactile(env, obs_clean["active_taxel_ratio"])
 
     obs_noisy = dict(obs_clean)
     obs_noisy["object_rot"] = noisy_obj_rot_xyzw

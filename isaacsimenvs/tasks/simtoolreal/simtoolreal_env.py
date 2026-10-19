@@ -20,15 +20,10 @@ from .utils.obs_utils import (
     compute_intermediate_values,
     compute_obs_dim,
 )
-from .utils.reset_utils import allocate_state_buffers, reset_env_state, update_type_adaptive_sampling
+from .utils.reset_utils import allocate_state_buffers, reset_env_state
 from .utils.reward_utils import compute_rewards
 from .utils.scene_utils import apply_physx_material_properties, setup_scene
-from .utils.termination_utils import (
-    compute_terminations,
-    get_curriculum_state,
-    set_curriculum_state,
-    update_tolerance_curriculum,
-)
+from .utils.termination_utils import compute_terminations, update_tolerance_curriculum
 
 
 __all__ = ["SimToolRealEnv", "SimToolRealEnvCfg"]
@@ -45,12 +40,21 @@ class SimToolRealEnv(DirectRLEnv):
         cfg.action_space = n_joints
         # Override obs/state space from configured field lists before
         # DirectRLEnv / rl_games observes the configclass.
-        cfg.observation_space = compute_obs_dim(cfg.obs.obs_list, n_joints)
-        cfg.state_space = compute_obs_dim(cfg.obs.state_list, n_joints)
+        from .utils.obs_utils import KEYPOINT_CORNERS
+
+        ids = cfg.obs.keypoint_corner_ids
+        n_kp = len(KEYPOINT_CORNERS) if ids is None else len(ids)
+        cfg.observation_space = compute_obs_dim(cfg.obs.obs_list, n_joints, n_kp)
+        cfg.state_space = compute_obs_dim(cfg.obs.state_list, n_joints, n_kp)
 
         super().__init__(cfg, render_mode, **kwargs)  # runs _setup_scene
         apply_physx_material_properties(self)
         allocate_state_buffers(self)
+        # The success count that ends each env's episode. One number for every env here.
+        self.max_successes_per_env = torch.full(
+            (self.num_envs,), int(self.cfg.termination.max_consecutive_successes),
+            dtype=torch.long, device=self.device,
+        )
 
     def _setup_scene(self) -> None:
         setup_scene(self)
@@ -74,16 +78,8 @@ class SimToolRealEnv(DirectRLEnv):
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
         update_tolerance_curriculum(self)
-        if self.cfg.reset.type_adaptive_sampling:
-            update_type_adaptive_sampling(self)
         compute_intermediate_values(self)
         return compute_terminations(self)
-
-    def get_env_state(self) -> dict:
-        return get_curriculum_state(self)
-
-    def set_env_state(self, env_state: dict) -> None:
-        set_curriculum_state(self, env_state)
 
     def _get_rewards(self) -> torch.Tensor:
         reward = compute_rewards(self)

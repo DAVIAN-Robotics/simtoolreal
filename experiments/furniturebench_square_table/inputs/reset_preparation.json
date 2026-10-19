@@ -1,0 +1,269 @@
+{
+  "source": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015",
+  "leg4_source": "/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_leg4_20261017/screw_resets.npz",
+  "leg4_sha256": "d6d6b22d167298a81c065b2216d803bbe8f41ecdf988b1a71605ebd65f524187",
+  "layout": 0,
+  "selection": "native_pass, grasp mode, all accepted arm branches; engagement also requires lead-in",
+  "legs": {
+    "leg1": {
+      "rows": 169683,
+      "per_progress": [
+        18882,
+        22114,
+        23165,
+        20896,
+        22397,
+        20687,
+        21924,
+        19618
+      ],
+      "sources": [
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__13_Precision_Sphere__leg1__layout0.npz",
+          "sha256": "2abe6868df280da51f855b068a19d67f44caa89d69e7c58ad02155163ca8a374"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__14_Tripod__leg1__layout0.npz",
+          "sha256": "fa0988893e1d063fd25f55eedea3f09125922cff7c46fecabded9ee5e21feab7"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__20_Writing_Tripod__leg1__layout0.npz",
+          "sha256": "e61ab5797af09357b7f5b78639cfba3838ac35c10749e5755e35010bdbc4d1e7"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__25_Lateral_Tripod__leg1__layout0.npz",
+          "sha256": "541a93bea29d5058fa04d3dd4b67e348926089cb46875368a2d8c00db193ff20"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__27_Quadpod__leg1__layout0.npz",
+          "sha256": "3541db33c258eecc87bbef7c51f0a76a1cb4b37d56a169897b1805c3eb915673"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__29_Stick__leg1__layout0.npz",
+          "sha256": "416dafc0e112a1b1dd54143e1a241f3347f55dd041969126099f9ac557d75369"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__2_Small_Diameter__leg1__layout0.npz",
+          "sha256": "167498136b5a5f75e099e80c8383774895ee2a192457096cb81a1f033503c4df"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__3_Medium_Wrap__leg1__layout0.npz",
+          "sha256": "5045f7a82298e82c5b80a374e720832957a0ac0ac9c40b4347b540227f787239"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__6_Prismatic_4_Finger__leg1__layout0.npz",
+          "sha256": "f77708440a57cdc5f4ebe21fa4ebd022c4a965054d2f244eaff7c091132f74b1"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__7_Prismatic_3_Finger__leg1__layout0.npz",
+          "sha256": "1f33afb1a52625b3b76ed1264b6e3270297df8eac2f421a266322d7baf77953c"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__8_Prismatic_2_Finger__leg1__layout0.npz",
+          "sha256": "750923d15a82e7d8171bbf7c579fca685a93c235c2f0608a8c1b112172290d20"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__9_Palmar_Pinch__leg1__layout0.npz",
+          "sha256": "4d26ddd52f1fc2c9db1206ac256afc2003e5b839e537cd208131bac584408b23"
+        }
+      ],
+      "unchanged_existing_pool": false
+    },
+    "leg2": {
+      "rows": 122620,
+      "per_progress": [
+        13588,
+        15876,
+        16626,
+        15461,
+        15809,
+        15095,
+        15617,
+        14548
+      ],
+      "sources": [
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__13_Precision_Sphere__leg2__layout0.npz",
+          "sha256": "aa7f2f50e772462203905ef8d6220e4e6a85d39fa7dda8063a2a877fe5314c51"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__14_Tripod__leg2__layout0.npz",
+          "sha256": "d548ff91ab7d61560fc87d64fa608b241e7da26be35027b61513bb8bdaeea85c"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__20_Writing_Tripod__leg2__layout0.npz",
+          "sha256": "b28094a599ebcbce3e73f39ea7ddbb4a12fad922b185bd4ede1bc9e03bea4af8"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__25_Lateral_Tripod__leg2__layout0.npz",
+          "sha256": "5bfd4d9e3362148669d9bf9af5661e302d70d8bd9ba65c2320461ee246f35acb"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__27_Quadpod__leg2__layout0.npz",
+          "sha256": "1a5ae02047d2e18be97e67fea44339f3dfac46068098c3477f870616232cece6"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__29_Stick__leg2__layout0.npz",
+          "sha256": "a1a8ed40085a07c76f44e416a4777fc64ab92696680a64ac7232bb2194dafcd4"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__2_Small_Diameter__leg2__layout0.npz",
+          "sha256": "86388319115faaf26ad5fb6f404a29cabd0b7adf9ebef1fccbec328019aea327"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__3_Medium_Wrap__leg2__layout0.npz",
+          "sha256": "45a617d651a6a2aa07fe7d108c340cbb6f32a84f1987015efa0077b1fd9a76a9"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__6_Prismatic_4_Finger__leg2__layout0.npz",
+          "sha256": "1d4ade4d8dbf4cd6762aa5de51c670cda5212ed5199be492569447dc6c57e660"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__7_Prismatic_3_Finger__leg2__layout0.npz",
+          "sha256": "c612c0d168129800c95513b31043f1ae241ec7eda674988af1f5e2e9f3561829"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__8_Prismatic_2_Finger__leg2__layout0.npz",
+          "sha256": "9d119870b7d0806fedb74f394f87ffcdaeb4428508710aedcc559b63d55f5f1a"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__9_Palmar_Pinch__leg2__layout0.npz",
+          "sha256": "d4995a6d4eddbb94e3001c5ba903f936d2cef9ef2c7663034c7e5fe04e86d923"
+        }
+      ],
+      "unchanged_existing_pool": false
+    },
+    "leg3": {
+      "rows": 145486,
+      "per_progress": [
+        15102,
+        19419,
+        19363,
+        18845,
+        18767,
+        18192,
+        18195,
+        17603
+      ],
+      "sources": [
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__13_Precision_Sphere__leg3__layout0.npz",
+          "sha256": "a48d4df7451e21cb908624b2ab8970f86cb2f13af3760564a0e82b8860d168ae"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__14_Tripod__leg3__layout0.npz",
+          "sha256": "89eac203dac7fe271ebf8a69844664273ffb4e2845d84eaa39563f68891523f2"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__20_Writing_Tripod__leg3__layout0.npz",
+          "sha256": "c2eaaa47122053f47c1ff814b180e66cf7cd78e26649a990d936044074d9e412"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__25_Lateral_Tripod__leg3__layout0.npz",
+          "sha256": "d0688ea01050695567a2d4c9820d7922d425b6bbe1566a377baa096fba8cb430"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__27_Quadpod__leg3__layout0.npz",
+          "sha256": "4b60784487c8dc6e490ce6b838d7b587b81f21db756941df08671f11c4b2b90f"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__29_Stick__leg3__layout0.npz",
+          "sha256": "be0fbc16d8c536721ffc519737ceb49d4ee2dd1c54cca63a9108bb66acfcbac9"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__2_Small_Diameter__leg3__layout0.npz",
+          "sha256": "6972206fa972d46f3cf441b1588ddbe08ac32bb15d855e8c9cd6613e5275d328"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__3_Medium_Wrap__leg3__layout0.npz",
+          "sha256": "e7830217d27ac5b87a4de654b1d9dff5843a7176735c7c1a314cf623dba6da2b"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__6_Prismatic_4_Finger__leg3__layout0.npz",
+          "sha256": "6afc66212c9c520d4c50a0b28351d0ff6d3f2b7e53ff6d28b4f9bbc197a6fb49"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__7_Prismatic_3_Finger__leg3__layout0.npz",
+          "sha256": "27fbc7b49156371fb9ddf52132b0ec4be82f76db388e837e796bdf360c2a9391"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__8_Prismatic_2_Finger__leg3__layout0.npz",
+          "sha256": "5e24dafd33ae15aacd262156d5c5996d66b2c26146ec227bb3a32361cc14d6a5"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__9_Palmar_Pinch__leg3__layout0.npz",
+          "sha256": "da5b948b5e1ed6801501023b42902d49a97611a10ea7cd6a41ac93c7c7f9ee5a"
+        }
+      ],
+      "unchanged_existing_pool": false
+    },
+    "leg4": {
+      "rows": 198234,
+      "per_progress": [
+        20752,
+        25799,
+        27033,
+        25333,
+        26016,
+        24305,
+        25478,
+        23518
+      ],
+      "sources": [
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__13_Precision_Sphere__leg4__layout0.npz",
+          "sha256": "acae98b4ade36cc3a8c6fac2dcfb5bc48a5ac92dcade2cca81db64d37ef22389"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__14_Tripod__leg4__layout0.npz",
+          "sha256": "0f4b2d8f69f73289a2f159c8aee653bfa96451f19bc7d57e132de21c072c1e44"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__20_Writing_Tripod__leg4__layout0.npz",
+          "sha256": "5ca61dc3d3565bfbbaebf59c3fae0b3ed2ca32f5927080a637a975d6358bb2d1"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__25_Lateral_Tripod__leg4__layout0.npz",
+          "sha256": "f9038ec75032b9573cc01afbf7f1b9130b8d2af0ec3ff826f8ae2f6abcc1a5cf"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__27_Quadpod__leg4__layout0.npz",
+          "sha256": "4418a18ac557f88d790193f02c0642f4112661ceb177b33e530780a073fea8df"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__29_Stick__leg4__layout0.npz",
+          "sha256": "5236c08101be1a6386c03a6b555ddcff10a725516a51d2e5883b126c52ba5bb5"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__2_Small_Diameter__leg4__layout0.npz",
+          "sha256": "e72a43b5f2a12c94c2444f7d018f832b70c98fbd3ea30881460e352f00825b6b"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__3_Medium_Wrap__leg4__layout0.npz",
+          "sha256": "ec4d3256266761c65a23bb6daf909d401097e98bc94d5ffbaa33bca36a9e809e"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__6_Prismatic_4_Finger__leg4__layout0.npz",
+          "sha256": "154651957fcb3bf76e4926c2ed1717051b7a80dd3a768b9ed7a6289d1555f84c"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__7_Prismatic_3_Finger__leg4__layout0.npz",
+          "sha256": "d0387b6d4801ccd3609b16194e1157137eba61501540f114c948849a34b03531"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__8_Prismatic_2_Finger__leg4__layout0.npz",
+          "sha256": "69461c71f8f6e73740d96162e31ff9e98f5197125e277f0c19a8448f7710f559"
+        },
+        {
+          "path": "/home/nas_main/sibeenkim/draftrec/_dexagent_stage1_003_fresh3_20261015/event-pools/table_assembly/square_table_leg__9_Palmar_Pinch__leg4__layout0.npz",
+          "sha256": "8e59c18f81b96049a052fe6b9c8283a9ea89178ef32f35ea2e51660839ce7600"
+        }
+      ],
+      "unchanged_existing_pool": true
+    }
+  },
+  "total_rows": 636023,
+  "leg4_arrays_identical": true,
+  "combined_sha256": "34ae6703409f721c8de8e999b44689dc80c2384060e4296426bcf7f6e52a9dc0",
+  "wall_seconds": 6.2770020961761475
+}

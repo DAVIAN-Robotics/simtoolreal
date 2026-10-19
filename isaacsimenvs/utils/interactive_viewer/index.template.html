@@ -479,8 +479,10 @@
 
           if (meshFormat === "obj") {
             const objLoader = new OBJLoader(loadingManager);
-            const meshUrl = new URL(path, window.location.href);
-            const baseUrl = new URL("./", meshUrl).toString();
+            // A data: URI has no directory, so there is nothing to resolve siblings against.
+            const isData = path.startsWith("data:");
+            const meshUrl = isData ? null : new URL(path, window.location.href);
+            const baseUrl = isData ? "" : new URL("./", meshUrl).toString();
 
             const loadObj = (materials = null) => {
               if (materials && !robotConfig.color_override) {
@@ -508,7 +510,7 @@
             // for every such mesh. We sniff the OBJ text first (the second
             // OBJLoader fetch reuses the HTTP cache) and skip MTL entirely
             // when no mtllib is present.
-            fetch(meshUrl.toString())
+            fetch(isData ? path : meshUrl.toString())
               .then((r) => (r.ok ? r.text() : ""))
               .then((objText) => {
                 const m = objText.match(/^mtllib\s+(\S+)/m);
@@ -516,7 +518,7 @@
                   loadObj();
                   return;
                 }
-                const mtlUrl = new URL(m[1], meshUrl).toString();
+                const mtlUrl = isData ? m[1] : new URL(m[1], meshUrl).toString();
                 const mtlLoader = new MTLLoader(loadingManager);
                 mtlLoader.setResourcePath(baseUrl);
                 mtlLoader.load(

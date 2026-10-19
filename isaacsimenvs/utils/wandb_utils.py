@@ -52,7 +52,9 @@ class WandbAlgoObserver(AlgoObserver):
         chosen = getattr(self.cfg, "wandb_name", "") or experiment_name
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         wandb_unique_id = f"{chosen}_{timestamp}"
-        display_name = chosen
+        display_name = f"{chosen}_{timestamp}"
+        if getattr(self.cfg, "wandb_exact_display_name", False):
+            display_name = chosen
         print(f"[Wandb] unique id: {wandb_unique_id}")
 
         cfg = self.cfg
@@ -93,8 +95,15 @@ class WandbAlgoObserver(AlgoObserver):
 
         # Capture a git diff so the run is reproducible from HEAD.
         diff_path = os.path.join(wandb.run.dir, "diff.patch")
-        with open(diff_path, "w") as f:
-            os.system(f"cd {repo_root} && git diff > {f.name}")
+        prepared_diff = getattr(cfg, "wandb_prepared_diff", "")
+        if prepared_diff:
+            # KAIT workers lack git. This diff is produced before submission
+            # against the supplied source snapshot, including new adapters.
+            import shutil
+            shutil.copyfile(prepared_diff, diff_path)
+        else:
+            with open(diff_path, "w") as f:
+                os.system(f"cd {repo_root} && git diff > {f.name}")
         diff_artifact = wandb.Artifact("diff", type="file", description="Git diff")
         diff_artifact.add_file(diff_path)
         wandb.run.log_artifact(diff_artifact)

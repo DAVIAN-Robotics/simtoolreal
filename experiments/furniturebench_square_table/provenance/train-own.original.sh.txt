@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#SBATCH --partition=compute
+#SBATCH --account=sub
+#SBATCH --qos=sub-own
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=200G
+#SBATCH --time=7-00:00:00
+#SBATCH --job-name=furniturebench-square_table-contact_termination_2s
+#SBATCH --output=/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_contact_termination_2s_20261017/logs/slurm-%j.log
+set -euo pipefail
+ROOT=/home/nas_main/sibeenkim/draftrec
+RUN=/home/nas_main/sibeenkim/draftrec/_furniturebench_square_table_contact_termination_2s_20261017
+TREE=$RUN/code
+PY=$ROOT/venv_isaacsim/bin/python
+cd "$RUN"
+export PYTHONPATH=$TREE/adapters:$TREE/rl_games:$TREE
+export LD_LIBRARY_PATH=$ROOT/syslibs/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+export OMNI_KIT_ACCEPT_EULA=YES
+export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONUNBUFFERED=1
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export TMPDIR=/tmp/sibeenkim-contact-loss-${SLURM_JOB_ID}
+mkdir -p "$TMPDIR" "$RUN/wandb"
+export WANDB_DIR=$RUN
+SSL_CERT_FILE=$("$PY" -c 'import certifi; print(certifi.where())')
+export SSL_CERT_FILE REQUESTS_CA_BUNDLE=$SSL_CERT_FILE
+# Slurm assigns the GPU; never override CUDA_VISIBLE_DEVICES.
+nvidia-smi
+"$PY" "$TREE/adapters/check_contact_loss.py"
+"$PY" "$TREE/adapters/check_kernels.py"
+if [ -f "$RUN/rl_smoke.json" ]; then mv "$RUN/rl_smoke.json" "$RUN/logs/rl_smoke-before-${SLURM_JOB_ID}.json"; fi
+"$PY" -u "$TREE/adapters/train_screw.py" --work "$RUN" --num-envs 96 --smoke --headless
+"$PY" -c 'import json, pathlib; p=pathlib.Path("rl_smoke.json"); assert p.exists(), "Smoke check produced no passing report"; s=json.loads(p.read_text()); assert s["done_path_119_vs_120_steps"] and s["contact_loss_policy_steps"] == 120 and s["actual_hand_object_contact_detected"] and s["immediate_reach_termination"], s'
+exec "$PY" -u "$TREE/adapters/train_screw.py" --work "$RUN" --num-envs 24576 --epochs 1000000 --headless

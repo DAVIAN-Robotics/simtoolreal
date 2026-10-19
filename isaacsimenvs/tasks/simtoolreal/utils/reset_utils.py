@@ -6,90 +6,13 @@ import json
 from pathlib import Path
 from xml.etree import ElementTree
 
-import math
-
 import torch
 
-from isaaclab.utils.math import quat_apply, random_orientation
+from isaaclab.utils.math import random_orientation
 
 from .action_utils import sample_log_uniform
 from .goal_sampling import sample_absolute_goal_pose, sample_delta_goal_pose
 from .obs_utils import KEYPOINT_CORNERS, NUM_FINGERTIPS
-
-# Dexonomy's squeeze pose is the grasp plus the contact torques over this gain, the gainprm of every
-# XHand actuator in its assets/hand/xhand/right.xml.
-DEXONOMY_HAND_KP = 3.0
-
-
-def _load_reset_states(env) -> None:
-    """Every pool object's grasped states, stacked (objects, states, ...) on the device. The squeeze
-    target is rescaled from Dexonomy's gain to this hand's stiffness and clamped to the joint limits."""
-    import numpy as np
-
-    n = env.cfg.reset.reset_state_count or None
-    columns = {k: [] for k in ("obj_pos", "obj_quat_wxyz", "arm_q", "hand_q", "hand_target")}
-    adaptive = env.cfg.reset.type_adaptive_sampling
-    if adaptive:
-        grasp_types = np.load(env.cfg.reset.grasp_type_file)
-        row_types = []
-    for urdf in env._object_urdf_paths:
-        with np.load(Path(env.cfg.reset.reset_state_dir) / f"{Path(urdf).stem}.npz") as f:
-            for key, rows in columns.items():
-                rows.append(f[key][:n])
-            if adaptive:
-                row_types.append(grasp_types[f"gtype__{Path(urdf).stem}"][f["grasp"][:n]])
-            arm_joints, hand_joints = list(f["arm_joints"]), list(f["hand_joints"])
-    names = list(env.robot.data.joint_names)
-    env._rs_arm_ids = torch.tensor([names.index(j) for j in arm_joints], device=env.device)
-    env._rs_hand_ids = torch.tensor([names.index(j) for j in hand_joints], device=env.device)
-
-    def stack(key):
-        return torch.tensor(np.stack(columns[key]), dtype=torch.float32, device=env.device)
-
-    env._rs_obj_pos = stack("obj_pos")
-    env._rs_obj_quat = stack("obj_quat_wxyz")
-    env._rs_arm_q = stack("arm_q")
-    env._rs_hand_q = stack("hand_q")
-    kp = torch.tensor([env.cfg.robot.hand_stiffness[j] for j in hand_joints], device=env.device)
-    lo, hi = env.robot.data.joint_pos_limits[0, env._rs_hand_ids].unbind(-1)
-    squeeze = env._rs_hand_q + (stack("hand_target") - env._rs_hand_q) * DEXONOMY_HAND_KP / kp
-    env._rs_hand_target = torch.maximum(torch.minimum(squeeze, hi), lo)
-
-    if env.cfg.reset.goal_fingertip_dir:
-        names = list(env._fingertip_body_names)
-        ft = []
-        for urdf in env._object_urdf_paths:
-            with np.load(Path(env.cfg.reset.goal_fingertip_dir) / f"{Path(urdf).stem}.npz") as f:
-                bodies = [str(b) for b in f["bodies"]]
-                ft.append(f["ft_obj"][:n][:, [bodies.index(b) for b in names]])
-        env._rs_ft_obj = torch.tensor(np.stack(ft), dtype=torch.float32, device=env.device)
-        assert env._rs_ft_obj.shape[:2] == env._rs_obj_pos.shape[:2], (env._rs_ft_obj.shape, env._rs_obj_pos.shape)
-        env._goal_row = torch.zeros(env.num_envs, dtype=torch.long, device=env.device)
-        env._goal_ft = torch.zeros(env.num_envs, NUM_FINGERTIPS, 3, device=env.device)
-        env._closest_fingertip_max_dist = torch.full((env.num_envs,), -1.0, device=env.device)
-
-    if env.cfg.reset.goal_wrist_dir:
-        palm_pos, palm_quat = [], []
-        for urdf in env._object_urdf_paths:
-            with np.load(Path(env.cfg.reset.goal_wrist_dir) / f"{Path(urdf).stem}.npz") as f:
-                palm_pos.append(f["palm_pos"][:n])
-                palm_quat.append(f["palm_quat_wxyz"][:n])
-        env._rs_palm_pos = torch.tensor(np.stack(palm_pos), dtype=torch.float32, device=env.device)
-        env._rs_palm_quat = torch.tensor(np.stack(palm_quat), dtype=torch.float32, device=env.device)
-        assert env._rs_palm_pos.shape[:2] == env._rs_obj_pos.shape[:2], (env._rs_palm_pos.shape, env._rs_obj_pos.shape)
-
-    if adaptive:
-        env._type_names = [str(t) for t in grasp_types["types"]]
-        n_types = len(env._type_names)
-        env._rs_row_type = torch.tensor(np.stack(row_types), dtype=torch.long, device=env.device)
-        env._rs_row_weight = torch.ones(env._rs_row_type.shape, device=env.device)
-        env._rs_type_env = torch.full((env.num_envs,), -1, dtype=torch.long, device=env.device)
-        env._type_weight = torch.ones(n_types, device=env.device)
-        env._type_succ_sum = torch.zeros(n_types, device=env.device)
-        env._type_ep_count = torch.zeros(n_types, device=env.device)
-        env._type_last_update = 0
-        env._type_log = {}
-
 
 def allocate_state_buffers(env) -> None:
     """Populate every per-env buffer + index cache used by the hooks.
@@ -138,14 +61,22 @@ def allocate_state_buffers(env) -> None:
     env._prev_targets = torch.zeros(env.num_envs, action_space, device=env.device)
 
     # --- Keypoint offsets in object local frame ---
+    ids = env.cfg.obs.keypoint_corner_ids
+    selected = KEYPOINT_CORNERS if ids is None else tuple(KEYPOINT_CORNERS[i] for i in ids)
     corners = torch.tensor(
-        KEYPOINT_CORNERS, device=env.device, dtype=torch.float32
-    )  # (8, 3)
+        selected, device=env.device, dtype=torch.float32
+    )  # (len(selected), 3)
 
     env._keypoint_offsets = (
         corners.unsqueeze(0)
         * (env._object_scale_per_env * rew.object_base_size * rew.keypoint_scale * 0.5).unsqueeze(1)
-    )  # (N, 8, 3)
+    )  # (N, 4, 3)
+
+    # Fixed-size reward keypoints follow legacy: fixed_size * keypoint_scale / 2.
+    env._keypoint_offsets_fixed = (
+        corners
+        * (0.5 * rew.keypoint_scale * torch.tensor(rew.fixed_size, device=env.device)).unsqueeze(0)
+    ).unsqueeze(0).expand(env.num_envs, -1, -1).contiguous()
 
     # --- Per-env DR priors (re-sampled on reset; seeded once here) ---
     lo, hi = dr.object_scale_noise_multiplier_range
@@ -182,12 +113,6 @@ def allocate_state_buffers(env) -> None:
     )
     env._frame_counter: int = 0
     env._last_curriculum_update: int = 0
-    if env.cfg.termination.tolerance_curriculum_per_object:
-        n_obj = len(env._object_urdf_paths)
-        env._object_success_tolerance = torch.full(
-            (n_obj,), env.cfg.termination.success_tolerance, device=env.device
-        )
-        env._object_last_curriculum_update = torch.zeros(n_obj, dtype=torch.long, device=env.device)
 
     # --- Object lifted-reward reference z (updated on each _reset_object_pose) ---
     init_z = env.cfg.reset.table_reset_z + env.cfg.reset.table_object_z_offset
@@ -203,9 +128,6 @@ def allocate_state_buffers(env) -> None:
         .get("size")
         .split()[2]
     ) * 0.5
-
-    if env.cfg.reset.reset_state_dir:
-        _load_reset_states(env)
 
     # --- Per-env table surface z (randomized in _reset_table_pose) ---
     env._table_z_per_env = torch.full(
@@ -490,10 +412,6 @@ def _reset_goal_pose(env, env_ids: torch.Tensor, mode: str) -> None:
         env.goal_viz.write_root_pose_to_sim(pose, env_ids=env_ids)
         return
 
-    if mode == "reset_state":
-        _sample_goal_state(env, env_ids)
-        return
-
     if mode == "delta":
         prev_pos_local = env.goal_viz.data.root_pos_w[env_ids] - env_origins
         prev_quat = env.goal_viz.data.root_quat_w[env_ids]
@@ -517,43 +435,13 @@ def _reset_goal_pose(env, env_ids: torch.Tensor, mode: str) -> None:
     else:
         raise ValueError(f"unknown goal sampling mode: {mode}")
 
-    new_pos_local = _clear_table(env, env_ids, new_pos_local, new_quat)
-
     pose = torch.cat([new_pos_local + env_origins, new_quat], dim=-1)
     env.goal_viz.write_root_pose_to_sim(pose, env_ids=env_ids)
-
-
-def _clear_table(env, env_ids, pos_local, quat_wxyz):
-    """Raise a sampled goal until the object clears the table at that orientation.
-
-    The sampler draws position uniformly and orientation uniformly over SO(3) with no geometry in
-    the loop, so 2.4 percent of goals put part of the object below the table surface, measured over
-    the cap16 pool. Those goals are unreachable and only add noise.
-
-    ``_table_z_per_env`` holds the table's centre, not its surface. The URDF box is 0.3 m tall, so
-    the surface is 0.15 m above it. The cfg comment claiming table_reset_z is the surface is wrong.
-
-    The lowest point of a box below its centre is the support function along -z, sum over axes of
-    |R[2,i]| times the half extent. object_scale_per_env is extent_m / object_base_size, so the
-    metric half extent is that times object_base_size / 2.
-    """
-    from isaaclab.utils.math import matrix_from_quat
-
-    half = env._object_scale_per_env[env_ids] * (env.cfg.reward.object_base_size * 0.5)
-    r_z = matrix_from_quat(quat_wxyz)[:, 2, :]
-    support = (r_z.abs() * half).sum(dim=-1)
-    table_top = env._table_z_per_env[env_ids] + env._table_half_height_m
-
-    out = pos_local.clone()
-    out[:, 2] = torch.maximum(out[:, 2], table_top + support)
-    return out
 
 
 def _clear_goal_trackers(env, env_ids: torch.Tensor) -> None:
     env._closest_keypoint_max_dist[env_ids] = -1.0
     env._closest_fingertip_dist[env_ids] = -1.0
-    if env.cfg.reset.goal_fingertip_dir:
-        env._closest_fingertip_max_dist[env_ids] = -1.0
     env._near_goal_steps[env_ids] = 0
 
 
@@ -563,126 +451,19 @@ def reset_goal_trackers(env, env_ids: torch.Tensor) -> None:
     _reset_goal_pose(env, env_ids, mode=env.cfg.reset.goal_sampling_type)
 
 
-def _set_goal_state(env, env_ids: torch.Tensor, rows: torch.Tensor) -> None:
-    """Make reset state `rows` of each env's object its goal: the pose to GoalViz, its fingertip points placed there."""
-    asset = env._object_asset_index_per_env[env_ids]
-    pos_local = env._rs_obj_pos[asset, rows]
-    quat = env._rs_obj_quat[asset, rows]
-    env.goal_viz.write_root_pose_to_sim(
-        torch.cat([pos_local + env.scene.env_origins[env_ids], quat], dim=-1), env_ids=env_ids
-    )
-    env._goal_row[env_ids] = rows
-    env._goal_ft[env_ids] = quat_apply(
-        quat.unsqueeze(1).expand(-1, NUM_FINGERTIPS, -1), env._rs_ft_obj[asset, rows]
-    ) + pos_local.unsqueeze(1)
-
-
-def _sample_goal_state(env, env_ids: torch.Tensor) -> None:
-    """Next goal: uniform among the object's reset states inside the delta window around the current goal state,
-    measured on the object pose, or on the palm pose when goal_wrist_dir is set."""
-    cfg = env.cfg.reset
-    asset = env._object_asset_index_per_env[env_ids]
-    cur = env._goal_row[env_ids]
-    if cfg.goal_wrist_dir:
-        win_pos, win_quat = env._rs_palm_pos, env._rs_palm_quat
-    else:
-        win_pos, win_quat = env._rs_obj_pos, env._rs_obj_quat
-    p, q = win_pos[asset], win_quat[asset]  # (n, states, 3), (n, states, 4)
-    in_pos = ((p - win_pos[asset, cur].unsqueeze(1)).abs() <= cfg.delta_goal_distance).all(dim=-1)
-    cos_half = math.cos(math.radians(cfg.delta_rotation_degrees) / 2.0)
-    in_rot = (q * win_quat[asset, cur].unsqueeze(1)).sum(dim=-1).abs() >= cos_half
-    rows = torch.multinomial((in_pos & in_rot).float(), 1).squeeze(-1)
-    _set_goal_state(env, env_ids, rows)
-
-
-def _reset_grasped(env, env_ids: torch.Tensor) -> None:
-    """Start from a random one of the object's grasped states, with the start pose as the first goal."""
-    n = env_ids.numel()
-    asset = env._object_asset_index_per_env[env_ids]
-    if env.cfg.reset.type_adaptive_sampling:
-        k = torch.multinomial(env._rs_row_weight[asset], 1).squeeze(-1)
-        env._rs_type_env[env_ids] = env._rs_row_type[asset, k]
-    else:
-        k = torch.randint(0, env._rs_obj_pos.shape[1], (n,), device=env.device)
-
-    joint_pos = env.robot.data.default_joint_pos[env_ids].clone()
-    joint_pos[:, env._rs_arm_ids] = env._rs_arm_q[asset, k]
-    joint_pos[:, env._rs_hand_ids] = env._rs_hand_q[asset, k]
-    env.robot.write_joint_state_to_sim(joint_pos, torch.zeros_like(joint_pos), env_ids=env_ids)
-    targets = joint_pos.clone()
-    targets[:, env._rs_hand_ids] = env._rs_hand_target[asset, k]
-    env._prev_targets[env_ids] = targets
-    env._cur_targets[env_ids] = targets
-
-    pos_local = env._rs_obj_pos[asset, k]
-    pose = torch.cat([pos_local + env.scene.env_origins[env_ids], env._rs_obj_quat[asset, k]], dim=-1)
-    env.object.write_root_pose_to_sim(pose, env_ids=env_ids)
-    env.object.write_root_velocity_to_sim(torch.zeros(n, 6, device=env.device), env_ids=env_ids)
-    if env.cfg.reset.goal_fingertip_dir:
-        _set_goal_state(env, env_ids, k)
-    else:
-        env.goal_viz.write_root_pose_to_sim(pose, env_ids=env_ids)
-    if env.cfg.reset.first_goal_random:
-        _reset_goal_pose(env, env_ids, mode="delta")
-    env._object_init_z[env_ids] = pos_local[:, 2]
-
-
-def _record_type_outcomes(env, env_ids: torch.Tensor) -> None:
-    """Add each finished episode's successes to the grasp type it started from, before the new draw."""
-    t = env._rs_type_env[env_ids]
-    played = t >= 0  # the first reset ends no episode
-    n_types = env._type_weight.numel()
-    env._type_succ_sum += torch.bincount(
-        t[played], weights=env._successes[env_ids][played].float(), minlength=n_types
-    )
-    env._type_ep_count += torch.bincount(t[played], minlength=n_types).float()
-
-
-def update_type_adaptive_sampling(env) -> None:
-    """Every interval, weight each grasp type by clip(mean / type mean) of its successes per episode."""
-    cfg = env.cfg.reset
-    if env._frame_counter - env._type_last_update < cfg.type_adaptive_interval:
-        return
-    count = env._type_ep_count
-    mean_t = env._type_succ_sum / count
-    mean_all = env._type_succ_sum.sum() / count.sum()
-    # A type with no episode this interval keeps its weight. A type at zero successes takes the max.
-    weight = torch.where(
-        count > 0, (mean_all / mean_t).clamp(cfg.type_adaptive_min, cfg.type_adaptive_max), env._type_weight
-    )
-    env._type_weight = weight
-    env._rs_row_weight = weight[env._rs_row_type]
-    share = count / count.sum()
-    env._type_log = {}
-    for name, s, w, p in zip(env._type_names, mean_t.tolist(), weight.tolist(), share.tolist()):
-        if p > 0:
-            env._type_log[f"type_successes/{name}"] = s
-        env._type_log[f"type_weight/{name}"] = w
-        env._type_log[f"type_share/{name}"] = p
-    env._type_succ_sum.zero_()
-    env._type_ep_count.zero_()
-    env._type_last_update = env._frame_counter
-
-
 def reset_env_state(env, env_ids: torch.Tensor) -> None:
     """Full per-env reset after ``super()._reset_idx``."""
     n = env_ids.numel()
 
-    if env.cfg.reset.reset_state_dir:
-        _reset_table_pose(env, env_ids)
-        if env.cfg.reset.type_adaptive_sampling:
-            _record_type_outcomes(env, env_ids)
-        _reset_grasped(env, env_ids)
-    else:
-        _randomize_robot_dof_state(env, env_ids)
-        _reset_table_pose(env, env_ids)
-        _reset_object_pose(env, env_ids)
-        _reset_goal_pose(env, env_ids, mode="absolute")  # full reset → always absolute
+    _randomize_robot_dof_state(env, env_ids)
+    _reset_table_pose(env, env_ids)
+    _reset_object_pose(env, env_ids)
+    _reset_goal_pose(env, env_ids, mode="absolute")  # full reset → always absolute
 
     env._prev_episode_successes[env_ids] = env._successes[env_ids]
 
     _clear_goal_trackers(env, env_ids)
-    env._lifted_object[env_ids] = bool(env.cfg.reset.reset_state_dir)
+    env._lifted_object[env_ids] = False
     env._successes[env_ids] = 0
 
     env._action_queue[env_ids] = 0.0

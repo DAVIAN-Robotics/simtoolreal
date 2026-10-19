@@ -3,16 +3,11 @@
 Clean port of the minimal subset of isaacgymenvs/tasks/simtoolreal/generate_objects.py
 needed for the base goal-pose-reaching env: `generate_handle_urdf` (single cuboid
 or cylinder) and `generate_handle_head_urdf` (handle + head composite with
-variable densities + parallel-axis-adjusted inertia).
-
-Every URDF is emitted in the object's own bounding-box frame. The primitives are
-described once, as parts, and that one description builds both the mesh the box
-is measured from and the geometry the URDF carries, so the two cannot disagree.
+variable densities + parallel-axis-adjusted inertia). No trimesh / vhacd code.
 
 The top-level entry `generate_handle_head_urdfs(types, num_per_type, out_dir)`
 mirrors legacy `env.py:_handle_head_primitives`: per-type sampling with
-`np.random.seed(42)`, pool shuffle, and box extents normalized by
-`object_base_size`.
+`np.random.seed(42)`, pool shuffle, and scales normalized by `object_base_size`.
 """
 
 from __future__ import annotations
@@ -23,9 +18,6 @@ from pathlib import Path
 from typing import Optional, Union
 
 import numpy as np
-import trimesh
-
-from dextoolbench.oriented_box import oriented_box, reexpress_origin
 
 from .object_size_distributions import OBJECT_SIZE_DISTRIBUTIONS, Scale2, Scale3
 
@@ -38,13 +30,9 @@ _NUM_OBJECTS_PER_TYPE_DEFAULT = 100
 # Reward-space normalization constant (same value the env uses when rescaling).
 _OBJECT_BASE_SIZE = 0.04
 
-# The oriented box of a tessellated cylinder depends on where the facets fall, so
-# the section count is pinned rather than left to the trimesh default.
-_CYLINDER_SECTIONS = 32
-
 
 # ----------------------------------------------------------------------------
-# Parts: one description, used for both the measured mesh and the emitted URDF
+# Primitive URDF emitters
 # ----------------------------------------------------------------------------
 
 
@@ -55,64 +43,90 @@ _CYLINDER_SECTIONS = 32
 # set_transforms overflows the partial view.
 _OBJECT_ROOT_LINK = "object_root"
 
-_CYL_ALONG_X = (0.0, -math.pi / 2, 0.0)
-_CYL_ALONG_Y = (-math.pi / 2, 0.0, 0.0)
+
+def _cuboid_urdf_constant_density(path: Path, scale: Scale3, density: float) -> Path:
+    lx, ly, lz = scale
+    # Standard URDF requires <mass> + <inertia>. Legacy isaacgym's URDF
+    # importer accepts <density> as a Gazebo extension and back-computes mass
+    # from density × volume; Isaac Sim's importer follows strict URDF spec
+    # and falls back to 1 kg when <mass> is missing — that breaks erasers and
+    # any other handle-only types. Emit explicit <mass> + <inertia> so both
+    # backends see byte-identical physics.
+    m, ixx, iyy, izz = _compute_mass_and_inertia(scale, density)
+    urdf = f"""<?xml version="1.0"?>
+<robot name="cuboid">
+  <link name="{_OBJECT_ROOT_LINK}">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="{lx} {ly} {lz}"/></geometry>
+      <material name="brown"><color rgba="0.55 0.27 0.07 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="{lx} {ly} {lz}"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="{m}"/>
+      <inertia ixx="{ixx}" iyy="{iyy}" izz="{izz}" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+</robot>
+"""
+    path.write_text(urdf)
+    return path
 
 
-def _box_part(extents, xyz, rpy):
-    lx, ly, lz = extents
-    return {
-        "geometry": f'<geometry><box size="{lx} {ly} {lz}"/></geometry>',
-        "mesh": trimesh.creation.box(extents=extents),
-        "xyz": xyz,
-        "rpy": rpy,
-    }
-
-
-def _cylinder_part(length, radius, xyz, rpy):
-    return {
-        "geometry": f'<geometry><cylinder length="{length}" radius="{radius}"/></geometry>',
-        "mesh": trimesh.creation.cylinder(
-            height=length, radius=radius, sections=_CYLINDER_SECTIONS
-        ),
-        "xyz": xyz,
-        "rpy": rpy,
-    }
-
-
-def _handle_part(handle_scale: Scale):
-    """The handle primitive, long axis along +x in the authored frame."""
-    if len(handle_scale) == 3:
-        return _box_part(handle_scale, (0.0, 0.0, 0.0), (0.0, 0.0, 0.0))
-    height, diameter = handle_scale
-    return _cylinder_part(height, diameter / 2, (0.0, 0.0, 0.0), _CYL_ALONG_X)
-
-
-def _head_part(head_scale: Scale, handle_scale: Scale):
-    """The head primitive, attached beyond the +x end of the handle."""
-    if len(head_scale) == 3:
-        x_offset = handle_scale[0] / 2 + head_scale[0] / 2
-        return _box_part(head_scale, (x_offset, 0.0, 0.0), (0.0, 0.0, 0.0))
-    height, diameter = head_scale
+def _cylinder_urdf_constant_density(
+    path: Path, height: float, diameter: float, density: float
+) -> Path:
     radius = diameter / 2
-    x_offset = handle_scale[0] / 2 + radius
-    return _cylinder_part(height, radius, (x_offset, 0.0, 0.0), _CYL_ALONG_Y)
+    # Same fix as the cuboid branch — emit explicit <mass> + <inertia> so
+    # Isaac Sim's URDF importer doesn't fall back to a default 1 kg mass.
+    # The geometry is rotated by rpy="0 -π/2 0" so the cylinder's length axis
+    # aligns with link x. _compute_mass_and_inertia returns inertia in the
+    # geometry-local frame (axis = z); we apply the same rpy on the inertial
+    # origin so the values stay correct after rotation.
+    m, ixx, iyy, izz = _compute_mass_and_inertia((height, diameter), density)
+    urdf = f"""<?xml version="1.0"?>
+<robot name="cylinder">
+  <link name="{_OBJECT_ROOT_LINK}">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -1.5707963267948966 0"/>
+      <geometry><cylinder length="{height}" radius="{radius}"/></geometry>
+      <material name="brown"><color rgba="0.55 0.27 0.07 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 -1.5707963267948966 0"/>
+      <geometry><cylinder length="{height}" radius="{radius}"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 -1.5707963267948966 0"/>
+      <mass value="{m}"/>
+      <inertia ixx="{ixx}" iyy="{iyy}" izz="{izz}" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+</robot>
+"""
+    path.write_text(urdf)
+    return path
 
 
-def _part_mesh(part) -> trimesh.Trimesh:
-    mesh = part["mesh"].copy()
-    mesh.apply_transform(_pose(part["xyz"], part["rpy"]))
-    return mesh
-
-
-def _pose(xyz, rpy) -> np.ndarray:
-    m = trimesh.transformations.euler_matrix(rpy[0], rpy[1], rpy[2], axes="sxyz")
-    m[:3, 3] = xyz
-    return m
+def generate_handle_urdf(
+    path: Path, handle_scale: Scale, handle_density: float = 400.0
+) -> Path:
+    """Emit a URDF for a single cuboid (len(scale)==3) or cylinder (len(scale)==2) handle."""
+    if len(handle_scale) == 3:
+        return _cuboid_urdf_constant_density(path, handle_scale, handle_density)
+    if len(handle_scale) == 2:
+        return _cylinder_urdf_constant_density(
+            path, handle_scale[0], handle_scale[1], handle_density
+        )
+    raise ValueError(f"Invalid handle_scale: {handle_scale}")
 
 
 # ----------------------------------------------------------------------------
-# Mass and inertia
+# Handle + head composite (variable density, single-link, with adjusted inertia)
 # ----------------------------------------------------------------------------
 
 
@@ -149,96 +163,60 @@ def _compute_mass_and_inertia(scale: Scale, density: float):
     raise ValueError(f"Invalid scale: {scale}")
 
 
-def _authored_frame_inertia(scale: Scale, density: float):
-    """Mass and diagonal inertia expressed in the authored frame, x along the part."""
-    if len(scale) == 3:
-        return _compute_mass_and_inertia(scale, density)
-    # Cylinder is modelled axis-along-z then rotated to +x, so ixx and izz swap.
-    m, izz, iyy, ixx = _compute_mass_and_inertia(scale, density)
-    return m, ixx, iyy, izz
-
-
-# ----------------------------------------------------------------------------
-# URDF emission, in the object's own box frame
-# ----------------------------------------------------------------------------
-
-
-def _write_urdf(path: Path, name: str, parts, mass, inertia, inertial_xyz, inertial_rpy):
-    """Emit the URDF in the object's own box frame. Returns (path, box extents)."""
-    mesh = trimesh.util.concatenate([_part_mesh(p) for p in parts])
-    extents, box_in_mesh = oriented_box(mesh)
-    mesh_in_box = np.linalg.inv(box_in_mesh)
-
-    bodies = []
-    materials = ('<material name="brown"><color rgba="0.55 0.27 0.07 1.0"/></material>',
-                 '<material name="gray"><color rgba="0.5 0.5 0.5 1.0"/></material>')
-    for i, part in enumerate(parts):
-        xyz, rpy = reexpress_origin(mesh_in_box, part["xyz"], part["rpy"])
-        origin = f'<origin xyz="{xyz[0]} {xyz[1]} {xyz[2]}" rpy="{rpy[0]} {rpy[1]} {rpy[2]}"/>'
-        bodies.append(
-            f"    <visual>\n      {origin}\n      {part['geometry']}\n"
-            f"      {materials[min(i, 1)]}\n    </visual>\n"
-            f"    <collision>\n      {origin}\n      {part['geometry']}\n    </collision>"
-        )
-
-    ixyz, irpy = reexpress_origin(mesh_in_box, inertial_xyz, inertial_rpy)
-    ixx, iyy, izz = inertia
-    body_xml = "\n".join(bodies)
-    urdf = f"""<?xml version="1.0"?>
-<robot name="{name}">
-  <link name="{_OBJECT_ROOT_LINK}">
-{body_xml}
-    <inertial>
-      <origin xyz="{ixyz[0]} {ixyz[1]} {ixyz[2]}" rpy="{irpy[0]} {irpy[1]} {irpy[2]}"/>
-      <mass value="{mass}"/>
-      <inertia ixx="{ixx}" iyy="{iyy}" izz="{izz}" ixy="0" ixz="0" iyz="0"/>
-    </inertial>
-  </link>
-</robot>
-"""
-    path.write_text(urdf)
-    return path, extents
-
-
-def _handle_urdf(path: Path, handle_scale: Scale, handle_density: float):
-    """Emit a single-primitive object. Returns (path, box extents)."""
-    part = _handle_part(handle_scale)
-    # Standard URDF requires <mass> + <inertia>. Legacy isaacgym's URDF importer
-    # accepts <density> as a Gazebo extension and back-computes mass from
-    # density x volume; Isaac Sim's importer follows strict URDF spec and falls
-    # back to 1 kg when <mass> is missing, which breaks erasers and any other
-    # handle-only type.
-    mass, ixx, iyy, izz = _authored_frame_inertia(handle_scale, handle_density)
-    name = "cuboid" if len(handle_scale) == 3 else "cylinder"
-    return _write_urdf(
-        path, name, [part], mass, (ixx, iyy, izz), (0.0, 0.0, 0.0), (0.0, 0.0, 0.0)
-    )
-
-
-def _handle_head_urdf(
+def _handle_head_urdf_variable_density(
     path: Path,
     handle_scale: Scale,
     head_scale: Scale,
     handle_density: float,
     head_density: float,
-):
-    handle = _handle_part(handle_scale)
-    head = _head_part(head_scale, handle_scale)
+) -> Path:
+    # Handle geometry + inertia (axis along +x; for cylinders we rotate -pi/2 about y).
+    if len(handle_scale) == 3:
+        lx, ly, lz = handle_scale
+        handle_geom = (
+            f'<origin xyz="0 0 0" rpy="0 0 0"/>\n'
+            f'        <geometry><box size="{lx} {ly} {lz}"/></geometry>'
+        )
+        handle_mass, handle_ixx, handle_iyy, handle_izz = _compute_mass_and_inertia(
+            handle_scale, handle_density
+        )
+    else:
+        h, d = handle_scale
+        r = d / 2
+        handle_geom = (
+            f'<origin xyz="0 0 0" rpy="0 -1.5707963267948966 0"/>\n'
+            f'        <geometry><cylinder length="{h}" radius="{r}"/></geometry>'
+        )
+        # Rotated so handle axis is along +x; flip ixx ↔ izz.
+        handle_mass, handle_izz, handle_iyy, handle_ixx = _compute_mass_and_inertia(
+            handle_scale, handle_density
+        )
 
-    handle_mass, handle_ixx, handle_iyy, handle_izz = _authored_frame_inertia(
-        handle_scale, handle_density
-    )
-    head_mass, head_ixx, head_iyy, head_izz = _authored_frame_inertia(
-        head_scale, head_density
-    )
-    if len(head_scale) == 2:
-        # Head cylinder lies along +y rather than +x, so its axis inertia is iyy.
+    # Head geometry + inertia.
+    if len(head_scale) == 3:
+        hlx, hly, hlz = head_scale
+        x_offset = handle_scale[0] / 2 + hlx / 2
+        head_geom = (
+            f'<origin xyz="{x_offset} 0 0" rpy="0 0 0"/>\n'
+            f'        <geometry><box size="{hlx} {hly} {hlz}"/></geometry>'
+        )
+        head_mass, head_ixx, head_iyy, head_izz = _compute_mass_and_inertia(
+            head_scale, head_density
+        )
+    else:
+        hh, hd = head_scale
+        hr = hd / 2
+        x_offset = handle_scale[0] / 2 + hr
+        head_geom = (
+            f'<origin xyz="{x_offset} 0 0" rpy="-1.5707963267948966 0 0"/>\n'
+            f'        <geometry><cylinder length="{hh}" radius="{hr}"/></geometry>'
+        )
+        # Rotated so head axis is along +y; flip iyy ↔ izz.
         head_mass, head_ixx, head_izz, head_iyy = _compute_mass_and_inertia(
             head_scale, head_density
         )
 
     # Parallel-axis shift to composite COM (handle at origin, head at +x_offset).
-    x_offset = head["xyz"][0]
     total_mass = handle_mass + head_mass
     com_x = (handle_mass * 0.0 + head_mass * x_offset) / total_mass
     d_handle = -com_x
@@ -252,37 +230,33 @@ def _handle_head_urdf(
         head_izz + head_mass * d_head * d_head
     )
 
-    return _write_urdf(
-        path, "handle_head", [handle, head], total_mass, (ixx, iyy, izz),
-        (com_x, 0.0, 0.0), (0.0, 0.0, 0.0),
-    )
-
-
-def _urdf_and_extents(
-    path: Path,
-    handle_scale: Scale,
-    head_scale: Optional[Scale],
-    handle_density: float,
-    head_density: Optional[float],
-):
-    """Emit one object and return (path, its own box extents in metres)."""
-    if head_scale is None and head_density is None:
-        return _handle_urdf(path, handle_scale, handle_density)
-    if head_scale is not None and head_density is not None:
-        return _handle_head_urdf(
-            path, handle_scale, head_scale, handle_density, head_density
-        )
-    raise ValueError(
-        f"head_scale and head_density must both be set or both None (got "
-        f"{head_scale} and {head_density})"
-    )
-
-
-def generate_handle_urdf(
-    path: Path, handle_scale: Scale, handle_density: float = 400.0
-) -> Path:
-    """Emit a URDF for a single cuboid (len(scale)==3) or cylinder (len(scale)==2) handle."""
-    return _handle_urdf(path, handle_scale, handle_density)[0]
+    urdf = f"""<?xml version="1.0"?>
+<robot name="handle_head">
+  <link name="{_OBJECT_ROOT_LINK}">
+    <visual>
+      {handle_geom}
+      <material name="brown"><color rgba="0.55 0.27 0.07 1.0"/></material>
+    </visual>
+    <collision>
+      {handle_geom}
+    </collision>
+    <visual>
+      {head_geom}
+      <material name="gray"><color rgba="0.5 0.5 0.5 1.0"/></material>
+    </visual>
+    <collision>
+      {head_geom}
+    </collision>
+    <inertial>
+      <origin xyz="{com_x} 0 0" rpy="0 0 0"/>
+      <mass value="{total_mass}"/>
+      <inertia ixx="{ixx}" iyy="{iyy}" izz="{izz}" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+</robot>
+"""
+    path.write_text(urdf)
+    return path
 
 
 def generate_handle_head_urdf(
@@ -294,17 +268,35 @@ def generate_handle_head_urdf(
 ) -> Path:
     """Emit a URDF for a handle (no head) or a handle+head composite.
 
-    The composite is single-link with parallel-axis-adjusted inertia; the 2-link
-    variant was unstable per legacy env.py:1723-1724 and is not ported.
+    The handle-only branch matches legacy `generate_handle_urdf`; the composite
+    branch matches `generate_handle_head_urdf_variable_density` (single-link
+    with parallel-axis-adjusted inertia — the 2-link variant was unstable per
+    legacy env.py:1723-1724 and is not ported).
     """
-    return _urdf_and_extents(
-        path, handle_scale, head_scale, handle_density, head_density
-    )[0]
+    if head_scale is None and head_density is None:
+        return generate_handle_urdf(path, handle_scale, handle_density)
+    if head_scale is not None and head_density is not None:
+        return _handle_head_urdf_variable_density(
+            path, handle_scale, head_scale, handle_density, head_density
+        )
+    raise ValueError(
+        f"head_scale and head_density must both be set or both None (got "
+        f"{head_scale} and {head_density})"
+    )
 
 
 # ----------------------------------------------------------------------------
 # Top-level: generate a pool of N×types URDFs for the env
 # ----------------------------------------------------------------------------
+
+
+def _scale_to_3d(scale: np.ndarray) -> tuple[float, float, float]:
+    """Convert cylinder (h, d) → (h, d, d) so all returned scales are 3-tuples."""
+    if len(scale) == 3:
+        return (float(scale[0]), float(scale[1]), float(scale[2]))
+    if len(scale) == 2:
+        return (float(scale[0]), float(scale[1]), float(scale[1]))
+    raise ValueError(f"Invalid scale shape: {scale.shape}")
 
 
 def generate_handle_head_urdfs(
@@ -322,9 +314,8 @@ def generate_handle_head_urdfs(
       1. Seed NumPy with ``seed`` (deterministic pool per run).
       2. For each matching ``ObjectSizeDistribution``, sample ``num_per_type``
          (handle_scale, head_scale, handle_density, head_density) tuples.
-      3. Emit one URDF per sample, each in that object's own bounding-box frame;
-         return file paths paired with the box extents normalized by
-         ``object_base_size``.
+      3. Emit one URDF per sample; return file paths paired with object scales
+         normalized by ``object_base_size``.
       4. Shuffle (paths, scales) in lockstep so env ``i`` gets pool entry
          ``i % len(pool)`` with uniform coverage over types.
 
@@ -333,9 +324,8 @@ def generate_handle_head_urdfs(
     urdf_paths : list[str]
         Absolute paths to generated URDFs. Length = ``num_per_type × len(matching types)``.
     object_scales_normalized : list[tuple[float, float, float]]
-        Per-pool-entry box extents, normalized by ``object_base_size``. The
-        policy reads these as the object descriptor and the reward measures
-        against the corners they define.
+        Per-pool-entry 3-tuple scales, normalized by ``object_base_size`` (reward
+        math uses these directly; see env.py:1814-1821).
     """
     out_dir = Path(out_dir)
     if out_dir.exists():
@@ -356,7 +346,7 @@ def generate_handle_head_urdfs(
         )
 
     paths: list[str] = []
-    extents_m: list[np.ndarray] = []
+    scales_raw: list[tuple[float, ...]] = []
     for dist in matching:
         # Sample order MUST match legacy env.py:1758-1772 (densities first,
         # scales second) — the two pools share seed=42 so first-asset URDFs
@@ -378,19 +368,22 @@ def generate_handle_head_urdfs(
                 .replace(".", "-")
                 + ".urdf"
             )
-            urdf_path, extents = _urdf_and_extents(
-                path=out_dir / fname,
+            urdf_path = out_dir / fname
+            generate_handle_head_urdf(
+                path=urdf_path,
                 handle_scale=h_scale,
                 head_scale=head,
                 handle_density=h_d,
                 head_density=head_d,
             )
             paths.append(str(urdf_path))
-            extents_m.append(extents)
+            scales_raw.append(h_scale)
 
+    # Convert to 3-tuples and normalize by object_base_size (matches env.py:1814-1821).
+    scales_3d = [_scale_to_3d(np.asarray(s)) for s in scales_raw]
     scales_norm = [
-        (float(e[0] / object_base_size), float(e[1] / object_base_size), float(e[2] / object_base_size))
-        for e in extents_m
+        (x / object_base_size, y / object_base_size, z / object_base_size)
+        for (x, y, z) in scales_3d
     ]
 
     # Shuffle (paths, scales) in lockstep so the per-type ordering doesn't bias

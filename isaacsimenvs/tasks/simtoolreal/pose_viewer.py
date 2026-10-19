@@ -7,9 +7,7 @@ Three.js/URDF HTML viewer that can be opened locally or logged to WandB.
 
 from __future__ import annotations
 
-import base64
 import random
-import struct
 import time
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -18,6 +16,8 @@ from typing import Any
 from urllib.parse import quote
 
 import gymnasium as gym
+import base64
+
 import numpy as np
 
 from isaacsimenvs.utils.interactive_viewer import create_html, make_embedded_robot, make_url_robot
@@ -79,55 +79,53 @@ def _raw_url_for_repo_path(path: Path, raw_base: str) -> str | None:
     return raw_base + quote(rel.as_posix(), safe="/")
 
 
-def _obj_to_stl_data_uri(obj_path: Path) -> str:
-    """Convert a triangulated OBJ into a binary-STL data URI.
+def _inline_mtl(mtl_path: Path) -> str | None:
+    """Inline a material file and its texture maps as one data URI."""
+    if not mtl_path.is_file():
+        return None
+    lines = []
+    for line in mtl_path.read_text(encoding="utf-8", errors="replace").splitlines():
+        parts = line.split()
+        if parts and parts[0].startswith("map_"):
+            image = (mtl_path.parent / parts[-1]).resolve()
+            if image.is_file():
+                mime = "image/jpeg" if image.suffix.lower() in (".jpg", ".jpeg") else "image/png"
+                data = base64.b64encode(image.read_bytes()).decode("ascii")
+                line = " ".join(parts[:-1] + [f"data:{mime};base64,{data}"])
+        lines.append(line)
+    blob = ("\n".join(lines) + "\n").encode("utf-8")
+    return "data:text/plain;base64," + base64.b64encode(blob).decode("ascii")
 
-    The viewer template's OBJ branch derives a base URL from the mesh URL, which
-    throws on data URIs, while its STL branch loads them and recomputes normals.
-    The trailing #ext=.stl is the template's format hint for an extension-less
-    URL. Fan triangulation is exact for convex CoACD pieces.
+
+def _mesh_data_uri(mesh_path: Path) -> str | None:
+    """Inline a mesh as a data URI so the browser needs no network fetch.
+
+    The assembly objects live only in the working tree, so the raw base has nothing to serve and the
+    object and its goal ghost draw as nothing. An OBJ carries its material file and texture inline
+    too, so the object keeps its texture. The #ext= suffix is the template's own convention for
+    naming a format the path cannot carry.
     """
-    vertices: list[list[float]] = []
-    faces: list[tuple[int, int, int]] = []
-    with open(obj_path, "r", encoding="utf-8") as handle:
-        for line in handle:
+    if not mesh_path.is_file():
+        return None
+    suffix = mesh_path.suffix.lower()
+    if suffix == ".obj":
+        lines = []
+        for line in mesh_path.read_text(encoding="utf-8", errors="replace").splitlines():
             parts = line.split()
-            if not parts:
-                continue
-            if parts[0] == "v":
-                vertices.append([float(parts[1]), float(parts[2]), float(parts[3])])
-            elif parts[0] == "f":
-                idx = [int(tok.split("/")[0]) for tok in parts[1:]]
-                assert all(i > 0 for i in idx), f"negative OBJ indices in {obj_path}"
-                for k in range(1, len(idx) - 1):
-                    faces.append((idx[0] - 1, idx[k] - 1, idx[k + 1] - 1))
-    assert vertices and faces, f"no geometry parsed from {obj_path}"
-
-    verts = np.asarray(vertices, dtype="<f4")
-    blob = bytearray(struct.pack("<80xI", len(faces)))
-    zero_normal = struct.pack("<3f", 0.0, 0.0, 0.0)
-    for a, b, c in faces:
-        blob += zero_normal
-        blob += verts[a].tobytes() + verts[b].tobytes() + verts[c].tobytes()
-        blob += b"\x00\x00"
-    return "data:model/stl;base64," + base64.b64encode(bytes(blob)).decode("ascii") + "#ext=.stl"
-
-
-def _strip_materials(urdf_text: str) -> str:
-    """Replace every <material> with the goal green.
-
-    urdf-loader assigns the URDF material to an STL mesh after loadMeshCb returns, which overwrote
-    the viewer's colour_override and left the goal grey. A material the URDF itself carries survives.
-    """
-    root = ET.fromstring(urdf_text)
-    for parent in root.iter():
-        for child in list(parent):
-            if child.tag == "material":
-                parent.remove(child)
-    for visual in root.iter("visual"):
-        material = ET.SubElement(visual, "material", name="goal_green")
-        ET.SubElement(material, "color", rgba="0.20 0.72 0.31 1.0")
-    return ET.tostring(root, encoding="unicode")
+            if parts and parts[0] == "mtllib":
+                uri = _inline_mtl((mesh_path.parent / parts[-1]).resolve())
+                if uri is None:
+                    continue
+                line = f"mtllib {uri}"
+            lines.append(line)
+        blob = ("\n".join(lines) + "\n").encode("utf-8")
+        mime, ext = "model/obj", ".obj"
+    elif suffix == ".stl":
+        blob = mesh_path.read_bytes()
+        mime, ext = "model/stl", ".stl"
+    else:
+        return None
+    return f"data:{mime};base64," + base64.b64encode(blob).decode("ascii") + f"#ext={ext}"
 
 
 def _rewrite_embedded_urdf_mesh_urls(
@@ -135,6 +133,7 @@ def _rewrite_embedded_urdf_mesh_urls(
     *,
     source_urdf_path: Path,
     raw_base: str,
+    inline_meshes: bool = False,
 ) -> str:
     """Make relative mesh filenames loadable from a standalone HTML document."""
 
@@ -143,9 +142,14 @@ def _rewrite_embedded_urdf_mesh_urls(
     except ET.ParseError:
         return urdf_text
 
+    # The viewer draws visual geometry only, and these assets name the same files under both
+    # <visual> and <collision>, so inlining every match would carry each mesh twice.
+    visual_meshes = {id(m) for v in root.iter("visual") for m in v.iter("mesh")}
+
     changed = False
-    _embed_cache: dict[Path, str] = {}
     for mesh_elem in root.findall(".//mesh"):
+        if inline_meshes and id(mesh_elem) not in visual_meshes:
+            continue
         filename = mesh_elem.get("filename")
         if not filename:
             continue
@@ -164,16 +168,11 @@ def _rewrite_embedded_urdf_mesh_urls(
             else:
                 mesh_path = source_urdf_path.parent / filename
 
-        mesh_url = _raw_url_for_repo_path(mesh_path, raw_base)
+        mesh_url = _mesh_data_uri(mesh_path) if inline_meshes else None
         if mesh_url is None:
-            # Outside the repo, so no public URL exists. Inline it instead of
-            # leaving a filesystem path no browser can fetch.
-            if mesh_path.suffix.lower() != ".obj" or not mesh_path.exists():
-                continue
-            mesh_url = _embed_cache.get(mesh_path)
-            if mesh_url is None:
-                mesh_url = _obj_to_stl_data_uri(mesh_path)
-                _embed_cache[mesh_path] = mesh_url
+            mesh_url = _raw_url_for_repo_path(mesh_path, raw_base)
+        if mesh_url is None:
+            continue
         mesh_elem.set("filename", mesh_url)
         changed = True
 
@@ -225,22 +224,15 @@ def hole_urdf_for_env(env, env_id: int) -> tuple[str, Path] | tuple[None, None]:
     hole_paths = getattr(env, "_hole_urdf_paths", None)
     if not hole_paths:
         return None, None
-    urdf_path = Path(hole_paths[env_id % len(hole_paths)])
+    # Co-trained problems hand out fixtures round robin over the prims the cloner discovered, so
+    # the env's index is the one recorded at spawn, not its env id.
+    asset_indices = getattr(env, "_problem_index_per_env", None)
+    if len(hole_paths) > 1 and asset_indices is not None:
+        index = int(asset_indices[env_id].detach().cpu().item())
+    else:
+        index = env_id % len(hole_paths)
+    urdf_path = Path(hole_paths[index])
     return urdf_path.read_text(encoding="utf-8"), urdf_path
-
-
-FINGERTIP_GOAL_COLORS = {
-    "thumb_rota_link2": (0.90, 0.13, 0.13),
-    "index_rota_link2": (0.13, 0.75, 0.24),
-    "mid_link2": (0.16, 0.42, 0.90),
-    "ring_link2": (0.16, 0.42, 0.90),
-    "pinky_link2": (0.16, 0.42, 0.90),
-}
-
-_TIP_URDF = (
-    '<robot name="{name}"><link name="tip"><visual><geometry>'
-    '<sphere radius="0.010"/></geometry></visual></link></robot>'
-)
 
 
 def capture_pose_viewer_frame(env, env_id: int) -> dict[str, Any]:
@@ -276,10 +268,6 @@ def capture_pose_viewer_frame(env, env_id: int) -> dict[str, Any]:
     if hole is not None:
         hole_pos = hole.data.root_pos_w[env_id] - origin
         frame["hole_pose"] = _pose_xyzw(hole_pos, hole.data.root_quat_w[env_id])
-    # The fingertip half of the goal, already in the env frame.
-    if hasattr(env, "_goal_ft"):
-        frame["fingertip_goal_names"] = list(env._fingertip_body_names)
-        frame["fingertip_goal_pos"] = _to_numpy(env._goal_ft[env_id])
     return frame
 
 
@@ -317,6 +305,7 @@ def build_pose_viewer_html(
             object_urdf_text,
             source_urdf_path=object_urdf_path,
             raw_base=raw_base,
+            inline_meshes=True,
         )
     if table_urdf_path is not None:
         table_urdf_text = _rewrite_embedded_urdf_mesh_urls(
@@ -329,6 +318,7 @@ def build_pose_viewer_html(
             hole_urdf_text,
             source_urdf_path=hole_urdf_path,
             raw_base=raw_base,
+            inline_meshes=True,
         )
 
     timestamps = np.arange(len(frames), dtype=np.float32) / 60.0
@@ -338,7 +328,7 @@ def build_pose_viewer_html(
         make_embedded_robot(name="object", urdf_text=object_urdf_text),
         make_embedded_robot(
             name="goal",
-            urdf_text=_strip_materials(object_urdf_text),
+            urdf_text=object_urdf_text,
             color_override=(0.20, 0.72, 0.31),
         ),
     ]
@@ -347,21 +337,6 @@ def build_pose_viewer_html(
         "object": np.stack([frame["object_pose"] for frame in frames]),
         "goal": np.stack([frame["goal_pose"] for frame in frames]),
     }
-    if all("fingertip_goal_pos" in frame for frame in frames):
-        for i, body in enumerate(frames[0]["fingertip_goal_names"]):
-            name = f"tip_{body}"
-            robots.append(
-                make_embedded_robot(
-                    name=name,
-                    urdf_text=_TIP_URDF.format(name=name),
-                    color_override=FINGERTIP_GOAL_COLORS[body],
-                )
-            )
-            pos = np.stack([frame["fingertip_goal_pos"][i] for frame in frames])
-            pose = np.zeros((len(frames), 7), dtype=np.float32)
-            pose[:, 0:3] = pos
-            pose[:, 6] = 1.0
-            object_poses[name] = pose
     if hole_urdf_text is not None and all("hole_pose" in frame for frame in frames):
         robots.insert(2, make_embedded_robot(name="hole", urdf_text=hole_urdf_text))
         object_poses["hole"] = np.stack([frame["hole_pose"] for frame in frames])
@@ -447,8 +422,13 @@ class SimToolRealPoseViewerWrapper(gym.Wrapper):
         result = self.env.step(action)
         self._step += 1
 
-        if self._frames is None and self.capture_interval > 0 and self._step % self.capture_interval == 0:
-            self._bind_env(self._env_rng.randrange(self.env.unwrapped.num_envs))
+        inner = self.env.unwrapped
+        if (
+            self._frames is None
+            and self.capture_interval > 0
+            and self._step % self.capture_interval == 0
+        ):
+            self._bind_env(self._env_rng.randrange(inner.num_envs))
             self._frames = []
             self._depth_frames = []
             self._depth_frames_clean = []

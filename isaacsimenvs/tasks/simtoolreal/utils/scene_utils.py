@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import os
-import json
 import math
 import shutil
 import tempfile
@@ -12,7 +10,6 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
 
-import numpy as np
 import torch
 import torch.nn.functional as F
 
@@ -26,7 +23,6 @@ from isaaclab.sim.spawners.wrappers import MultiUsdFileCfg
 from isaaclab.sim.utils import find_matching_prim_paths, get_current_stage
 
 from .generate_objects import generate_handle_head_urdfs
-from .obs_utils import OBS_FIELD_SIZES
 
 
 _CONTACT_OFFSET = 0.002
@@ -48,7 +44,7 @@ _PHYSICS_SPECS: dict[str, tuple[str, str, str]] = {
 
 
 def build_robot_articulation_usd_cfg(
-    usd_path: str, robot, *, start_arm_higher: bool = False, contact_sensors: bool = False
+    usd_path: str, robot, *, start_arm_higher: bool = False
 ) -> ArticulationCfg:
     arm_default = dict(robot.arm_default_pos)
     if start_arm_higher:
@@ -58,7 +54,7 @@ def build_robot_articulation_usd_cfg(
         arm_default[arm_names[3]] += math.radians(10.0)
     return ArticulationCfg(
         prim_path="/World/envs/env_.*/Robot",
-        spawn=UsdFileCfg(usd_path=usd_path, activate_contact_sensors=contact_sensors),
+        spawn=UsdFileCfg(usd_path=usd_path),
         init_state=ArticulationCfg.InitialStateCfg(
             pos=(0.0, 0.48, 0.53),
             rot=tuple(float(x) for x in robot.base_quat_wxyz),
@@ -81,9 +77,6 @@ def build_robot_articulation_usd_cfg(
                 stiffness=robot.hand_stiffness,
                 damping=robot.hand_damping,
                 armature=robot.hand_armature,
-                friction=robot.hand_friction,
-                dynamic_friction=robot.hand_dynamic_friction,
-                effort_limit_sim=robot.hand_effort_limit,
             ),
         },
     )
@@ -1297,6 +1290,13 @@ def _generate_scaled_table_urdfs(
             f"table URDF {base_urdf_path!r} has no <box size=\"...\"/> element; "
             "scaling helper only supports the simple single-box table."
         )
+    sizes = set(re.findall(r'<box\s+size="([\d.\-+eE\s]+)"\s*/>', base_text))
+    if len(sizes) != 1:
+        raise ValueError(
+            f"table URDF {base_urdf_path!r} has {len(sizes)} distinct <box size> values. "
+            "The scaler rewrites every box to one size and never touches <origin>, so it "
+            "would resize the parts of a multi-part table onto each other."
+        )
     base_dims = tuple(float(v) for v in match.group(1).split())
     if len(base_dims) != 3:
         raise ValueError(
@@ -1332,13 +1332,6 @@ def _convert_urdf_to_usd(
     replace_cylinders_with_capsules: bool = False,
     joint_drive=None,
 ) -> str:
-    # A converted asset that is already on disk is reused as is. The converter
-    # names its output <work dir>/<stem>/<stem>.usd, so the path is predictable
-    # without running it.
-    cached = Path(usd_work_dir) / Path(asset_path).stem / f"{Path(asset_path).stem}.usd"
-    if cached.exists():
-        return str(cached)
-
     converter_asset_path = _prepare_urdf_for_isaacsim(asset_path, usd_work_dir)
     cfg_kwargs = dict(
         asset_path=converter_asset_path,
@@ -1395,8 +1388,6 @@ def _bake_usd(
 
     raw = Path(raw_usd_path)
     baked_usd_path = bake_root / baked_subdir / raw.parent.name / raw.name
-    if baked_usd_path.exists():
-        return str(baked_usd_path)
     baked_usd_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(raw, baked_usd_path)
     for child in raw.parent.iterdir():
@@ -1456,6 +1447,14 @@ def _bake_usd(
 # ----------------------------------------------------------------------------
 # Runtime material setup (post-launch, via PhysX views)
 # ----------------------------------------------------------------------------
+
+def build_tactile_clouds(env) -> None:
+    """Taxel clouds, only when a tactile field is actually configured."""
+    if "contact_center" in env.cfg.obs.obs_list or "contact_center" in env.cfg.obs.state_list:
+        from . import tactile_utils
+
+        tactile_utils.build_object_clouds(env, env._object_urdf_paths)
+
 
 def apply_physx_material_properties(env) -> None:
     """Set contact materials through PhysX tensor views.
@@ -1569,16 +1568,6 @@ def _build_object_scale_tensor(env, object_scales_normalized, num_object_usds: i
         env._object_asset_index_per_env[env_id] = asset_index
 
 
-def _build_shape_code_tensor(env) -> None:
-    with np.load(env.cfg.assets.shape_code_file) as f:
-        row = {str(n): i for i, n in enumerate(f["names"])}
-        code = f["code"][[row[Path(p).stem] for p in env._object_urdf_paths]]
-    assert code.shape[1] == OBS_FIELD_SIZES["shape_code"], code.shape
-    env._shape_code_per_env = torch.as_tensor(code, device=env.device, dtype=torch.float32)[
-        env._object_asset_index_per_env
-    ]
-
-
 def setup_scene(env) -> None:
     """Build and register robot, table, object, goal, ground, and light."""
     assets_cfg = env.cfg.assets
@@ -1591,22 +1580,8 @@ def setup_scene(env) -> None:
 
     # 1. Resolve the object pool: a single named URDF (DexToolBench eval) or
     #    procedural URDFs generated in a per-launch temp dir.
-    if assets_cfg.asset_cache_dir:
-        env._tmp_asset_dir = str(Path(assets_cfg.asset_cache_dir))
-        os.makedirs(env._tmp_asset_dir, exist_ok=True)
-    else:
-        env._tmp_asset_dir = tempfile.mkdtemp(prefix="simtoolreal_assets_")
-    if assets_cfg.object_pool_dir:
-        pool_file = Path(assets_cfg.object_pool_dir) / "pool.json"
-        if not pool_file.exists():
-            raise FileNotFoundError(f"no pool.json in {assets_cfg.object_pool_dir}")
-        pool = json.loads(pool_file.read_text())
-        urdf_paths = [Path(entry["urdf"]) for entry in pool]
-        missing = [str(p) for p in urdf_paths if not p.exists()]
-        if missing:
-            raise FileNotFoundError(f"staged urdfs not found: {missing[:3]}")
-        object_scales_normalized = [tuple(entry["scale"]) for entry in pool]
-    elif assets_cfg.object_urdf:
+    env._tmp_asset_dir = tempfile.mkdtemp(prefix="simtoolreal_assets_")
+    if assets_cfg.object_urdf:
         if assets_cfg.object_scale is None:
             raise ValueError(
                 "cfg.assets.object_scale must be set when object_urdf is given "
@@ -1736,7 +1711,6 @@ def setup_scene(env) -> None:
         robot_usd_path,
         env.cfg.robot,
         start_arm_higher=getattr(env.cfg.reset, "start_arm_higher", False),
-        contact_sensors=bool(env.cfg.reset.reset_state_dir),
     ))
     env.table = RigidObject(build_rigid_object_cfg("/World/envs/env_.*/Table", table_usd_paths))
     env.object = RigidObject(build_rigid_object_cfg("/World/envs/env_.*/Object", object_usd_paths))
@@ -1750,25 +1724,9 @@ def setup_scene(env) -> None:
 
     # 6. Per-env scale tensor for spawned Objects.
     _build_object_scale_tensor(env, object_scales_normalized, len(object_usd_paths))
-    if assets_cfg.shape_code_file:
-        _build_shape_code_tensor(env)
 
     # 7. Register with scene so DirectRLEnv refreshes their tensors each step.
     env.scene.articulations["robot"] = env.robot
-    if env.cfg.reset.reset_state_dir:
-        from isaaclab.sensors import ContactSensor, ContactSensorCfg
-
-        # One sensor per hand body, because PhysX resolves an object filter only for a sensor pattern
-        # that matches a single body per env.
-        hand = find_matching_prim_paths("/World/envs/env_0/Robot/(fr3_link7|thumb_.*|index_.*|mid_.*|ring_.*|pinky_.*)")
-        env.hand_contacts = []
-        for body in (p.rsplit("/", 1)[-1] for p in hand):
-            sensor = ContactSensor(ContactSensorCfg(
-                prim_path=f"/World/envs/env_.*/Robot/{body}",
-                filter_prim_paths_expr=["/World/envs/env_.*/Object/object_root"],
-            ))
-            env.scene.sensors[f"hand_contact_{body}"] = sensor
-            env.hand_contacts.append(sensor)
     env.scene.rigid_objects["table"] = env.table
     env.scene.rigid_objects["object"] = env.object
     env.scene.rigid_objects["goal_viz"] = env.goal_viz

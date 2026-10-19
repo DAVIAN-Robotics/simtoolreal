@@ -91,8 +91,6 @@ def main() -> None:
     parser.add_argument("--wandb_group", default="")
     parser.add_argument("--wandb_entity", default="")
     parser.add_argument("--wandb_name", default="", help="Defaults to agent_cfg.params.config.name")
-    parser.add_argument("--eigendexplore_basis", default="",
-                        help="Hand basis npz; when set, exploration is EigenDEXplore with that basis")
     parser.add_argument("--wandb_tags", nargs="*", default=[])
     parser.add_argument("--wandb_notes", default="")
     parser.add_argument("--wandb_logcode_dir", default="")
@@ -146,12 +144,6 @@ def main() -> None:
             cfg=env_cfg,
             render_mode="rgb_array" if args_cli.capture_video else None,
         )
-
-        if args_cli.eigendexplore_basis:
-            from eigendexplore.rl_games import configure
-            from isaacsimenvs.utils.eigendexplore_utils import eigendexplore_settings
-
-            configure(agent_cfg["params"], eigendexplore_settings(env.unwrapped, args_cli.eigendexplore_basis))
 
         if args_cli.capture_video:
             from pathlib import Path

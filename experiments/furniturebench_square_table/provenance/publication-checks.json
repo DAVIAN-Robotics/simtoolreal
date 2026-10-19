@@ -1,0 +1,19 @@
+{
+  "source_files": 335,
+  "asset_files": 671,
+  "reset_rows": 636023,
+  "package_check": "passed",
+  "cpu_contact_loss": "passed",
+  "cpu_sgs": "passed",
+  "reach_geometry_frames": 28958,
+  "reach_geometry_dtypes": [
+    "float32",
+    "float64"
+  ],
+  "preparation_with_git": "passed",
+  "preparation_without_git": "passed",
+  "shell_syntax": "passed",
+  "fresh_gpu_smoke": "not_run_compute_unavailable",
+  "original_run_gpu_smoke_report": "original-rl_smoke.json",
+  "asset_whitespace": "Retained byte-for-byte from run assets; source/docs whitespace check passed."
+}
